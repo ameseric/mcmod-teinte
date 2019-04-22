@@ -1,0 +1,16 @@
+[
+{
+  "modid": "witherwar",
+  "name": "Wither War",
+  "description": "Fight the withering Rot.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["ExampleDude"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

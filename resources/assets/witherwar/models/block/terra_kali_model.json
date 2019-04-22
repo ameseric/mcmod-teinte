@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "down": "witherwar:blocks/anocortex",
+        "up": "witherwar:blocks/anocortex",
+        "north": "witherwar:blocks/anocortex",
+        "east": "witherwar:blocks/anocortex",
+        "south": "witherwar:blocks/anocortex",
+        "west": "witherwar:blocks/anocortex",
+        "particle": "blocks/obsidian"
+    }
+}

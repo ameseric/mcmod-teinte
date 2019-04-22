@@ -1,0 +1,211 @@
+
+
+Minecraft Goal: Survive
+1) Gather Stuff
+2) Use that Stuff to make surviving easier (better food / weapons / tools / structures)
+
+
+Problem (personal): Minecraft is too easy to survive, and turning up difficulty makes it annoying.
+Why? All it does is make enemies damage sponges and require more food.
+The default difficulty only aims at changing numbers - not the world. And the world of minecraft is, arguably,
+the only character worth caring about.
+
+Suggested tweaks:
+	1) New enemy patterns. The idea was to use Serpents to randomly attack players /in their homes/ and-
+	2) Change the world. Serpents continue to change the blocks around them into useless materials, and will continue to spread indefinitely,
+			making them a priority target.
+			
+		Detrimental world effects.
+			- Black Rain
+			- Noxious fogs
+
+
+
+
+
+
+HIGH
+	x	Mob Spawner (wither skels for now) - appears to be working, needs testing in terms of range.
+	x	World placment in main package (need thunderstorm code)
+	x	Mouth Block, item
+	x	reconfigure LSystem structure
+	x	multiple spawns per block
+	x	new Entity types for spawner (extend WSkeleton and Ghast, modify)
+	x	local terraforming as well?
+	x	Seperate custom Mob Spawner from Serpent for other blocks to use.	
+	x	Generic TileEntity with useful block search/manipulation features.
+	o	Cataromotus spawning, eating, leaving.
+		x	Maw branch generation - LSystem vs Targeted Search
+				ultimately, I think we want TSearch, but for now should probably just do LSystem...
+				2) why not both? LSystem down to non-air, then interrupt it and begin blockSearching neighbors.
+				1) or, could grab a block box, find a manufactured block, and calculate a path there, then neighborSearch.
+		o	Cataromotus structure
+	o	Fix Kalimmacinus branch generation block validation.
+	x	randomize symbol selection for terraform
+	o	Teralith generation/placement by Main.
+	
+
+		
+	
+MED
+	o	Custom Textures (recolors)
+	o	Add Sun Cap branch type for Kalimmacinus
+	o	increase terraform efficiency
+	o	discard FLESH after mind removal
+	o	generate branches during game?
+	o	generation settings (need more types, more tweaking, move axiom)
+	o	do we need to save TileEntity data upon breaking? I think we do for Kalimmacinus families....
+				depends whether we allow multiple types per species class, or multiple sub-classes per.
+	o	faster powered minecart?
+	
+	
+LOW
+	o	additional SKIN types	
+	o	randomized Teralith species?
+	o	void particles near Serpents? Definitely further down.
+	o	allow Teraliths to harvest and hold dropped items. Implies GUI needed for player to retrieve... or put them in a crate?
+	o	slime plants for harvesting slime balls
+		o	item Slimey Seeds
+			o	re-texture seeds
+			o	Item class
+		o	BlockStem class extension
+	
+
+
+Overall, might want to simplify each type and branch out more.
+So, Kali has terraforming and possibly solar. Maybe do just one.
+
+Wild / Basic?
+	Stationary, -acinus
+		General terraforming	Kalimmacinus
+		Water terraforming		???
+		Acid Rain				???
+		Positive biome change
+		Dungeon generator
+		Hole kraken?
+		
+	Moves, -motus (might divide into continuous and warp)
+		General harassment		Cataromotus
+		Observer (Air)?
+		Ore collector
+		Teralith predator
+			Medium
+			Large
+			
+			
+	Dimensional
+		"Mother" Teralith, floats in Void as Dimension.
+	
+	
+Unknown
+	Weather Cycle
+	Dimension leaper
+	Solar collection (also Kalimmacinus?)
+		A smaller solar type, more similar to an off-tree?
+	Teralith that feeds on items? Would need to look into block-item pickup.
+
+	
+	
+	
+	
+Modified / Created
+	Weather Control
+	Biome control
+	City-support (gigalith)
+	Needle-growth type.
+	
+	
+Don't know what to do with generic "grow" type, for bridges and towers.
+	
+	
+Might have positive/negatives not be divided by species, but by void corruption.
+
+
+
+
+
+
+Skins
+	Obsidian
+	Prismarine
+	Glass
+	Granite?
+	Quartz?
+	Ice? Melting issue.
+	
+	
+Goals
+	???
+	
+	
+Should entity spawns vary?
+
+NU, or NULL Direction, does not mean the end of the chain - just that we must pick a different direction.
+end of tree is purely based on the number of recursions.
+
+
+Per Serpent, or per Branch?
+Symbols
+	YP
+	YN
+	XP
+	XN
+	ZP
+	ZN
+	(S/S) weight ratio
+	NU
+	
+Axiom (standard)
+	YP(XP/XN/ZP/ZN/NU)YP
+	
+	
+Rules
+	YP -> YP(YP?XP?XN?ZP?ZN)
+	XP -> XP(YP/XP/NU)
+	XN -> XN(YP/XN/NU)
+	ZP -> ZP(YP/ZP/NU)
+	ZN -> ZN(YP/ZN/NU) 
+
+
+Y -> YABE
+YABE -> YABEAABBE
+
+TODO
+	CRIT
+	- Monster spawn
+	- mouth block / generation / goal
+
+	NONCRIT
+	- textures
+	- SKIN types
+	- FLESH block
+	- add solar cap?
+
+
+Name		YP
+BlockPos	(0,1,0)
+Action
+
+
+skin - any block that is not skin becomes skin (ignoring bone and flesh), following the pattern.
+		no reset
+flesh - any skin block without adj air and touching another flesh, following the skin pattern.
+		resets upon reaching any block that is not skin/flesh/bone.
+bone - any flesh block without adj skin and touching another bone, following the pattern.
+		resets upon reaching any block that is not flesh or bone.
+		
+		
+		
+			//BlockPos newPos = this.pos.add( 0 ,1 ,0);
+			//world.setBlockState( newPos ,Blocks.OBSIDIAN.getDefaultState());
+			
+			/**BlockPos newPos = this.pos.add( 0 ,-1 ,0);
+			Block below = world.getBlockState( newPos).getBlock();
+			System.out.println( below);
+			if( below instanceof BlockDirt) {
+				System.out.println( "Huzzah!");
+			} **/
+			
+			
+// randomly pick 2-3 axis, each axis should have a weight.
+// one direction will stay constant until end of tier (constants are determined by pattern).

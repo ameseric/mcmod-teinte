@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "normal": { "model": "witherwar:terra_kali_model" }
+        //"normal": { "model": "minecraft:lit_redstone_lamp" }
+    }
+}
