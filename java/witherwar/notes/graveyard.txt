@@ -1,11 +1,6 @@
 
 
 
-testing
-
-
-
-
 private int[] location;
 private HashSet<int[]> moduleLocations;
 private Ticket ticket;
