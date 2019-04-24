@@ -59,6 +59,33 @@ Since mods can have a player config file, we'll use that to separate the code se
 							features.
 							
 						Need to manipulate new chunk generation to match world age.
+						
+						
+		Lite Automation	There are a number of ways to automate certain actions in vanilla minecraft, and a great many mods that give you many,
+							many options. This would be my own small contribution - just a couple of basic AI harvesters and blocks. I would
+							prefer to use only vanilla Minecraft blocks, but it would thematically make more sense to use either a form of
+							Terralith or captured Aleph drones. If TEINTE is released, I would disable this by default.
+						
+						
+	Structure of Addons:
+		Factions
+			Aleph
+			Villager?
+		Void
+			Jodh
+			Rot
+			Rebirth
+		Terralith
+			Captive Harvesting
+			Types
+		Region-Naming
+		Villain
+		Dimensions
+		Lite Automation
+		
+		Advancement Tree, as basic in-game guide.
+		Probably would also need a more detailed guide.
+			
 		
 		
 		
@@ -72,7 +99,7 @@ Since mods can have a player config file, we'll use that to separate the code se
 			- The End Is Not The End	TEINTE
 			- A Thin Place				ATP
 			
-		Get github page together and commit.
+		Region-naming.
 		
 		Start generic Faction class
 			resources
