@@ -7,6 +7,8 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 /**
@@ -18,34 +20,44 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  * 
  *  Rough GUI outline. Right now written in bad practice, will be modified later to accomodate different GUI elements.
  */
-public class RegionGUI{
+public class TeinteGUI{
 	public RenderHandler renderHandler;
+	private RegionOverlay regionGUI;
 	
-	public RegionGUI() {
+	public TeinteGUI() {
 		renderHandler = new RenderHandler();
+		regionGUI = new RegionOverlay();
 	}
 	
 	
 	public class RenderHandler{
 	    @SubscribeEvent
-	    public void onRenderGui( RenderGameOverlayEvent.Post event)
-	    {
-			 if ( event.getType() != ElementType.EXPERIENCE) return;
-			new ActualRegionGUI( Minecraft.getMinecraft());
+	    public void onRenderGui( RenderGameOverlayEvent.Post event){
+			 if ( event.getType() == ElementType.EXPERIENCE) {
+				 regionGUI.draw( Minecraft.getMinecraft());
+			 }
 	    }
+			 
 	}
 	
-	
-	
-	private class ActualRegionGUI extends Gui{
-		String text = "Sample";
+	@SideOnly( Side.CLIENT)
+	public class RegionOverlay extends Gui{
+		String text = "SAMPLE";
+		int tick = 0;
 		
-		public ActualRegionGUI( Minecraft mc){
+		public void draw( Minecraft mc){
 	        ScaledResolution scaled = new ScaledResolution( mc);
 	        int width = scaled.getScaledWidth();
 	        int height = scaled.getScaledHeight();
+	        
+	        int timer = tick/20;
+	        String textNow = text.substring( 0 ,timer);
+	        if( timer == text.length()) {
+	        	tick = 0;
+	        }
 	 
-	        drawCenteredString( mc.fontRenderer ,text ,width / 2 ,(height / 2) - 4 ,Integer.parseInt("FFAA00", 16));		
+	        drawString( mc.fontRenderer ,textNow ,width / 20 ,height / 10 ,Integer.parseInt("FFAA00", 16));
+	        tick++;
 		}
 	}
 	
