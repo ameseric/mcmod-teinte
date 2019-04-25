@@ -47,6 +47,7 @@ import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.util.ChunkManager;
+import witherwar.util.RegionGUI;
 
 
 
@@ -157,7 +158,7 @@ public class WitherWar
 	
     @EventHandler
     public void postInit( FMLPostInitializationEvent event) {
-    	
+    	MinecraftForge.EVENT_BUS.register( new RegionGUI().renderHandler);
   	 	proxy.postInit();
     }
     
@@ -274,6 +275,8 @@ public class WitherWar
 			
 		}
 	}
+	
+
 
 	
 }	
