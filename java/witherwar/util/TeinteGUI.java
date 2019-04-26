@@ -61,9 +61,6 @@ public class TeinteGUI{
 	        int alpha = getFadeAlpha();
 	        
 	        GlStateManager.scale( SCALE ,SCALE ,SCALE);
-	        //drawCenteredString( mc.fontRenderer ,text ,Math.round( width/(2*SCALE)) ,Math.round( height/(SCALE*2) - ((DEFAULT_TEXT_PIXEL_HEIGHT/2) * SCALE)) 
-	        //		,Integer.parseInt("EEEEEE" ,16) | (alpha << 24));
-	        
 	        mc.fontRenderer.drawString( text ,width/(24*SCALE) ,height/(SCALE*14) ,Integer.parseInt("EEEEEE" ,16) | (alpha << 24) ,false);
 	        GlStateManager.scale( ISCALE ,ISCALE ,ISCALE);
 	        
@@ -72,7 +69,6 @@ public class TeinteGUI{
 		private int getFadeAlpha() {
 			
 			int alpha = Math.min( (int) Math.floor( (1.0F/16.0F) * Math.pow(tick ,2)) + 4 ,MAX_ALPHA);
-			System.out.println( alpha);
 			
 			if (asc) {
 				if( alpha == MAX_ALPHA) {
