@@ -37,6 +37,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.block.BlockAsh;
 import witherwar.block.BlockCatarCortex;
 import witherwar.block.BlockFlesh;
+import witherwar.block.BlockGuidestone;
 import witherwar.block.BlockCatarMaw;
 import witherwar.block.BlockRefHolder;
 import witherwar.block.BlockSerpentmind;
@@ -102,6 +103,7 @@ public class WitherWar
     	WitherWar.newBlocks.put( "terra_catar_maw" ,new BlockRefHolder( new BlockCatarMaw()    ,"minecraft:nether_wart_block"));
     	WitherWar.newBlocks.put( "dead_ash"        ,new BlockRefHolder( new BlockAsh()         ,"witherwar:dead_ash"));
     	WitherWar.newBlocks.put( "terra_catar"     ,new BlockRefHolder( new BlockCatarCortex() ,"witherwar:terra_kali"));
+    	WitherWar.newBlocks.put( "guidestone"     ,new BlockRefHolder( new BlockGuidestone() ,"minecraft:glowstone"));
     	
     	int i = 0;
     	for( BlockRefHolder brh : WitherWar.newBlocks.values()) {
