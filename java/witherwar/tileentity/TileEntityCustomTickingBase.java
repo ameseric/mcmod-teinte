@@ -38,9 +38,6 @@ public class TileEntityCustomTickingBase extends TileEntity implements ITickable
 	protected Ticket ticket;
 	private boolean triedToAssignTicket = false;
 	
-	
-
-	
 	protected interface BlockFilter{
 		boolean scan( Block bs);
 	}
