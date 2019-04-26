@@ -58,10 +58,10 @@ public class WitherWar
     public static final String MODID = "witherwar";
     public static final String VERSION = "0.1";
     public static final int TICKSASECOND = 20;
-    public static final int MAX_RANGE = 16;
     public static CreativeTabs wwCreativeTab;
     public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
-	private int tickcount = 0;
+    //public static HashMap<String ,TickHandler> tickHandlers;
+	private static int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static IProxy proxy;
@@ -77,23 +77,37 @@ public class WitherWar
     public void preInit( FMLPreInitializationEvent event) {  
     	
     	wwCreativeTab = new CreativeTabs( "witherwar_tab"){
-
 			@Override
 			@SideOnly(Side.CLIENT)
 			public ItemStack getTabIconItem() {
 				return new ItemStack( Items.END_CRYSTAL);
 			}};
    	
-    	registerBlocks(); //followup code in proxy.preInit()
-    	
+    	registerBlocks(); //followup code in proxy.preInit()    	
     	registerEntities();
-
     	registerTileEntities();
     	
 		proxy.preInit();
 		
+    }   
+    
+    
+	
+	@EventHandler
+    public void init( FMLInitializationEvent event){
+    	ForgeChunkManager.setForcedChunkLoadingCallback( instance, new ChunkManager());
+    	MinecraftForge.EVENT_BUS.register( instance);
+    	proxy.init();
     }
     
+	
+	
+	
+    @EventHandler
+    public void postInit( FMLPostInitializationEvent event) {
+    	MinecraftForge.EVENT_BUS.register( new TeinteGUI().renderHandler);
+  	 	proxy.postInit();
+    }
     
     
     
@@ -146,59 +160,28 @@ public class WitherWar
     }
     
     
-    
-	
-	@EventHandler
-    public void init( FMLInitializationEvent event){
-    	ForgeChunkManager.setForcedChunkLoadingCallback( instance, new ChunkManager());
-    	MinecraftForge.EVENT_BUS.register( instance);
-    	proxy.init();
-    }
-    
-	
-	
-	
-    @EventHandler
-    public void postInit( FMLPostInitializationEvent event) {
-    	MinecraftForge.EVENT_BUS.register( new TeinteGUI().renderHandler);
-  	 	proxy.postInit();
-    }
-    
-    
-    
-
-    
-    
    
- 
+ /**
+  * Put all of the tick-event handling into separate classes, getting too cluttered in here.
+  * Have a separate tick handler for each module, own folder.
+  * 
+  */
     
   
 	@SubscribeEvent
 	public void onWorldTick( TickEvent.WorldTickEvent event){
 		tickcount += 1;
 		
-		//as far as indexing at placement, 
-		if( true && tickcount%2 == 0) {//allowRegionNames){
-			//select next player in queue
-			//check if they have proper item
-			//get block position -- might index by chunks, actually. Fuzziness isn't a problem here.
-			//if y < 60, abort. Lazy, but good enough for personal purposes, and speedier.
-			//cycle through region dictionary and plug in block position
-			//if hit, trigger text display event
-			//iterate next player queue
-		}
+		//if( tickHandlers.size() == 0) {
+		//	tickHandlers.put( "region" ,new TickHandlerRegion());
+		//}
+		
 		
 		if( tickcount == TICKSASECOND * 20 ){ //200 seconds
-			System.out.println( "Ticking!");
 			tickcount = 0;
 			
+			//tickRegions( tickcount);
 
-			
-			//provide config values
-			//if( true) {//allowAleph) {
-				//spawn aleph chance
-			//}
-			
 			int rand = new Random().nextInt(120);
 			if( rand > 1) {
 /**				
@@ -219,11 +202,27 @@ public class WitherWar
 
 	}
 	
+/**	
+	private void tickRegions( int tickcount) {
+		++tickcount;		
+		
+		if( tickcount%4 == 0) {
+			List<EntityPlayer> players = world.playerEntities;
+			for( EntityPlayer player : players) {
+				if( true) { //need to check for Transient Worm
+					if( player.getPosition().getY() > 60) {
+						//this.world.getChunkFromBlockCoords( player.getPosition());
+						
+					}
+				}
+			}
+		}
+	}**/
 	
 	
 	private void birthTeralith() {
 		World world = DimensionManager.getWorld(0);
-		
+
 		List<EntityPlayer> players = world.playerEntities;
 		Random rand = new Random();
 				
@@ -231,8 +230,8 @@ public class WitherWar
 			int choice = rand.nextInt( players.size());
 			BlockPos center = players.get(choice).getPosition();
 			
-			int x = center.getX() + (rand.nextInt( MAX_RANGE) - rand.nextInt( MAX_RANGE));
-			int z = center.getZ() + (rand.nextInt( MAX_RANGE) - rand.nextInt( MAX_RANGE));
+			int x = center.getX() + (rand.nextInt( 16) - rand.nextInt( 16));
+			int z = center.getZ() + (rand.nextInt( 16) - rand.nextInt( 16));
 			//BlockPos placement = new BlockPos( x+center.getX() ,200 ,z+center.getZ());
 			
 			for( int i=200; i>2; i--) {
@@ -250,7 +249,7 @@ public class WitherWar
 	
 	
 	@Config( modid=MODID ,name="This Needs To Be Set" ,category="General")
-	public static class generalConfig {
+	public static class config {
 		@Comment( value={ "When true, allows the Aleph to appear in your world" ,"and slowly sculpt your world into a monument-city."})
 		@Name( value = "Enable Aleph Faction")
 		public static boolean allowAleph = true;

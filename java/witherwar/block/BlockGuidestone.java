@@ -3,7 +3,11 @@ package witherwar.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import witherwar.WitherWar;
+import witherwar.tileentity.TileEntitySerpentmind;
 
 
 public class BlockGuidestone extends Block{
@@ -15,16 +19,14 @@ public class BlockGuidestone extends Block{
 		setCreativeTab( WitherWar.wwCreativeTab);
 	}
 
-}
-
-
-
-/**
-class MaterialFlesh extends Material{
-
-	public MaterialFlesh(MapColor color) {
-		super(color);
-		this.setRequiresTool();
+	@Override
+	public boolean hasTileEntity( IBlockState state) {
+		return true;
 	}
 	
-}**/
+	@Override
+	public TileEntity createTileEntity( World world ,IBlockState state) {
+		return new TileEntitySerpentmind();
+	}
+	
+}
