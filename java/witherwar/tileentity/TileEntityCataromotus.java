@@ -53,7 +53,7 @@ public class TileEntityCataromotus extends TileEntityCustomTickingBase{
 		//if newly placed, grow Form before everything else.
 		
 		++ticks;
-		if( ticks == 10) {
+		if( ticks == 5) {
 			ticks = 0;
 			++timer;
 			
