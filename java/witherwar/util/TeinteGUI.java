@@ -21,9 +21,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * 
  *  Rough GUI outline. Right now written in bad practice, will be modified later to accomodate different GUI elements.
  */
+@SideOnly( Side.CLIENT)
 public class TeinteGUI{
 	public RenderHandler renderHandler;
 	private RegionOverlay regionGUI;
+	private boolean running = false;
+	private String regionName = "----";
+	
 	
 	public TeinteGUI() {
 		renderHandler = new RenderHandler();
@@ -31,27 +35,35 @@ public class TeinteGUI{
 	}
 	
 	
+	
+	public void triggerDraw( String regionName) {
+		this.running = true;
+		this.regionName = regionName;
+	}
+	
+	
+	
 	public class RenderHandler{
 	    @SubscribeEvent
 	    public void onRenderGui( RenderGameOverlayEvent.Post event){
-			 if ( event.getType() == ElementType.EXPERIENCE) {
+			 if ( event.getType() == ElementType.EXPERIENCE && running) {
 				 regionGUI.draw( Minecraft.getMinecraft());
 			 }
-	    }
-			 
+	    }			 
 	}
 	
-	@SideOnly( Side.CLIENT)
+	
+	
 	public class RegionOverlay extends Gui{
 		final int MAX_ALPHA = 255;
 		final float SCALE = 1.6F;
 		final float ISCALE = 1/SCALE;
-		final int DELAY = 60;
+		final int DELAY = 120;
 		
-		String text = "Plains of Reprieve";
 		int tick = 0;
 		int delayCounter = 0;
 		boolean asc = true;
+		
 		
 		public void draw( Minecraft mc){
 	        ScaledResolution scaled = new ScaledResolution( mc);
@@ -61,14 +73,14 @@ public class TeinteGUI{
 	        int alpha = getFadeAlpha();
 	        
 	        GlStateManager.scale( SCALE ,SCALE ,SCALE);
-	        mc.fontRenderer.drawString( text ,width/(24*SCALE) ,height/(SCALE*14) ,Integer.parseInt("EEEEEE" ,16) | (alpha << 24) ,false);
+	        mc.fontRenderer.drawString( regionName ,width/(30*SCALE) ,height/(SCALE*20) ,Integer.parseInt("EEEEEE" ,16) | (alpha << 24) ,false);
 	        GlStateManager.scale( ISCALE ,ISCALE ,ISCALE);
 	        
 		}
 		
 		private int getFadeAlpha() {
 			
-			int alpha = Math.min( (int) Math.floor( (1.0F/16.0F) * Math.pow(tick ,2)) + 4 ,MAX_ALPHA);
+			int alpha = Math.min( (int) Math.floor( (1.0F/18.0F) * Math.pow(tick ,2)) + 4 ,MAX_ALPHA);
 			
 			if (asc) {
 				if( alpha == MAX_ALPHA) {
@@ -81,6 +93,7 @@ public class TeinteGUI{
 				++tick;
 			}else {
 				if( alpha == 4) {
+					running = false;
 					asc = true;
 				}else {
 					--tick;
