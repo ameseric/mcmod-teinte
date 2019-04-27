@@ -7,6 +7,7 @@ import java.util.Random;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -20,6 +21,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.Config.Name;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -49,6 +51,9 @@ import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.util.ChunkManager;
 import witherwar.util.TeinteGUI;
+import witherwar.util.TeintePacketHandler;
+import witherwar.util.TeintePacketHandler.RegionMessage;
+import witherwar.util.TeintePacketHandler.RegionMessage.RegionMessageHandler;
 
 
 
@@ -60,8 +65,10 @@ public class WitherWar
     public static final int TICKSASECOND = 20;
     public static CreativeTabs wwCreativeTab;
     public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
-    //public static HashMap<String ,TickHandler> tickHandlers;
+    public World world;
 	private static int tickcount = 0;
+	
+	public TeinteGUI teinteGUI;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static IProxy proxy;
@@ -87,6 +94,8 @@ public class WitherWar
     	registerEntities();
     	registerTileEntities();
     	
+    	TeintePacketHandler.snwrapper.registerMessage( RegionMessageHandler.class, RegionMessage.class, 0, Side.CLIENT);
+    	
 		proxy.preInit();
 		
     }   
@@ -105,7 +114,8 @@ public class WitherWar
 	
     @EventHandler
     public void postInit( FMLPostInitializationEvent event) {
-    	MinecraftForge.EVENT_BUS.register( new TeinteGUI().renderHandler);
+    	this.teinteGUI = new TeinteGUI();
+    	MinecraftForge.EVENT_BUS.register( this.teinteGUI.renderHandler);
   	 	proxy.postInit();
     }
     
@@ -117,7 +127,7 @@ public class WitherWar
     	WitherWar.newBlocks.put( "terra_catar_maw" ,new BlockRefHolder( new BlockCatarMaw()    ,"minecraft:nether_wart_block"));
     	WitherWar.newBlocks.put( "dead_ash"        ,new BlockRefHolder( new BlockAsh()         ,"witherwar:dead_ash"));
     	WitherWar.newBlocks.put( "terra_catar"     ,new BlockRefHolder( new BlockCatarCortex() ,"witherwar:terra_kali"));
-    	WitherWar.newBlocks.put( "guidestone"     ,new BlockRefHolder( new BlockGuidestone() ,"minecraft:glowstone"));
+    	WitherWar.newBlocks.put( "guidestone"	   ,new BlockRefHolder( new BlockGuidestone()  ,"minecraft:glowstone"));
     	
     	int i = 0;
     	for( BlockRefHolder brh : WitherWar.newBlocks.values()) {
@@ -160,66 +170,67 @@ public class WitherWar
     }
     
     
-   
- /**
-  * Put all of the tick-event handling into separate classes, getting too cluttered in here.
-  * Have a separate tick handler for each module, own folder.
-  * 
-  */
+	@SubscribeEvent
+	public void onWorldLoad(WorldEvent.Load event) {
+		World world = event.getWorld();
+		if( !world.isRemote && world.provider.getDimension() == 0) {
+			System.out.println( "Found overworld?");
+			this.world = DimensionManager.getWorld(0);
+		}
+	}
     
   
 	@SubscribeEvent
 	public void onWorldTick( TickEvent.WorldTickEvent event){
 		tickcount += 1;
 		
-		//if( tickHandlers.size() == 0) {
-		//	tickHandlers.put( "region" ,new TickHandlerRegion());
-		//}
+		
+		if( this.world.isRemote) { return;} //server logic gate
 		
 		
-		if( tickcount == TICKSASECOND * 20 ){ //200 seconds
+		if( tickcount == TICKSASECOND * 16 ){ 
 			tickcount = 0;
+			System.out.println( "Ticking!");
 			
-			//tickRegions( tickcount);
+			tickRegions( tickcount);
 
-			int rand = new Random().nextInt(120);
+/**			int rand = new Random().nextInt(120);
 			if( rand > 1) {
-/**				
-				World world = DimensionManager.getWorld(0);
+				
 				WorldInfo wi = world.getWorldInfo();
 				wi.setCleanWeatherTime( 0);
 				wi.setThunderTime( TICKSASECOND * 60);
 				wi.setRainTime( TICKSASECOND * 60);
 				wi.setRaining( true);
-				wi.setThundering( true);**/				
+				wi.setThundering( true);				
 				
 				if( rand > 1 ) {
 					//placeSerpent();
 				}
 
-			}
+			}**/
 		}
 
 	}
 	
-/**	
+	
 	private void tickRegions( int tickcount) {
-		++tickcount;		
 		
 		if( tickcount%4 == 0) {
 			List<EntityPlayer> players = world.playerEntities;
 			for( EntityPlayer player : players) {
 				if( true) { //need to check for Transient Worm
-					if( player.getPosition().getY() > 60) {
-						//this.world.getChunkFromBlockCoords( player.getPosition());
+					//if( player.getPosition().getY() > 60) {
+//						this.world.getChunkFromBlockCoords( player.getPosition());
+						TeintePacketHandler.snwrapper.sendTo( new RegionMessage("Misty Moor") ,(EntityPlayerMP)player);
 						
-					}
+					//}
 				}
 			}
 		}
-	}**/
+	}
 	
-	
+/**	
 	private void birthTeralith() {
 		World world = DimensionManager.getWorld(0);
 
@@ -244,7 +255,7 @@ public class WitherWar
 			}
 		}
 	}
-	
+**/	
 
 	
 	
