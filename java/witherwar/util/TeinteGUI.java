@@ -73,7 +73,7 @@ public class TeinteGUI{
 	        int alpha = getFadeAlpha();
 	        
 	        GlStateManager.scale( SCALE ,SCALE ,SCALE);
-	        mc.fontRenderer.drawString( regionName ,width/(30*SCALE) ,height/(SCALE*20) ,Integer.parseInt("EEEEEE" ,16) | (alpha << 24) ,false);
+	        mc.fontRenderer.drawString( regionName ,width/(30*SCALE) ,height/(SCALE*20) ,Integer.parseInt("EEEEEE" ,16) | (alpha << 24) ,true);
 	        GlStateManager.scale( ISCALE ,ISCALE ,ISCALE);
 	        
 		}

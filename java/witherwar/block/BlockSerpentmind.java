@@ -23,7 +23,7 @@ public class BlockSerpentmind extends Block{
 		this.setHarvestLevel("pickaxe" ,2);
 		setLightLevel(0.8F);
 		//setCreativeTab( CreativeTabs.BUILDING_BLOCKS);
-		setCreativeTab( WitherWar.wwCreativeTab);
+		setCreativeTab( WitherWar.teinteTab);
 	}
 	
 	

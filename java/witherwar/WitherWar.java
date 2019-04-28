@@ -2,19 +2,14 @@ package witherwar;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,6 +25,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -50,10 +47,8 @@ import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.util.ChunkManager;
-import witherwar.util.TeinteGUI;
-import witherwar.util.TeintePacketHandler;
-import witherwar.util.TeintePacketHandler.RegionMessage;
-import witherwar.util.TeintePacketHandler.RegionMessage.RegionMessageHandler;
+import witherwar.util.RegionMessage;
+import witherwar.util.RegionMessage.RegionMessageHandler;
 
 
 
@@ -63,12 +58,12 @@ public class WitherWar
     public static final String MODID = "witherwar";
     public static final String VERSION = "0.1";
     public static final int TICKSASECOND = 20;
-    public static CreativeTabs wwCreativeTab;
-    public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
-    public World world;
-	private static int tickcount = 0;
+	public static final SimpleNetworkWrapper snwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
 	
-	public TeinteGUI teinteGUI;
+    public static CreativeTabs teinteTab;
+    public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
+    public static World world;
+	private static int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static IProxy proxy;
@@ -83,7 +78,7 @@ public class WitherWar
     @EventHandler
     public void preInit( FMLPreInitializationEvent event) {  
     	
-    	wwCreativeTab = new CreativeTabs( "witherwar_tab"){
+    	teinteTab = new CreativeTabs( "witherwar_tab"){
 			@Override
 			@SideOnly(Side.CLIENT)
 			public ItemStack getTabIconItem() {
@@ -94,7 +89,7 @@ public class WitherWar
     	registerEntities();
     	registerTileEntities();
     	
-    	TeintePacketHandler.snwrapper.registerMessage( RegionMessageHandler.class, RegionMessage.class, 0, Side.CLIENT);
+    	snwrapper.registerMessage( RegionMessageHandler.class, RegionMessage.class, 0, Side.CLIENT);
     	
 		proxy.preInit();
 		
@@ -114,8 +109,6 @@ public class WitherWar
 	
     @EventHandler
     public void postInit( FMLPostInitializationEvent event) {
-    	this.teinteGUI = new TeinteGUI();
-    	MinecraftForge.EVENT_BUS.register( this.teinteGUI.renderHandler);
   	 	proxy.postInit();
     }
     
@@ -170,29 +163,32 @@ public class WitherWar
     }
     
     
+    
+    //Used to set World variable
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
-		World world = event.getWorld();
-		if( !world.isRemote && world.provider.getDimension() == 0) {
-			System.out.println( "Found overworld?");
-			this.world = DimensionManager.getWorld(0);
+		if( event.getWorld().provider.getDimension() == 0) {
+			world = DimensionManager.getWorld(0);
 		}
 	}
+	
+	
     
   
 	@SubscribeEvent
 	public void onWorldTick( TickEvent.WorldTickEvent event){
 		tickcount += 1;
 		
-		
-		if( this.world.isRemote) { return;} //server logic gate
-		
+	
 		
 		if( tickcount == TICKSASECOND * 16 ){ 
 			tickcount = 0;
-			System.out.println( "Ticking!");
 			
+			if( world.isRemote) { return;} //*logical* server gate (not physical)
 			tickRegions( tickcount);
+			//tickTerraliths();
+			//tickVoid();
+			//tickAleph();
 
 /**			int rand = new Random().nextInt(120);
 			if( rand > 1) {
@@ -213,7 +209,7 @@ public class WitherWar
 
 	}
 	
-	
+	@SideOnly(Side.CLIENT)
 	private void tickRegions( int tickcount) {
 		
 		if( tickcount%4 == 0) {
@@ -222,7 +218,7 @@ public class WitherWar
 				if( true) { //need to check for Transient Worm
 					//if( player.getPosition().getY() > 60) {
 //						this.world.getChunkFromBlockCoords( player.getPosition());
-						TeintePacketHandler.snwrapper.sendTo( new RegionMessage("Misty Moor") ,(EntityPlayerMP)player);
+						WitherWar.snwrapper.sendTo( new RegionMessage("Misty Moor") ,(EntityPlayerMP)player);
 						
 					//}
 				}

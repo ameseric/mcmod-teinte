@@ -25,7 +25,7 @@ public class BlockFlesh extends Block{
         this.setDefaultState( this.blockState.getBaseState());
         this.setHarvestLevel("axe" ,1);
 		//setCreativeTab( CreativeTabs.BUILDING_BLOCKS);
-		setCreativeTab( WitherWar.wwCreativeTab);
+		setCreativeTab( WitherWar.teinteTab);
 //"nether_wart_block", (new Block(Material.GRASS, MapColor.RED)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS).setHardness(1.0F).setSoundType(SoundType.WOOD).setUnlocalizedName("netherWartBlock"));
 	}
 	

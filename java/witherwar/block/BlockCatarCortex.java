@@ -23,7 +23,7 @@ public class BlockCatarCortex extends Block{
 		//this.setHarvestLevel("pickaxe" ,2);
 		//setLightLevel(0.8F);
 		//setCreativeTab( CreativeTabs.MISC);
-		setCreativeTab( WitherWar.wwCreativeTab);
+		setCreativeTab( WitherWar.teinteTab);
 	}
 	
 	

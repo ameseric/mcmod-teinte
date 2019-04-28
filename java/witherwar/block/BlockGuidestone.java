@@ -16,17 +16,17 @@ public class BlockGuidestone extends Block{
 		super( Material.ROCK);
 		setUnlocalizedName( "guidestone");
 		setRegistryName( "guidestone");
-		setCreativeTab( WitherWar.wwCreativeTab);
+		setCreativeTab( WitherWar.teinteTab);
 	}
 
 	@Override
 	public boolean hasTileEntity( IBlockState state) {
-		return true;
+		return false;
 	}
-	
+/**	
 	@Override
 	public TileEntity createTileEntity( World world ,IBlockState state) {
 		return new TileEntitySerpentmind();
-	}
+	}**/
 	
 }

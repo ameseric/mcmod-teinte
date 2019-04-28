@@ -1,25 +1,25 @@
 package witherwar.proxy;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public abstract class IProxy {
+public interface IProxy {
 	
 	abstract public boolean isDedicatedServer();
 	
-	public void preInit() {
-		
-	}
+	void preInit();
 	
-	public void init() {
-		
-	}
+	void init();
 	
-	public void postInit() {
-		
-	}
+	void postInit();	
 	
+    /**
+     * Returns a side-appropriate EntityPlayer for use during message handling.
+     *
+     * @param parContext the context
+     * @return the player entity from context
+     */
+    EntityPlayer getPlayerEntityFromContext(MessageContext ctx);
 	
-	public void onWorldTick() {
-		
-	}
 	
 }
