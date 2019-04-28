@@ -28,7 +28,6 @@ import witherwar.util.Symbol;
  * 
  * @author Guiltygate
  *
- * TileEntity with basic block searching methods and FCM support.
  * Can be used without Chunk loading by not calling super.update()
  * 
  */

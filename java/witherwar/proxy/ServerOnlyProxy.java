@@ -1,14 +1,15 @@
 package witherwar.proxy;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-
-public class ServerOnlyProxy extends IProxy{
+public class ServerOnlyProxy implements IProxy{
 	
 	public void preInit() {
 	}
 	
 	public void init() {
-		//MinecraftForge.EVENT_BUS.register( new WitherWar( mc));
+
 	}
 	
 	public void postInit() {
@@ -17,11 +18,16 @@ public class ServerOnlyProxy extends IProxy{
 	
 
 
-	@Override
 	public boolean isDedicatedServer() {
 		// TODO Auto-generated method stub
 		return true;
 	}
-	
+
+	@Override
+	public EntityPlayer getPlayerEntityFromContext(MessageContext ctx) {
+		return ctx.getServerHandler().player;
+	}
+
+
 
 }

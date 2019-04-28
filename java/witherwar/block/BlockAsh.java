@@ -14,7 +14,7 @@ public class BlockAsh extends BlockFalling{
 		super( Material.SAND);
 		setUnlocalizedName( "dead_ash");
 		setRegistryName( "dead_ash");
-		setCreativeTab( WitherWar.wwCreativeTab);
+		setCreativeTab( WitherWar.teinteTab);
 	}
 
 }

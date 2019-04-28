@@ -4,14 +4,17 @@ package witherwar.proxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderGhast;
 import net.minecraft.client.renderer.entity.RenderWitherSkeleton;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import witherwar.WitherWar;
 import witherwar.block.BlockRefHolder;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
 import witherwar.util.TeinteGUI;
 
-public class ClientOnlyProxy extends IProxy{
+public class ClientOnlyProxy implements IProxy{
+	public static TeinteGUI teinteGUI;
 	
 	public void preInit() {
 		
@@ -27,7 +30,8 @@ public class ClientOnlyProxy extends IProxy{
 	}
 	
 	public void postInit() {
-//		MinecraftForge.EVENT_BUS.register( new TeinteGUI().renderHandler);
+    	teinteGUI = new TeinteGUI();
+    	MinecraftForge.EVENT_BUS.register( teinteGUI.renderHandler);
 	}
 
 	@Override
@@ -38,7 +42,12 @@ public class ClientOnlyProxy extends IProxy{
 
 	
 	
-	
+	@Override
+	// code taken from Jabelar, but seems to be an endless loop? Also doesn't seem useful.
+	public EntityPlayer getPlayerEntityFromContext(MessageContext ctx) {
+		return null;
+		//return (ctx.side.isClient() ? Minecraft.getMinecraft().player : WitherWar.proxy.getPlayerEntityFromContext(ctx));
+	}
 
 	
 
