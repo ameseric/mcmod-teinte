@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -42,8 +43,10 @@ import witherwar.block.BlockRefHolder;
 import witherwar.block.BlockSerpentmind;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
+import witherwar.gui.GuiEditGuidestone;
 import witherwar.proxy.IProxy;
 import witherwar.tileentity.TileEntityCataromotus;
+import witherwar.tileentity.TileEntityGuidestone;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.util.ChunkManager;
@@ -100,9 +103,30 @@ public class WitherWar
 	@EventHandler
     public void init( FMLInitializationEvent event){
     	ForgeChunkManager.setForcedChunkLoadingCallback( instance, new ChunkManager());
+    	//NetworkRegistry.INSTANCE.registerGuiHandler( instance, new GuiHandler());
     	MinecraftForge.EVENT_BUS.register( instance);
     	proxy.init();
     }
+	
+/**	
+	public class GuiHandler implements IGuiHandler{
+
+		@Override
+		public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+			if( ID == 0) {
+				
+			}
+			return null;
+		}
+		
+	}
+**/
     
 	
 	
@@ -160,6 +184,7 @@ public class WitherWar
 		GameRegistry.registerTileEntity( TileEntitySerpentmind.class ,new ResourceLocation("witherwar:tile_entity_serpentmind"));
 		GameRegistry.registerTileEntity( TileEntityMaw.class ,new ResourceLocation("witherwar:tile_entity_maw"));
 		GameRegistry.registerTileEntity( TileEntityCataromotus.class ,new ResourceLocation("witherwar:tile_entity_cataromotus"));
+		GameRegistry.registerTileEntity( TileEntityGuidestone.class ,new ResourceLocation("witherwar:tile_entity_guidestone"));
     }
     
     
@@ -184,7 +209,7 @@ public class WitherWar
 		if( tickcount == TICKSASECOND * 16 ){ 
 			tickcount = 0;
 			
-			if( world.isRemote) { return;} //*logical* server gate (not physical)
+			if( !world.isRemote) { return;} //*logical* server gate (AOT physical)
 			tickRegions( tickcount);
 			//tickTerraliths();
 			//tickVoid();

@@ -1,4 +1,4 @@
-package witherwar.util;
+package witherwar.gui;
 
 
 import net.minecraft.client.Minecraft;
@@ -26,7 +26,7 @@ public class TeinteGUI{
 	public RenderHandler renderHandler;
 	private RegionOverlay regionGUI;
 	private boolean running = false;
-	private String regionName = "----";
+	private String regionName = "NULL";
 	
 	
 	public TeinteGUI() {
