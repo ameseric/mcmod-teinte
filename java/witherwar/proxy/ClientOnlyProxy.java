@@ -11,7 +11,7 @@ import witherwar.WitherWar;
 import witherwar.block.BlockRefHolder;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
-import witherwar.util.TeinteGUI;
+import witherwar.gui.TeinteGUI;
 
 public class ClientOnlyProxy implements IProxy{
 	public static TeinteGUI teinteGUI;
