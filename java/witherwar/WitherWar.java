@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
@@ -65,6 +66,7 @@ public class WitherWar
 	
     public static CreativeTabs teinteTab;
     public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
+    private static HashMap<ChunkPos ,TileEntityGuidestone> regionalMap = new HashMap<>();
     public static World world;
 	private static int tickcount = 0;
 	
@@ -198,6 +200,13 @@ public class WitherWar
 	}
 	
 	
+	public void setRegionalMap( TileEntityGuidestone tileentity) {
+		for( ChunkPos pos : tileentity.map) {
+			regionalMap.put( pos ,tileentity);
+		}
+	}
+	
+	
     
   
 	@SubscribeEvent
@@ -243,6 +252,7 @@ public class WitherWar
 				if( true) { //need to check for Transient Worm
 					//if( player.getPosition().getY() > 60) {
 //						this.world.getChunkFromBlockCoords( player.getPosition());
+						
 						WitherWar.snwrapper.sendTo( new RegionMessage("Misty Moor") ,(EntityPlayerMP)player);
 						
 					//}

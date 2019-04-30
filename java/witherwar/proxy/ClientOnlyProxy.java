@@ -5,13 +5,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderGhast;
 import net.minecraft.client.renderer.entity.RenderWitherSkeleton;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntitySign;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import witherwar.WitherWar;
 import witherwar.block.BlockRefHolder;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
+import witherwar.gui.GuiEditGuidestone;
 import witherwar.gui.TeinteGUI;
+import witherwar.tileentity.TileEntityGuidestone;
 
 public class ClientOnlyProxy implements IProxy{
 	public static TeinteGUI teinteGUI;
@@ -47,6 +51,15 @@ public class ClientOnlyProxy implements IProxy{
 	public EntityPlayer getPlayerEntityFromContext(MessageContext ctx) {
 		return null;
 		//return (ctx.side.isClient() ? Minecraft.getMinecraft().player : WitherWar.proxy.getPlayerEntityFromContext(ctx));
+	}
+
+	@Override
+	public void openGui(int ID ,TileEntity tileentity) {
+		if( ID == 0) {
+			TileEntityGuidestone te = (TileEntityGuidestone) tileentity;
+			Minecraft.getMinecraft().displayGuiScreen( new GuiEditGuidestone( te.regionName));
+		}
+		
 	}
 
 	

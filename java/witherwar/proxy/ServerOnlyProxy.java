@@ -1,6 +1,7 @@
 package witherwar.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ServerOnlyProxy implements IProxy{
@@ -26,6 +27,12 @@ public class ServerOnlyProxy implements IProxy{
 	@Override
 	public EntityPlayer getPlayerEntityFromContext(MessageContext ctx) {
 		return ctx.getServerHandler().player;
+	}
+
+	@Override
+	public void openGui(int ID, TileEntity tileentity) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
