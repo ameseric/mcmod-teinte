@@ -1,4 +1,4 @@
-package witherwar.util;
+package witherwar.network;
 
 import java.nio.charset.Charset;
 
