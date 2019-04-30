@@ -2,6 +2,7 @@ package witherwar.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ServerOnlyProxy implements IProxy{
@@ -30,7 +31,7 @@ public class ServerOnlyProxy implements IProxy{
 	}
 
 	@Override
-	public void openGui(int ID, TileEntity tileentity) {
+	public void openGui(int ID, IMessage msg) {
 		// TODO Auto-generated method stub
 		
 	}
