@@ -2,6 +2,7 @@ package witherwar.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public interface IProxy {
@@ -23,7 +24,7 @@ public interface IProxy {
     EntityPlayer getPlayerEntityFromContext(MessageContext ctx);
     
     
-    void openGui( int ID ,TileEntity tileentity);
+    void openGui( int ID ,IMessage msg);
 	
 	
 }

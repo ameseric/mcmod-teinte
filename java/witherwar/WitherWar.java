@@ -44,9 +44,10 @@ import witherwar.block.BlockRefHolder;
 import witherwar.block.BlockSerpentmind;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
-import witherwar.gui.GuiEditGuidestone;
-import witherwar.network.RegionMessage;
-import witherwar.network.RegionMessage.RegionMessageHandler;
+import witherwar.network.MessageRegionOverlayOn;
+import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
+import witherwar.network.*;//MessageRegionOverlayOn.MessageHandleRegionOverlayOn;
+import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.IProxy;
 import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityGuidestone;
@@ -94,7 +95,9 @@ public class WitherWar
     	registerEntities();
     	registerTileEntities();
     	
-    	snwrapper.registerMessage( RegionMessageHandler.class, RegionMessage.class, 0, Side.CLIENT);
+    	snwrapper.registerMessage( HandleMessageRegionOverlayOn.class, MessageRegionOverlayOn.class, 0, Side.CLIENT);
+    	snwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.CLIENT);
+    	snwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.SERVER);
     	
 		proxy.preInit();
 		
@@ -253,7 +256,7 @@ public class WitherWar
 					//if( player.getPosition().getY() > 60) {
 //						this.world.getChunkFromBlockCoords( player.getPosition());
 						
-						WitherWar.snwrapper.sendTo( new RegionMessage("Misty Moor") ,(EntityPlayerMP)player);
+						//WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn("Misty Moor") ,(EntityPlayerMP)player);
 						
 					//}
 				}

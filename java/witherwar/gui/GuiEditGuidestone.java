@@ -5,15 +5,20 @@ import java.io.IOException;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import witherwar.WitherWar;
+import witherwar.network.MessageEditGuidestone;
 
 
 public class GuiEditGuidestone extends GuiScreen{
 	private GuiTextField text;
 	private String plaintext;
+	private MessageEditGuidestone msg;
 	
 	
-	public GuiEditGuidestone( String regionName) {
-		this.plaintext = regionName;
+	public GuiEditGuidestone( IMessage message) {
+		this.msg = (MessageEditGuidestone) message;
+		this.plaintext = msg.regionName;
 	}
 	 
 
@@ -28,6 +33,8 @@ public class GuiEditGuidestone extends GuiScreen{
 	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
+		this.plaintext = this.plaintext.toString();
+		WitherWar.snwrapper.sendToServer( new MessageEditGuidestone( this.plaintext ,msg.x ,msg.y ,msg.z));
 	}
 	 
 

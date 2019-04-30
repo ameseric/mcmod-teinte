@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import witherwar.WitherWar;
 import witherwar.block.BlockRefHolder;
@@ -54,10 +55,9 @@ public class ClientOnlyProxy implements IProxy{
 	}
 
 	@Override
-	public void openGui(int ID ,TileEntity tileentity) {
+	public void openGui(int ID ,IMessage msg) {
 		if( ID == 0) {
-			TileEntityGuidestone te = (TileEntityGuidestone) tileentity;
-			Minecraft.getMinecraft().displayGuiScreen( new GuiEditGuidestone( te.regionName));
+			Minecraft.getMinecraft().displayGuiScreen( new GuiEditGuidestone( msg));
 		}
 		
 	}
