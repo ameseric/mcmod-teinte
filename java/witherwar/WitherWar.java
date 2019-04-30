@@ -45,14 +45,14 @@ import witherwar.block.BlockSerpentmind;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
 import witherwar.gui.GuiEditGuidestone;
+import witherwar.network.RegionMessage;
+import witherwar.network.RegionMessage.RegionMessageHandler;
 import witherwar.proxy.IProxy;
 import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityGuidestone;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.util.ChunkManager;
-import witherwar.util.RegionMessage;
-import witherwar.util.RegionMessage.RegionMessageHandler;
 
 
 
