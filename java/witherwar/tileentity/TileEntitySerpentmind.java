@@ -196,7 +196,7 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 		this.spawnerLogicB.updateSpawner();
 		super.update();
 		
-		if (!this.hasWorld() || world.isRemote) return; // no client-side work
+		if (!this.hasWorld() || this.world.isRemote) return; // no client-side work
 		
 		
 		if( this.numOfBranches == 0) {

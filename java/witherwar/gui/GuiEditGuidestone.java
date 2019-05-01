@@ -32,8 +32,10 @@ public class GuiEditGuidestone extends GuiScreen{
 	
 	@Override
 	public void onGuiClosed() {
+		System.out.println( "Closing GUI...");
 		super.onGuiClosed();
-		this.plaintext = this.plaintext.toString();
+		this.plaintext = this.text.getText();
+		System.out.println( this.plaintext);
 		WitherWar.snwrapper.sendToServer( new MessageEditGuidestone( this.plaintext ,msg.x ,msg.y ,msg.z));
 	}
 	 
@@ -51,6 +53,11 @@ public class GuiEditGuidestone extends GuiScreen{
     public void updateScreen(){
         super.updateScreen();
         this.text.updateCursorCounter();
+    }
+    
+    @Override
+    public boolean doesGuiPauseGame() {
+    	return false;
     }
 	 
 

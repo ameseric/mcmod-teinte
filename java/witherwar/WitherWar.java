@@ -68,7 +68,7 @@ public class WitherWar
     public static CreativeTabs teinteTab;
     public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
     private static HashMap<ChunkPos ,TileEntityGuidestone> regionalMap = new HashMap<>();
-    public static World world;
+    //public static World world;
 	private static int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
@@ -113,25 +113,6 @@ public class WitherWar
     	proxy.init();
     }
 	
-/**	
-	public class GuiHandler implements IGuiHandler{
-
-		@Override
-		public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-			if( ID == 0) {
-				
-			}
-			return null;
-		}
-		
-	}
-**/
     
 	
 	
@@ -194,16 +175,18 @@ public class WitherWar
     
     
     
-    //Used to set World variable
+    /**
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
+		WitherWar.wor
 		if( event.getWorld().provider.getDimension() == 0) {
-			world = DimensionManager.getWorld(0);
+			System.out.println( "-------------------------------Loading world on a thread......");
+			world = event.getWorld();
 		}
-	}
+	}**/
 	
 	
-	public void setRegionalMap( TileEntityGuidestone tileentity) {
+	public void setRegionMap( TileEntityGuidestone tileentity) {
 		for( ChunkPos pos : tileentity.map) {
 			regionalMap.put( pos ,tileentity);
 		}
@@ -214,15 +197,14 @@ public class WitherWar
   
 	@SubscribeEvent
 	public void onWorldTick( TickEvent.WorldTickEvent event){
+		if( event.world.isRemote) { return;} //if logical client, return
+
 		tickcount += 1;
-		
-	
 		
 		if( tickcount == TICKSASECOND * 16 ){ 
 			tickcount = 0;
 			
-			if( !world.isRemote) { return;} //*logical* server gate (AOT physical)
-			tickRegions( tickcount);
+			tickRegions( tickcount ,event.world);
 			//tickTerraliths();
 			//tickVoid();
 			//tickAleph();
@@ -247,7 +229,7 @@ public class WitherWar
 	}
 	
 	@SideOnly(Side.CLIENT)
-	private void tickRegions( int tickcount) {
+	private void tickRegions( int tickcount ,World world) {
 		
 		if( tickcount%4 == 0) {
 			List<EntityPlayer> players = world.playerEntities;
