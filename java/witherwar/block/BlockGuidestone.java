@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.WitherWar;
 import witherwar.tileentity.TileEntityGuidestone;
+import witherwar.tileentity.TileEntityMaw;
 
 
 public class BlockGuidestone extends Block{
@@ -41,13 +42,21 @@ public class BlockGuidestone extends Block{
         return EnumBlockRenderType.MODEL;
     }
 	
-
-    
+	@Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		TileEntityGuidestone teg = (TileEntityGuidestone) worldIn.getTileEntity( pos);
+		teg.removeFromRegionMap();
+		super.breakBlock( worldIn ,pos, state);
+	}
+	
+	
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand
     		,EnumFacing facing ,float hitX ,float hitY ,float hitZ) {
-    	TileEntityGuidestone teg = (TileEntityGuidestone) worldIn.getTileEntity( pos);
-    	teg.onBlockActivated(worldIn ,pos ,playerIn);
+    	if( !worldIn.isRemote) {
+    		TileEntityGuidestone teg = (TileEntityGuidestone) worldIn.getTileEntity( pos);
+    		teg.onBlockActivated(worldIn ,pos ,playerIn);
+    	}
     	return true;
     }
 

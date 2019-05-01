@@ -24,6 +24,7 @@ public class TileEntityGuidestone extends TileEntity{
 
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
     	super.writeToNBT(compound);
+    	compound.setString( "name" ,this.regionName);
     	return compound;
     }
     
@@ -31,6 +32,7 @@ public class TileEntityGuidestone extends TileEntity{
     
     public void readFromNBT(NBTTagCompound compound) {
     	super.readFromNBT(compound);
+    	this.regionName = compound.getString( "name");
     }
     
     
@@ -41,12 +43,10 @@ public class TileEntityGuidestone extends TileEntity{
 
 
 	public void findRegionChunks() {
-		System.out.println( "Finding region chunks...");
-		this.map.add( new ChunkPos( this.pos.getX()%16 ,this.pos.getZ()%16));
+		this.map.add( new ChunkPos( this.pos));
 	}
 	
 	public boolean hasRegionChunks() {
-		System.out.println( "Checking region chunks...");
 		return ( this.map.size() > 0 );
 	}
 	
@@ -55,19 +55,22 @@ public class TileEntityGuidestone extends TileEntity{
 	}
 	
 	
-	public void update( String regionName) {
+	public void setRegionalMap( String regionName) {
 		this.setRegionName(regionName);
 		WitherWar.instance.setRegionMap( this);
 	}
 	
 	
+	public void removeFromRegionMap() {
+		WitherWar.instance.removeFromRegionMap( this);
+	}
+	
+	
 	public void onBlockActivated( World world ,BlockPos pos ,EntityPlayer player) {
-		if( !world.isRemote) {
-			if( !hasRegionChunks()) {
-				findRegionChunks();
-			}
-			WitherWar.snwrapper.sendTo( new MessageEditGuidestone( this.regionName ,pos.getX() ,pos.getY() ,pos.getZ()) ,(EntityPlayerMP)player);
-		}		
+		if( !hasRegionChunks()) {
+			findRegionChunks();
+		}
+		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( this.regionName ,pos.getX() ,pos.getY() ,pos.getZ()) ,(EntityPlayerMP)player);
 	}
 	
 	

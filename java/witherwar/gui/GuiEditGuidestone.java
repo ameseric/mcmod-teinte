@@ -2,9 +2,12 @@ package witherwar.gui;
 
 import java.io.IOException;
 
+import org.lwjgl.input.Keyboard;
 
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import witherwar.WitherWar;
 import witherwar.network.MessageEditGuidestone;
@@ -14,6 +17,7 @@ public class GuiEditGuidestone extends GuiScreen{
 	private GuiTextField text;
 	private String plaintext;
 	private MessageEditGuidestone msg;
+    private GuiButton doneBtn;
 	
 	
 	public GuiEditGuidestone( IMessage message) {
@@ -23,8 +27,12 @@ public class GuiEditGuidestone extends GuiScreen{
 	 
 
 	public void initGui(){
+        this.buttonList.clear();
+        Keyboard.enableRepeatEvents(true);
+        this.doneBtn = this.addButton(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120, I18n.format("gui.done")));
+		
         this.text = new GuiTextField( 0 ,this.fontRenderer ,this.width / 2 - 68 ,this.height/2-46 ,137 ,20);
-        text.setMaxStringLength(23);
+        text.setMaxStringLength(24);
         text.setText( this.plaintext);
         this.text.setFocused(true);
 	}
@@ -32,21 +40,35 @@ public class GuiEditGuidestone extends GuiScreen{
 	
 	@Override
 	public void onGuiClosed() {
-		System.out.println( "Closing GUI...");
+        Keyboard.enableRepeatEvents(false);
 		super.onGuiClosed();
 		this.plaintext = this.text.getText();
-		System.out.println( this.plaintext);
 		WitherWar.snwrapper.sendToServer( new MessageEditGuidestone( this.plaintext ,msg.x ,msg.y ,msg.z));
 	}
 	 
 
-	protected void keyTyped(char par1, int par2){
+	protected void keyTyped(char typedChar ,int keyCode){
 		try {
-			super.keyTyped(par1, par2);
+			super.keyTyped(typedChar , keyCode);
+	        if (keyCode == 1 || keyCode == 28){
+	            this.actionPerformed(this.doneBtn);
+	        }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        this.text.textboxKeyTyped(par1, par2);
+        this.text.textboxKeyTyped(typedChar , keyCode);
+    }
+	
+
+    protected void actionPerformed(GuiButton button) throws IOException
+    {
+        if (button.enabled)
+        {
+            if (button.id == 0)
+            {
+                this.mc.displayGuiScreen((GuiScreen)null);
+            }
+        }
     }
 	 
 
@@ -61,10 +83,10 @@ public class GuiEditGuidestone extends GuiScreen{
     }
 	 
 
-    public void drawScreen(int par1, int par2, float par3){
+    public void drawScreen(int mouseX, int mouseY ,float partialTicks){
         this.drawDefaultBackground();
         this.text.drawTextBox();
-        super.drawScreen(par1, par2, par3);
+        super.drawScreen(mouseX, mouseY, partialTicks);
     }
  
 
