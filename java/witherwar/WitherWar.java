@@ -54,6 +54,7 @@ import witherwar.tileentity.TileEntityGuidestone;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.util.ChunkManager;
+import witherwar.util.TeinteWorldSavedData;
 
 
 
@@ -64,12 +65,12 @@ public class WitherWar
     public static final String VERSION = "0.1";
     public static final int TICKSASECOND = 20;
 	public static final SimpleNetworkWrapper snwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
+	private TeinteWorldSavedData data;
 	
     public static CreativeTabs teinteTab;
     public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
-    private static HashMap<ChunkPos ,TileEntityGuidestone> regionalMap = new HashMap<>();
-    //public static World world;
-	private static int tickcount = 0;
+    //private HashMap<ChunkPos ,TileEntityGuidestone> regionalMap;
+	private int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static IProxy proxy;
@@ -108,7 +109,6 @@ public class WitherWar
 	@EventHandler
     public void init( FMLInitializationEvent event){
     	ForgeChunkManager.setForcedChunkLoadingCallback( instance, new ChunkManager());
-    	//NetworkRegistry.INSTANCE.registerGuiHandler( instance, new GuiHandler());
     	MinecraftForge.EVENT_BUS.register( instance);
     	proxy.init();
     }
@@ -136,11 +136,8 @@ public class WitherWar
     	for( BlockRefHolder brh : WitherWar.newBlocks.values()) {
     		brh.registerBlock();
     		i++;
-    		System.out.println(i);
     	}    	
-    }
-    
-    
+    }    
     
     
     private void registerEntities() {
@@ -175,25 +172,30 @@ public class WitherWar
     
     
     
-    /**
-	@SubscribeEvent
-	public void onWorldLoad(WorldEvent.Load event) {
-		WitherWar.wor
-		if( event.getWorld().provider.getDimension() == 0) {
-			System.out.println( "-------------------------------Loading world on a thread......");
-			world = event.getWorld();
-		}
-	}**/
-	
+    @SubscribeEvent
+    public void onWorldLoad( WorldEvent.Load event) {
+    	if( event.getWorld().provider.getDimension() == 0 && !event.getWorld().isRemote) {
+    		data = TeinteWorldSavedData.get( event.getWorld());
+    	}
+    }
+    
+
 	
 	public void setRegionMap( TileEntityGuidestone tileentity) {
 		for( ChunkPos pos : tileentity.map) {
-			regionalMap.put( pos ,tileentity);
+			data.regionMap.put( pos ,tileentity);
 		}
+		data.markDirty();
 	}
 	
 	
-    
+    public void removeFromRegionMap( TileEntityGuidestone tileentity) {
+		for( ChunkPos pos : tileentity.map) {
+			data.regionMap.remove( pos);
+		}
+		data.markDirty();
+    }
+	
   
 	@SubscribeEvent
 	public void onWorldTick( TickEvent.WorldTickEvent event){
@@ -201,7 +203,7 @@ public class WitherWar
 
 		tickcount += 1;
 		
-		if( tickcount == TICKSASECOND * 16 ){ 
+		if( tickcount == TICKSASECOND * 4 ){ 
 			tickcount = 0;
 			
 			tickRegions( tickcount ,event.world);
@@ -230,17 +232,15 @@ public class WitherWar
 	
 	@SideOnly(Side.CLIENT)
 	private void tickRegions( int tickcount ,World world) {
-		
-		if( tickcount%4 == 0) {
-			List<EntityPlayer> players = world.playerEntities;
-			for( EntityPlayer player : players) {
-				if( true) { //need to check for Transient Worm
-					//if( player.getPosition().getY() > 60) {
-//						this.world.getChunkFromBlockCoords( player.getPosition());
-						
-						//WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn("Misty Moor") ,(EntityPlayerMP)player);
-						
-					//}
+		List<EntityPlayer> players = world.playerEntities;
+		for( EntityPlayer player : players) {
+			if( true) { //need to check for Transient Worm
+				if( player.getPosition().getY() > 1) {
+					ChunkPos pos = world.getChunkFromBlockCoords( player.getPosition()).getPos();
+					if( data.regionMap.containsKey( pos)) {
+						String regionName = data.regionMap.get( pos).regionName;
+						WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
+					}
 				}
 			}
 		}

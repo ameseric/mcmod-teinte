@@ -58,11 +58,9 @@ public class MessageEditGuidestone implements IMessage{
 		public IMessage onMessage(MessageEditGuidestone msg, MessageContext ctx) {
 			
 			if( FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ) { 
-				System.out.println( "Triggering gui open");
 				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
 					WitherWar.proxy.openGui( 0 ,msg));
 			}else {
-				System.out.println("Triggering server handler...");
 				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
 					this.serverHandler( msg));
 			}
@@ -72,7 +70,7 @@ public class MessageEditGuidestone implements IMessage{
 		public void serverHandler( MessageEditGuidestone msg) {
 			BlockPos pos = new BlockPos( msg.x ,msg.y ,msg.z);
 			TileEntityGuidestone tileentity = (TileEntityGuidestone) DimensionManager.getWorld(0).getTileEntity( pos);
-			tileentity.update( msg.regionName);
+			tileentity.setRegionalMap( msg.regionName);
 		}
 		
 		
