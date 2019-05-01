@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 import witherwar.WitherWar;
 import witherwar.tileentity.TileEntityGuidestone;
 
@@ -55,18 +56,17 @@ public class MessageEditGuidestone implements IMessage{
 
 		@Override
 		public IMessage onMessage(MessageEditGuidestone msg, MessageContext ctx) {
-			if( ctx.side.isClient()) { //physical client check
-			System.out.println( "Triggering gui open");
-			FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
-				WitherWar.proxy.openGui( 0 ,msg));
-			}
 			
-			if( !DimensionManager.getWorld(0).isRemote){ //logical server check
+			if( FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ) { 
+				System.out.println( "Triggering gui open");
+				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
+					WitherWar.proxy.openGui( 0 ,msg));
+			}else {
 				System.out.println("Triggering server handler...");
 				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
 					this.serverHandler( msg));
 			}
-		return null;
+			return null;
 		}
 		
 		public void serverHandler( MessageEditGuidestone msg) {

@@ -70,7 +70,7 @@ public class TileEntityMaw extends TileEntityCustomTickingBase{
 	
 	@Override
 	public void update() {		
-		if (!this.hasWorld() || world.isRemote) return; // no client-side work
+		if (!this.hasWorld() || this.world.isRemote) return; // no client-side work
 		
 		++ticks;
 		if( ticks == 10) { //ticks modulo of five?
