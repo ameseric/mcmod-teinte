@@ -57,12 +57,12 @@ public class TileEntityGuidestone extends TileEntity{
 	
 	public void setRegionalMap( String regionName) {
 		this.setRegionName(regionName);
-		WitherWar.instance.setRegionMap( this);
+		//WitherWar.instance.setRegionMap( this);
 	}
 	
 	
 	public void removeFromRegionMap() {
-		WitherWar.instance.removeFromRegionMap( this);
+		//WitherWar.instance.removeFromRegionMap( this);
 	}
 	
 	
@@ -70,7 +70,7 @@ public class TileEntityGuidestone extends TileEntity{
 		if( !hasRegionChunks()) {
 			findRegionChunks();
 		}
-		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( this.regionName ,pos.getX() ,pos.getY() ,pos.getZ()) ,(EntityPlayerMP)player);
+		//WitherWar.snwrapper.sendTo( new MessageEditGuidestone( this.regionName ,pos.getX() ,pos.getY() ,pos.getZ()) ,(EntityPlayerMP)player);
 	}
 	
 	

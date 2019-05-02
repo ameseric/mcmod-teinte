@@ -3,12 +3,15 @@ package witherwar;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -25,6 +28,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -132,10 +136,8 @@ public class WitherWar
     	WitherWar.newBlocks.put( "terra_catar"     ,new BlockRefHolder( new BlockCatarCortex() ,"witherwar:terra_kali"));
     	WitherWar.newBlocks.put( "guidestone"	   ,new BlockRefHolder( new BlockGuidestone()  ,"minecraft:glowstone"));
     	
-    	int i = 0;
     	for( BlockRefHolder brh : WitherWar.newBlocks.values()) {
     		brh.registerBlock();
-    		i++;
     	}    	
     }    
     
@@ -167,7 +169,7 @@ public class WitherWar
 		GameRegistry.registerTileEntity( TileEntitySerpentmind.class ,new ResourceLocation("witherwar:tile_entity_serpentmind"));
 		GameRegistry.registerTileEntity( TileEntityMaw.class ,new ResourceLocation("witherwar:tile_entity_maw"));
 		GameRegistry.registerTileEntity( TileEntityCataromotus.class ,new ResourceLocation("witherwar:tile_entity_cataromotus"));
-		GameRegistry.registerTileEntity( TileEntityGuidestone.class ,new ResourceLocation("witherwar:tile_entity_guidestone"));
+		//GameRegistry.registerTileEntity( TileEntityGuidestone.class ,new ResourceLocation("witherwar:tile_entity_guidestone"));
     }
     
     
@@ -175,27 +177,66 @@ public class WitherWar
     @SubscribeEvent
     public void onWorldLoad( WorldEvent.Load event) {
     	if( event.getWorld().provider.getDimension() == 0 && !event.getWorld().isRemote) {
-    		data = TeinteWorldSavedData.get( event.getWorld());
+    		this.data = TeinteWorldSavedData.get( event.getWorld());
     	}
+    }
+    
+    
+    @SubscribeEvent
+    public void playerLoggedOn( PlayerLoggedInEvent event) {
+    	this.data.playerRegionMap.put( event.player ,"");
     }
     
 
 	
-	public void setRegionMap( TileEntityGuidestone tileentity) {
-		for( ChunkPos pos : tileentity.map) {
-			data.regionMap.put( pos ,tileentity);
+	public void addToRegionMap( int id ,List<ChunkPos> map) {
+		for( ChunkPos pos : map) {
+			this.data.regionMap.put( pos ,id);
 		}
-		data.markDirty();
+		this.setRegionName( id ,"");
+		//this.data.markDirty();
+	}
+	
+    public void removeFromRegionMap( BlockPos pos) {
+    	removeFromRegionMap( new ChunkPos(pos));
+    }
+	
+	public void removeFromRegionMap( ChunkPos cpos) {
+		int id = this.getRegionID( cpos);
+		this.data.regionMap.entrySet().removeIf( e -> e.getValue() == id); //efficient?
+		this.data.regionNameMap.remove( id);
+		//this.data.markDirty();
+    }
+	
+	public int getRegionID(BlockPos pos) {
+		return getRegionID( new ChunkPos(pos));
+	}
+	
+	public int getRegionID( ChunkPos pos) {
+		if( data.regionMap.containsKey( pos)) {
+			return data.regionMap.get( pos);
+		}
+		return -1;
+	}	
+	
+	public String getRegionName( int id) { return this.data.regionNameMap.get(id);	}
+	public String getRegionName( ChunkPos pos) { return this.getRegionName( this.getRegionID(pos)); }	
+	public String getRegionName( BlockPos pos) { return this.getRegionName( this.getRegionID(pos));	}
+	
+	public String getPlayerRegionName( EntityPlayer player) {
+		return this.data.playerRegionMap.get( player);
+	}
+	
+	public void setPlayerRegionName( EntityPlayer player ,String name) {
+		this.data.playerRegionMap.put( player ,name);
+	}
+	
+	public void setRegionName( int id ,String name) {
+		this.data.regionNameMap.put( id ,name);
 	}
 	
 	
-    public void removeFromRegionMap( TileEntityGuidestone tileentity) {
-		for( ChunkPos pos : tileentity.map) {
-			data.regionMap.remove( pos);
-		}
-		data.markDirty();
-    }
-	
+
   
 	@SubscribeEvent
 	public void onWorldTick( TickEvent.WorldTickEvent event){
@@ -234,13 +275,12 @@ public class WitherWar
 	private void tickRegions( int tickcount ,World world) {
 		List<EntityPlayer> players = world.playerEntities;
 		for( EntityPlayer player : players) {
-			if( true) { //need to check for Transient Worm
-				if( player.getPosition().getY() > 1) {
-					ChunkPos pos = world.getChunkFromBlockCoords( player.getPosition()).getPos();
-					if( data.regionMap.containsKey( pos)) {
-						String regionName = data.regionMap.get( pos).regionName;
-						WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
-					}
+			if( player.getPosition().getY() > 1) { //&& transient worm in effect
+				ChunkPos cpos = new ChunkPos( player.getPosition());
+				String regionName = this.getRegionName( cpos);
+				if( regionName != null && regionName != this.getPlayerRegionName( player)) {
+					WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
+					this.setPlayerRegionName( player ,regionName);
 				}
 			}
 		}
