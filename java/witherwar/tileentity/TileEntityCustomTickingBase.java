@@ -2,6 +2,7 @@ package witherwar.tileentity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -142,8 +143,41 @@ public class TileEntityCustomTickingBase extends TileEntity implements ITickable
 		int x = b.getX() - a.getX();
 		int y = b.getY() - a.getY();
 		int z = b.getZ() - a.getZ();
-		int totalPool = Math.abs(x) + Math.abs(y) + Math.abs(z);
+//		int totalPool = Math.abs(x) + Math.abs(y) + Math.abs(z);
+
+		ArrayList<Symbol> path = new ArrayList<Symbol>();
 		
+		if( x > 0) {
+			for( int i=0; i<x; i++) {
+				path.add( Symbol.XP);
+			}
+		}else {
+			for( int i=0; i>x; i--) {
+				path.add( Symbol.XN);
+			}			
+		}
+		
+		if( y > 0) {
+			for( int i=0; i<y; i++) {
+				path.add( Symbol.YP);
+			}
+		}else {
+			for( int i=0; i>y; i--) {
+				path.add( Symbol.YN);
+			}			
+		}
+		
+		if( z > 0) {
+			for( int i=0; i<z; i++) {
+				path.add( Symbol.ZP);
+			}
+		}else {
+			for( int i=0; i>z; i--) {
+				path.add( Symbol.ZN);
+			}			
+		}
+
+		/**
 		Symbol[] path = new Symbol[totalPool];
 		Random rand = new Random();
 		int choice;
@@ -196,8 +230,9 @@ public class TileEntityCustomTickingBase extends TileEntity implements ITickable
 					}else { choice = 0;}
 				}
 			}
-		}
-		return path;
+		}**/
+		Collections.shuffle( path);
+		return  path.toArray( new Symbol[ path.size()]);
 	}
 	
 	

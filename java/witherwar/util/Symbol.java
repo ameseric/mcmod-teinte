@@ -1,6 +1,7 @@
 package witherwar.util;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.minecraft.util.math.BlockPos;
@@ -49,6 +50,20 @@ public enum Symbol{ //not a generic Symbol class, which bothers me, but I think 
 	public static Symbol[] nonNullValues() {
 		Symbol[] noNull = Arrays.copyOfRange( Symbol.values() ,0 ,6);
 		return noNull;
+	}
+	
+	public static ArrayList<Symbol> compliment2D( Symbol a) {
+		int n = a.toInt();
+		ArrayList<Symbol> arr = new ArrayList<>();
+		
+		if( n == 2 || n == 3) {
+			arr.add( Symbol.ZP);
+			arr.add( Symbol.ZN);
+		}else{
+			arr.add( Symbol.XP);
+			arr.add( Symbol.XN);
+		}
+		return arr;
 	}
 	
 	public static Symbol intToSymbol( int n) {
