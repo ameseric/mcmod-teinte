@@ -194,7 +194,7 @@ public class WitherWar
 			this.data.regionMap.put( pos ,id);
 		}
 		this.setRegionName( id ,"");
-		//this.data.markDirty();
+		this.data.markDirty();
 	}
 	
     public void removeFromRegionMap( BlockPos pos) {
@@ -205,7 +205,7 @@ public class WitherWar
 		int id = this.getRegionID( cpos);
 		this.data.regionMap.entrySet().removeIf( e -> e.getValue() == id); //efficient?
 		this.data.regionNameMap.remove( id);
-		//this.data.markDirty();
+		this.data.markDirty();
     }
 	
 	public int getRegionID(BlockPos pos) {
