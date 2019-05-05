@@ -58,7 +58,7 @@ public class TeinteGUI{
 		final int MAX_ALPHA = 255;
 		final float SCALE = 1.6F;
 		final float ISCALE = 1/SCALE;
-		final int DELAY = 100;
+		final int DELAY = 80;
 		
 		int tick = 0;
 		int delayCounter = 0;
