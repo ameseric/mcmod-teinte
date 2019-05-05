@@ -28,6 +28,10 @@ public enum Symbol{ //not a generic Symbol class, which bothers me, but I think 
 		return this.tx;
 	}
 	
+	public int getX() {	return this.mod.getX();	}
+	public int getY() {	return this.mod.getY();	}
+	public int getZ() {	return this.mod.getZ();	}
+	
 	
 	public static Symbol[] randomValues() {
 		return Symbol.randomValues( 3);
