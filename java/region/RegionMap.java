@@ -21,6 +21,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import region.SuperChunk.SCPos;
 import witherwar.WitherWar;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageRegionOverlayOn;
@@ -28,8 +29,14 @@ import witherwar.util.Symbol;
 
 public class RegionMap {
 	private WorldSavedData data;
-	private HashMap<ChunkPos ,Integer> map;
-	public HashMap<Integer ,String> nameMap;
+	//private HashMap<ChunkPos ,Integer> map;
+	
+	//SuperChunkPos HashMap -> ChunkPos HashMap -> Region //convoluted, but for saving purposees lets us break up ChunkPos HashMap
+	
+	//HashMap<SuperChunkPos ,HashMap< ChunkPos ,Region>> map; //convoluted, but allows for saving/updating to be O(n)
+	HashSet<SuperChunk> map;
+	
+	//public HashMap<Integer ,String> nameMap;
 	public HashMap<EntityPlayer ,String> playerMap;
 	private HashSet<Integer> rejectedBiomes = Sets.newHashSet( 16 ,25 ,26);
 	private HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();
@@ -50,9 +57,8 @@ public class RegionMap {
 		this.nameMap = new HashMap<>();
 		this.playerMap = new HashMap<>();
 		
-		//messy, but allows us O(1) lookup, and we'll have 10k+ lookups in one tick.
+		//messy, but allows us O(1) lookup, and we'll have 1k+ lookups in one tick.
 		List< HashSet<Integer>> biomeGroups = new ArrayList<>();		
-		HashSet<Integer> oceans = Sets.newHashSet( 0 ,24 ,46 ,49 ,45 ,48 ,44 ,47);
 		biomeGroups.add( Sets.newHashSet( 0 ,24 ,46 ,49 ,45 ,48 ,44 ,47)); //oceans
 		biomeGroups.add( Sets.newHashSet( 4 ,18 ,132)); //forest
 		biomeGroups.add( Sets.newHashSet( 27 ,28 ,155 ,156)); //bforest
@@ -83,16 +89,17 @@ public class RegionMap {
 	
 	
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer playerIn) {
-		int id = getRegionID( pos);
-		if( id == -1) {
-			id = ThreadLocalRandom.current().nextInt(0, 999999 + 1);
+		//int id = getRegionID( pos);
+		String name = getRegionName( pos); 
+		if( name == null) {
+			name = new Integer( ThreadLocalRandom.current().nextInt(0, 999999 + 1)).toString();
 			//saveExecutor.submit( this.threadedFindRegionChunks(world, pos, id));
 			List<ChunkPos> map = findRegionChunks( world ,pos);
 			addRegion( id ,map);
 			//this.addRegionID(id);
 		}
-		String regionName = getRegionName( id);
-		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( id ,regionName) ,(EntityPlayerMP)playerIn);
+		//String regionName = getRegionName( id);
+		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( name ,pos.getX() ,pos.getY()) ,(EntityPlayerMP)playerIn);
 		
 
 	}
