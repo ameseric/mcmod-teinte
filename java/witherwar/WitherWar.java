@@ -1,20 +1,15 @@
 package witherwar;
 
 import java.util.HashMap;
-import java.util.List;
-
-import javax.annotation.Nullable;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
@@ -28,9 +23,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -54,7 +47,6 @@ import witherwar.network.*;//MessageRegionOverlayOn.MessageHandleRegionOverlayOn
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.IProxy;
 import witherwar.tileentity.TileEntityCataromotus;
-import witherwar.tileentity.TileEntityGuidestone;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.util.ChunkManager;
@@ -185,8 +177,8 @@ public class WitherWar
     
     
 
-    public void removeFromRegionMap( BlockPos pos) { this.data.regionMap.removeRegion(pos);}
-	public void setRegionName( int id ,String name) { this.data.regionMap.setRegionName(id, name);}
+    public void removeRegion( BlockPos pos) { this.data.regionMap.removeRegion(pos);}
+    public void setRegionName( String name ,BlockPos pos) { this.data.regionMap.updateRegionName(name, pos);}
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer player) {
 		if( config.allowRegionOverlay) {
 			this.data.regionMap.guidestoneActivated(world, pos, player);

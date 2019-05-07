@@ -43,7 +43,7 @@ public class GuiEditGuidestone extends GuiScreen{
         Keyboard.enableRepeatEvents(false);
 		super.onGuiClosed();
 		this.plaintext = this.text.getText();
-		WitherWar.snwrapper.sendToServer( new MessageEditGuidestone( msg.id ,this.plaintext));
+		WitherWar.snwrapper.sendToServer( new MessageEditGuidestone( msg.x ,msg.z ,this.plaintext));
 	}
 	 
 

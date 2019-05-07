@@ -67,7 +67,7 @@ public class MessageEditGuidestone implements IMessage{
 					WitherWar.proxy.openGui( 0 ,msg));
 			}else {
 				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
-					WitherWar.instance.setRegionName( new ChunkPos( msg.x ,msg.z) ,msg.regionName));
+					WitherWar.instance.setRegionName( msg.regionName , new BlockPos( msg.x ,0 ,msg.z) ));
 	//				this.serverHandler( msg));
 			}
 			return null;

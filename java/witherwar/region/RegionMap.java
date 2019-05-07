@@ -1,25 +1,16 @@
 package witherwar.region;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
-
 import javax.annotation.Nullable;
-
-import com.google.common.collect.Sets;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -27,7 +18,6 @@ import witherwar.WitherWar;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.region.SuperChunk.SCPos;
-import witherwar.util.Symbol;
 
 public class RegionMap {
 	private WorldSavedData data;
@@ -37,66 +27,33 @@ public class RegionMap {
 	//SuperChunkPos HashMap -> ChunkPos HashMap -> Region //convoluted, but for saving purposees lets us break up ChunkPos HashMap
 	
 	//HashMap<SuperChunkPos ,HashMap< ChunkPos ,Region>> map; //convoluted, but allows for saving/updating to be O(n)
-	//HashMap<SCPos ,SuperChunk> map;
+	HashMap<SCPos ,SuperChunk> map;
 //	SuperChunkMap map;
-	private List< List<SuperChunk>> map;
+	//private List< List<SuperChunk>> map;
 
 	
 	//public HashMap<Integer ,String> nameMap;
 	public HashMap<EntityPlayer ,String> playerMap;
-	private HashSet<Integer> rejectedBiomes = Sets.newHashSet( 16 ,25 ,26);
-	private HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();
 	public static ExecutorService saveExecutor = Executors.newFixedThreadPool(1);
 	
-	private final int MAX_SEARCH_DEPTH = 30;
 
 	
 	public RegionMap( WorldSavedData data) {
 		this.data = data;
 		this.initDataStructs();
-	}
-	
+	}	
 	
 	// Bad idea? Used for delaying findRegion call until after Guidestone activation.
 	public void setWorld( World world) {
 		this.world = world;
-	}
-	
+	}	
 	
 	private void initDataStructs() {
-		//this.map = new HashMap<>();
+		this.map = new HashMap<>();
 //		this.map = new SuperChunkMap();
 		//this.nameMap = new HashMap<>();
-		this.map = new ArrayList< List<SuperChunk>>();
+		//this.map = new ArrayList< List<SuperChunk>>();
 		this.playerMap = new HashMap<>();
-		
-		//messy, but allows us O(1) lookup, and we'll have 1k+ lookups in one tick.
-		List< HashSet<Integer>> biomeGroups = new ArrayList<>();		
-		biomeGroups.add( Sets.newHashSet( 0 ,24 ,46 ,49 ,45 ,48 ,44 ,47)); //oceans
-		biomeGroups.add( Sets.newHashSet( 4 ,18 ,132)); //forest
-		biomeGroups.add( Sets.newHashSet( 27 ,28 ,155 ,156)); //bforest
-		biomeGroups.add( Sets.newHashSet( 29 ,157)); //dforest
-		biomeGroups.add( Sets.newHashSet( 21 ,22 ,149 ,168 ,169)); //jungle
-		biomeGroups.add( Sets.newHashSet( 5 ,19)); //taiga
-		biomeGroups.add( Sets.newHashSet( 30 ,31)); //staiga
-		biomeGroups.add( Sets.newHashSet( 32 ,33 ,160 ,161)); //giants
-		biomeGroups.add( Sets.newHashSet( 14 ,15)); //mushroom
-		biomeGroups.add( Sets.newHashSet( 6 ,134)); //swamp
-		biomeGroups.add( Sets.newHashSet( 35 ,36)); //savanna
-		biomeGroups.add( Sets.newHashSet( 163 ,164)); //shattered
-		biomeGroups.add( Sets.newHashSet( 1 ,129)); //plains
-		biomeGroups.add( Sets.newHashSet( 2 ,17 ,130)); //desert
-		biomeGroups.add( Sets.newHashSet( 3 ,34 ,131 ,162)); //mountains
-		biomeGroups.add( Sets.newHashSet( 37 ,38 ,39 ,165 ,166 ,167)); //badlands
-
-		for( HashSet<Integer> biomeGroup : biomeGroups) {
-			System.out.println( "Adding group: " + biomeGroup);
-			for( Integer i : biomeGroup) {
-				System.out.print( "Adding biome: " + i);
-				this.similarBiomes.put( i ,biomeGroup);
-			}
-		}
-
 	}
 	
 	
@@ -146,64 +103,92 @@ public class RegionMap {
 //			//this.addRegionID(id);
 //		}
 		String regionName = this.getRegionName( new ChunkPos(pos));
-		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getY() ,regionName) ,(EntityPlayerMP)playerIn);
+		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getZ() ,regionName) ,(EntityPlayerMP)playerIn);
 		
 
 	}
 	
 	
-	public void updateRegionName( String name ,BlockPos startingPosition) {
-		String oldName = this.getRegionName( new ChunkPos( startingPosition));
-		if( oldName == null) {
-			this.createNewRegion( name ,startingPosition);
-		}else {
-			this.setRegionName( new ChunkPos( startingPosition) ,name);
-		}
-	}
-	
-	private Region getRegion( ChunkPos pos) {
-		return this.getSuperChunk( pos).getRegion(pos);
-	}
-	
-	@Nullable
-	private SuperChunk getSuperChunk( ChunkPos pos) {
-		try{
-			return this.map.get( pos.x>>5).get( pos.z>>5);
-		}catch( IndexOutOfBoundsException e){
-			return null;
-		}
-	}
-
-	
-	
-	private void createNewRegion( String regionName ,BlockPos startingPosition) {
-		Region newRegion = new Region( regionName ,startingPosition);
-		for( ChunkPos pos : newRegion.chunks) {
-			this.getSuperChunk( pos).addRegionChunk( pos ,newRegion);			
-		}
-		//this.findRegionChunks( this.world ,startingPosition);
-	}
-    
-    
 //    public void addRegionID( int id) {
 //    	this.setRegionName( id ,"");
 //    }
 
 	
-	private void addRegion( int id ,List<ChunkPos> map) {
-		for( ChunkPos pos : map) {
-			this.map.put( pos ,id);
+//	private void addRegion( int id ,List<ChunkPos> map) {
+//		for( ChunkPos pos : map) {
+//			this.map.put( pos ,id);
+//		}
+//		this.setRegionName( id ,"");
+//	}
+
+	
+	@Nullable
+	private SuperChunk getSuperChunk( ChunkPos pos) {
+//		List<SuperChunk> a;
+//		try{
+//			 a = this.map.get( (pos.x>>5)+2000);
+//		}catch( IndexOutOfBoundsException e){
+//			a = new ArrayList<SuperChunk>();
+//			this.map.add( (pos.x>>5)+2000 ,a);
+//		}
+//		
+//		try {
+//			return a.get( (pos.z>>5)+2000 );
+//		}catch( IndexOutOfBoundsException e){
+//			SuperChunk newSC = new SuperChunk();
+//			a.add( (pos.z>>5)+2000 ,newSC);
+//			return newSC;
+//		}
+		
+		SuperChunk sc = this.map.get( new SCPos( pos));
+		if( sc == null) {
+			sc = new SuperChunk( pos);
+			this.map.put( sc.pos ,sc);
 		}
-		this.setRegionName( id ,"");
+		return sc;
 	}
 	
-    public void removeRegion( BlockPos pos) {  	removeRegion( new ChunkPos(pos));    }	
+	
+	
+	
+	public void updateRegionName( String name ,BlockPos startingPosition) {
+		ChunkPos pos = new ChunkPos( startingPosition);
+		//String oldName = this.getRegionName( pos);
+		Region r = this.getRegion(pos);
+		if( r == null) {
+			this.createNewRegion( name ,startingPosition);
+		}else {
+			r.name = name;
+		}
+	}
+	
+	
+	private void createNewRegion( String regionName ,BlockPos startingPosition) {
+		Region newRegion = new Region( regionName ,startingPosition ,this.world);
+		for( ChunkPos pos : newRegion.getChunks()) {
+			this.getSuperChunk( pos).add( pos ,newRegion);			
+		}
+	}
+	
+	
+	@Nullable
+	private Region getRegion( ChunkPos pos) {
+		return this.getSuperChunk( pos).getRegion(pos);
+	}	
+
+	
+    public void removeRegion( BlockPos pos) {  	removeRegion( new ChunkPos(pos));  }	
 	public void removeRegion( ChunkPos cpos) {
 		//int id = this.getRegionID( cpos);
 		//this.map.entrySet().removeIf( e -> e.getValue() == id); //efficient?
 		//this.nameMap.remove( id);
-		Region toRemove = this.map.getRegion( cpos);
-		this.save();
+		Region toRemove = this.getRegion( cpos);
+		if( toRemove != null) {
+			for( ChunkPos pos : toRemove.getChunks()) {
+				this.getSuperChunk( pos).remove( pos);
+			}
+			this.save();
+		}
     }
 	
 //	public int getRegionID(BlockPos pos) {
@@ -221,14 +206,23 @@ public class RegionMap {
 	//public String getRegionName( ChunkPos pos) { return this.getRegionName( this.getRegionID(pos)); }	
 	//public String getRegionName( BlockPos pos) { return this.getRegionName( this.getRegionID(pos));	}
 	
-	private String getRegionName( BlockPos pos) { return this.getRegionName( new ChunkPos(pos));}
-	private String getRegionName( ChunkPos pos) { return this.getRegion( pos).name;}
+	//private String getRegionName( BlockPos pos) { return this.getRegionName(new ChunkPos(pos));}
+	
+	/**
+	 * 
+	 * @param pos
+	 * @return Returns empty string if no Region exists.
+	 */
+	private String getRegionName( ChunkPos pos) { 
+		Region r = this.getRegion( pos);
+		if( r != null) {
+			return r.name;
+		}
+		return "";
+	}
 	//this.map.get( new SCPos( pos)).getRegion( pos).name;
 	//this.map.get( x>>4).get( z>>4).getRegion( ChunkPos);
-	
-	public void setRegionName( ChunkPos pos ,String name) { 
-		this.getRegion( pos).name = name;
-	}
+
 	
 	public String getPlayerRegionName( EntityPlayer player) { return this.playerMap.get( player);	}	
 	public void setPlayerRegionName( EntityPlayer player ,String name) {this.playerMap.put( player ,name);	}
@@ -243,6 +237,8 @@ public class RegionMap {
 	public void save() {
 		this.data.markDirty();
 	}
+	
+	
 	
 	
 	public NBTTagCompound writeToNBT( NBTTagCompound nbt) {
@@ -284,108 +280,18 @@ public class RegionMap {
 	}
 	
 	
-	public Runnable threadedFindRegionChunks( World world ,BlockPos pos ,int id) {
-		List<ChunkPos> map = findRegionChunks( world ,pos);
-		this.addRegion(id, map);
-		return null;
-	}
+//	public Runnable threadedFindRegionChunks( World world ,BlockPos pos ,int id) {
+//		List<ChunkPos> map = findRegionChunks( world ,pos);
+//		this.addRegion(id, map);
+//		return null;
+//	}
 	
 	
-    public List<ChunkPos> findRegionChunks( World world ,BlockPos pos) {
-    	HashSet<ChunkPos> bmap = new HashSet<>();
-    	ChunkPos origin = new ChunkPos(pos);
-    	//map.add( origin);
-    	Biome regionBiome = world.getBiome( pos);
-    	
-    	Symbol[] dirs = new Symbol[]{ Symbol.XP ,Symbol.ZP ,Symbol.ZN ,Symbol.XN};
-    	//for( Symbol s : dirs) {
-    		findRegionChunks( bmap ,world ,origin ,Symbol.XP ,regionBiome ,regionBiome ,0);
-    		//bmap.remove( origin);
-    	//}
-    	
-    	return new ArrayList<>(bmap);
-    }
-    
-    
-    
-// Possible move to Region
-    private void findRegionChunks( HashSet<ChunkPos> bmap ,World world ,ChunkPos pos ,Symbol direction ,Biome originBiome ,Biome lastBiome ,int depth) {
-    	//if( bmap.contains( pos) || bmap.size() > 400) {  return;}
-    	if( bmap.contains( pos) || depth > this.MAX_SEARCH_DEPTH ) { return;}
 
-    	
-    	//if( bmap.contains( pos)) { System.out.println( "Already have it."); return;}
-    	//if( bmap.size() > 400) { System.out.println( "Hit cap."); return;}
-    	
-    	Biome currentBiome = getAverageBiome( world ,pos);//world.getBiome( pos);
-    	if( !isSimilarBiome( originBiome ,currentBiome) && !isPassableRiver( currentBiome ,lastBiome ,depth)) {
-    		return;
-    	}
-    	
-   		bmap.add( pos);
-   		
-   		int mod = depth / 5;
-   		for( int y=120; y<mod+121; y++) {
-   	   		world.setBlockState( new BlockPos( pos.getXStart()+7 ,y ,pos.getZStart()+7) ,Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState());
-   		}
-   		
+    
+    
+    
 
-    	ArrayList<Symbol> arr = Symbol.compliment2D( direction);
-    	arr.add( direction);
-    	for( Symbol s : arr) {
-    		ChunkPos newpos = new ChunkPos( pos.x+s.getX() ,pos.z+s.getZ() );
-    		findRegionChunks( bmap ,world ,newpos ,s ,originBiome ,currentBiome ,depth++);
-    	}
-    	return;
-    }
-    
-    
-    private Biome getAverageBiome( World world ,ChunkPos pos) {
-    	Biome b =  world.getBiome( new BlockPos( pos.getXStart()+7 ,0 ,pos.getZStart()+7 ));
-    	//System.out.println( "----------------------> " + b.getBiomeName() + " " + Biome.getIdForBiome( b));
-    	return b;
-    }
-    
-    
-    private boolean isSimilarBiome( Biome originBiome ,Biome newBiome) {
-    	if( isRejectBiome( newBiome)) { return false; }
-    	
-    	HashSet<Integer> map = this.similarBiomes.get( Biome.getIdForBiome( originBiome));
-    	if( map != null) {
-    		return map.contains( Biome.getIdForBiome( newBiome));
-    	}    	
-    	return originBiome == newBiome;
-    }
-    
-    private boolean isPassableRiver( Biome newBiome ,Biome lastBiome ,int depth) {
-    	int idNew = Biome.getIdForBiome( newBiome); 
-    	if( idNew != 7 || idNew != 11) { return false;} //not river
-    	
-    	if( (float)depth/MAX_SEARCH_DEPTH < 0.65) { return false;}
-    
-    	int idOld = Biome.getIdForBiome( lastBiome);
-    	if( (idOld == 7 && idNew == 7) || ( idOld == 11 && idNew == 11)){
-    		return false;
-    	}
-    	
-    	return true;
-    }
-
- /**   
-    private boolean followingRiver( Biome oldBiome ,Biome newBiome) {
-    	int id1 = Biome.getIdForBiome( oldBiome);
-    	int id2 = Biome.getIdForBiome( newBiome);
-    	return ( id1 == 7 && id2 == 7) || ( id1 == 11 && id2 == 11);
-    }
-    
-    private boolean isRiver( Biome biome) {
-    	int id = Biome.getIdForBiome( biome);
-    	return id == 7 || id == 11;
-    }**/
-    
-    private boolean isRejectBiome( Biome biome) {    	
-    	return this.rejectedBiomes.contains( Biome.getIdForBiome(biome)); 
-    }
 	
 	
 }

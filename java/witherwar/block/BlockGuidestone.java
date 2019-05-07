@@ -41,7 +41,7 @@ public class BlockGuidestone extends Block{
 	
 	@Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-		WitherWar.instance.removeFromRegionMap( pos);
+		WitherWar.instance.removeRegion( pos);
 		super.breakBlock( worldIn ,pos, state);
 	}
 	//import java.util.concurrent.ThreadLocalRandom;
