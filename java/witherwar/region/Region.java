@@ -1,7 +1,8 @@
-package region;
+package witherwar.region;
 
 import java.util.HashSet;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
 /**
@@ -19,8 +20,8 @@ public class Region {
 	HashSet<ChunkPos> chunks;	
 	String name;
 	
-	public Region( String name ,HashSet<ChunkPos> chunks) {
-		this.chunks = chunks;
+	public Region( String name ,BlockPos startingPosition) {
+		//this.chunks = chunks;
 		this.name = name;
 	}
 	

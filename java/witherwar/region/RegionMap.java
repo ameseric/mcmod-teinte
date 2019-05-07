@@ -1,4 +1,4 @@
-package region;
+package witherwar.region;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Sets;
 
@@ -21,10 +23,10 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import region.SuperChunk.SCPos;
 import witherwar.WitherWar;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageRegionOverlayOn;
+import witherwar.region.SuperChunk.SCPos;
 import witherwar.util.Symbol;
 
 public class RegionMap {
@@ -35,8 +37,10 @@ public class RegionMap {
 	//SuperChunkPos HashMap -> ChunkPos HashMap -> Region //convoluted, but for saving purposees lets us break up ChunkPos HashMap
 	
 	//HashMap<SuperChunkPos ,HashMap< ChunkPos ,Region>> map; //convoluted, but allows for saving/updating to be O(n)
-	HashMap<SCPos ,SuperChunk> map;
-	SuperChunkMap scm;
+	//HashMap<SCPos ,SuperChunk> map;
+//	SuperChunkMap map;
+	private List< List<SuperChunk>> map;
+
 	
 	//public HashMap<Integer ,String> nameMap;
 	public HashMap<EntityPlayer ,String> playerMap;
@@ -60,8 +64,10 @@ public class RegionMap {
 	
 	
 	private void initDataStructs() {
-		this.map = new HashMap<>();
+		//this.map = new HashMap<>();
+//		this.map = new SuperChunkMap();
 		//this.nameMap = new HashMap<>();
+		this.map = new ArrayList< List<SuperChunk>>();
 		this.playerMap = new HashMap<>();
 		
 		//messy, but allows us O(1) lookup, and we'll have 1k+ lookups in one tick.
@@ -150,64 +156,82 @@ public class RegionMap {
 		String oldName = this.getRegionName( new ChunkPos( startingPosition));
 		if( oldName == null) {
 			this.createNewRegion( name ,startingPosition);
+		}else {
+			this.setRegionName( new ChunkPos( startingPosition) ,name);
 		}
 	}
 	
+	private Region getRegion( ChunkPos pos) {
+		return this.getSuperChunk( pos).getRegion(pos);
+	}
 	
-	public void createNewRegion( String regionName ,BlockPos startingPosition) {
-		this.findRegionChunks( this.world ,startingPosition);
+	@Nullable
+	private SuperChunk getSuperChunk( ChunkPos pos) {
+		try{
+			return this.map.get( pos.x>>5).get( pos.z>>5);
+		}catch( IndexOutOfBoundsException e){
+			return null;
+		}
+	}
+
+	
+	
+	private void createNewRegion( String regionName ,BlockPos startingPosition) {
+		Region newRegion = new Region( regionName ,startingPosition);
+		for( ChunkPos pos : newRegion.chunks) {
+			this.getSuperChunk( pos).addRegionChunk( pos ,newRegion);			
+		}
+		//this.findRegionChunks( this.world ,startingPosition);
 	}
     
     
-    public void addRegionID( int id) {
-    	this.setRegionName( id ,"");
-    }
+//    public void addRegionID( int id) {
+//    	this.setRegionName( id ,"");
+//    }
 
 	
-	public void addRegion( int id ,List<ChunkPos> map) {
+	private void addRegion( int id ,List<ChunkPos> map) {
 		for( ChunkPos pos : map) {
 			this.map.put( pos ,id);
 		}
 		this.setRegionName( id ,"");
 	}
 	
-    public void removeFromRegionMap( BlockPos pos) {
-    	removeFromRegionMap( new ChunkPos(pos));
-    }
-	
-	public void removeFromRegionMap( ChunkPos cpos) {
+    public void removeRegion( BlockPos pos) {  	removeRegion( new ChunkPos(pos));    }	
+	public void removeRegion( ChunkPos cpos) {
 		//int id = this.getRegionID( cpos);
 		//this.map.entrySet().removeIf( e -> e.getValue() == id); //efficient?
 		//this.nameMap.remove( id);
-		Region toRemove = this.map.get( new SCPos(cpos)).getRegion( cpos);
+		Region toRemove = this.map.getRegion( cpos);
 		this.save();
     }
 	
-	public int getRegionID(BlockPos pos) {
-		return getRegionID( new ChunkPos(pos));
-	}
-	
-	public int getRegionID( ChunkPos pos) {
-		if( this.map.containsKey( pos)) {
-			return this.map.get( pos);
-		}
-		return -1;
-	}	
+//	public int getRegionID(BlockPos pos) {
+//		return getRegionID( new ChunkPos(pos));
+//	}
+//	
+//	public int getRegionID( ChunkPos pos) {
+//		if( this.map.containsKey( pos)) {
+//			return this.map.get( pos);
+//		}
+//		return -1;
+//	}	
 	
 	//public String getRegionName( int id) { return this.nameMap.get(id);	}
 	//public String getRegionName( ChunkPos pos) { return this.getRegionName( this.getRegionID(pos)); }	
 	//public String getRegionName( BlockPos pos) { return this.getRegionName( this.getRegionID(pos));	}
 	
+	private String getRegionName( BlockPos pos) { return this.getRegionName( new ChunkPos(pos));}
+	private String getRegionName( ChunkPos pos) { return this.getRegion( pos).name;}
+	//this.map.get( new SCPos( pos)).getRegion( pos).name;
+	//this.map.get( x>>4).get( z>>4).getRegion( ChunkPos);
+	
 	public void setRegionName( ChunkPos pos ,String name) { 
-		this.map.get( new SCPos( pos)).setRegionName( name ,pos); 
+		this.getRegion( pos).name = name;
 	}
 	
-	public String getPlayerRegionName( EntityPlayer player) {
-		return this.playerMap.get( player);
-	}	
-	public void setPlayerRegionName( EntityPlayer player ,String name) {
-		this.playerMap.put( player ,name);
-	}
+	public String getPlayerRegionName( EntityPlayer player) { return this.playerMap.get( player);	}	
+	public void setPlayerRegionName( EntityPlayer player ,String name) {this.playerMap.put( player ,name);	}
 	
 	//public void setRegionName( int id ,String name) {
 	//	this.nameMap.put( id ,name);
@@ -221,8 +245,6 @@ public class RegionMap {
 	}
 	
 	
-	//should probably optimize saving, so that name updates don't trigger all ChunkPos to be re-set
-	//and *might* want to break up this.map into a new Object. I don't know when this will impact server performance.
 	public NBTTagCompound writeToNBT( NBTTagCompound nbt) {
 //		int i = 0;
 //		for( ChunkPos cpos : this.map.keySet()) {
@@ -285,6 +307,8 @@ public class RegionMap {
     }
     
     
+    
+// Possible move to Region
     private void findRegionChunks( HashSet<ChunkPos> bmap ,World world ,ChunkPos pos ,Symbol direction ,Biome originBiome ,Biome lastBiome ,int depth) {
     	//if( bmap.contains( pos) || bmap.size() > 400) {  return;}
     	if( bmap.contains( pos) || depth > this.MAX_SEARCH_DEPTH ) { return;}

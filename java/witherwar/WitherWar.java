@@ -185,7 +185,7 @@ public class WitherWar
     
     
 
-    public void removeFromRegionMap( BlockPos pos) { this.data.regionMap.removeFromRegionMap(pos);}
+    public void removeFromRegionMap( BlockPos pos) { this.data.regionMap.removeRegion(pos);}
 	public void setRegionName( int id ,String name) { this.data.regionMap.setRegionName(id, name);}
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer player) {
 		if( config.allowRegionOverlay) {
