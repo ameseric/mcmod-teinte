@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -15,16 +16,17 @@ import witherwar.tileentity.TileEntityGuidestone;
 
 public class MessageEditGuidestone implements IMessage{
 	public String regionName = "";
-	//public int x = 0;
+	public int x = 0;
 	//public int y = 0;
-	//public int z = 0;
-	public int id;
+	public int z = 0;
+	//public int id;
 	
 	public MessageEditGuidestone() {}
 	
-	public MessageEditGuidestone( int id ,String regionName) {
+	public MessageEditGuidestone( int x ,int z ,String regionName) {
 		this.regionName = regionName;
-		this.id = id;
+		this.x = x;
+		this.z = z;
 	}
 	
 	/**public MessageEditGuidestone( String name ,int x ,int y ,int z) {
@@ -38,10 +40,10 @@ public class MessageEditGuidestone implements IMessage{
 	public void fromBytes(ByteBuf buf) {
 		int length = buf.readInt();
 		this.regionName = buf.readCharSequence( length ,Charset.defaultCharset()).toString();
-		this.id = buf.readInt();
-		//this.x = buf.readInt();
+		//this.id = buf.readInt();
+		this.x = buf.readInt();
 		//this.y = buf.readInt();
-		//this.z = buf.readInt();
+		this.z = buf.readInt();
 	}
 
 	@Override
@@ -49,9 +51,9 @@ public class MessageEditGuidestone implements IMessage{
 		int length = this.regionName.getBytes().length;
 		buf.writeInt( length);
 		buf.writeCharSequence( this.regionName ,Charset.defaultCharset());
-		buf.writeInt( this.id);
+		buf.writeInt( this.x);
 		//buf.writeInt( this.y);
-		//buf.writeInt( this.z);
+		buf.writeInt( this.z);
 	}	
 	
 	
@@ -65,7 +67,7 @@ public class MessageEditGuidestone implements IMessage{
 					WitherWar.proxy.openGui( 0 ,msg));
 			}else {
 				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
-					WitherWar.instance.setRegionName( msg.id ,msg.regionName));
+					WitherWar.instance.setRegionName( new ChunkPos( msg.x ,msg.z) ,msg.regionName));
 	//				this.serverHandler( msg));
 			}
 			return null;

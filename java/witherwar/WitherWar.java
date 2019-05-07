@@ -177,6 +177,7 @@ public class WitherWar
     public void onWorldLoad( WorldEvent.Load event) {
     	if( event.getWorld().provider.getDimension() == 0 && !event.getWorld().isRemote) {
     		this.data = TeinteWorldSavedData.get( event.getWorld());
+    		this.data.regionMap.setWorld( event.getWorld());
     		MinecraftForge.EVENT_BUS.register( this.data.regionMap);
     	}
     }
@@ -187,7 +188,9 @@ public class WitherWar
     public void removeFromRegionMap( BlockPos pos) { this.data.regionMap.removeFromRegionMap(pos);}
 	public void setRegionName( int id ,String name) { this.data.regionMap.setRegionName(id, name);}
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer player) {
-		this.data.regionMap.guidestoneActivated(world, pos, player);
+		if( config.allowRegionOverlay) {
+			this.data.regionMap.guidestoneActivated(world, pos, player);
+		}
 	}
 	
 
@@ -201,7 +204,9 @@ public class WitherWar
 			tickcount = 0;
 			
 			//tickRegions( tickcount ,event.world);
-			this.data.regionMap.tick( tickcount ,event.world);
+			if( config.allowRegionOverlay) {
+				this.data.regionMap.tick( tickcount ,event.world);
+			}
 			//tickTerraliths();
 			//tickVoid();
 			//tickAleph();
@@ -272,6 +277,10 @@ public class WitherWar
 		@Comment( value={ "When true, allows players to craft portals" ,"and travel to pocket dimensions."})
 		@Name( value = "An Option Name")
 		public static boolean allowPDimensions = true;
+		
+		@Comment( value= {"When true, allows Guidestones to project the current Region name","onto the player's screen."})
+		@Name( value="Enable Region Overlay")
+		public static boolean allowRegionOverlay = true;
 		
 		@Config( modid=MODID ,name="Terralith Config" ,category="TConfig")
 		public static class terralithConfig{

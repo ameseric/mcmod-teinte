@@ -16,7 +16,7 @@ import net.minecraft.util.math.ChunkPos;
  *
  */
 public class Region {
-	HashSet<ChunkPos> chunks;
+	HashSet<ChunkPos> chunks;	
 	String name;
 	
 	public Region( String name ,HashSet<ChunkPos> chunks) {

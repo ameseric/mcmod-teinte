@@ -29,12 +29,14 @@ import witherwar.util.Symbol;
 
 public class RegionMap {
 	private WorldSavedData data;
+	private World world;
 	//private HashMap<ChunkPos ,Integer> map;
 	
 	//SuperChunkPos HashMap -> ChunkPos HashMap -> Region //convoluted, but for saving purposees lets us break up ChunkPos HashMap
 	
 	//HashMap<SuperChunkPos ,HashMap< ChunkPos ,Region>> map; //convoluted, but allows for saving/updating to be O(n)
-	HashSet<SuperChunk> map;
+	HashMap<SCPos ,SuperChunk> map;
+	SuperChunkMap scm;
 	
 	//public HashMap<Integer ,String> nameMap;
 	public HashMap<EntityPlayer ,String> playerMap;
@@ -48,13 +50,18 @@ public class RegionMap {
 	public RegionMap( WorldSavedData data) {
 		this.data = data;
 		this.initDataStructs();
+	}
 	
+	
+	// Bad idea? Used for delaying findRegion call until after Guidestone activation.
+	public void setWorld( World world) {
+		this.world = world;
 	}
 	
 	
 	private void initDataStructs() {
 		this.map = new HashMap<>();
-		this.nameMap = new HashMap<>();
+		//this.nameMap = new HashMap<>();
 		this.playerMap = new HashMap<>();
 		
 		//messy, but allows us O(1) lookup, and we'll have 1k+ lookups in one tick.
@@ -85,25 +92,6 @@ public class RegionMap {
 		}
 
 	}
-	
-	
-	
-	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer playerIn) {
-		//int id = getRegionID( pos);
-		String name = getRegionName( pos); 
-		if( name == null) {
-			name = new Integer( ThreadLocalRandom.current().nextInt(0, 999999 + 1)).toString();
-			//saveExecutor.submit( this.threadedFindRegionChunks(world, pos, id));
-			List<ChunkPos> map = findRegionChunks( world ,pos);
-			addRegion( id ,map);
-			//this.addRegionID(id);
-		}
-		//String regionName = getRegionName( id);
-		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( name ,pos.getX() ,pos.getY()) ,(EntityPlayerMP)playerIn);
-		
-
-	}
-	
 	
 	
 	
@@ -140,6 +128,37 @@ public class RegionMap {
     }
     
     
+    
+	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer playerIn) {
+		//int id = getRegionID( pos);
+//		String name = getRegionName( pos); 
+//		if( name == null) {
+//			name = new Integer( ThreadLocalRandom.current().nextInt(0, 999999 + 1)).toString();
+//			//saveExecutor.submit( this.threadedFindRegionChunks(world, pos, id));
+//			List<ChunkPos> map = findRegionChunks( world ,pos);
+//			addRegion( id ,map);
+//			//this.addRegionID(id);
+//		}
+		String regionName = this.getRegionName( new ChunkPos(pos));
+		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getY() ,regionName) ,(EntityPlayerMP)playerIn);
+		
+
+	}
+	
+	
+	public void updateRegionName( String name ,BlockPos startingPosition) {
+		String oldName = this.getRegionName( new ChunkPos( startingPosition));
+		if( oldName == null) {
+			this.createNewRegion( name ,startingPosition);
+		}
+	}
+	
+	
+	public void createNewRegion( String regionName ,BlockPos startingPosition) {
+		this.findRegionChunks( this.world ,startingPosition);
+	}
+    
+    
     public void addRegionID( int id) {
     	this.setRegionName( id ,"");
     }
@@ -157,9 +176,10 @@ public class RegionMap {
     }
 	
 	public void removeFromRegionMap( ChunkPos cpos) {
-		int id = this.getRegionID( cpos);
-		this.map.entrySet().removeIf( e -> e.getValue() == id); //efficient?
-		this.nameMap.remove( id);
+		//int id = this.getRegionID( cpos);
+		//this.map.entrySet().removeIf( e -> e.getValue() == id); //efficient?
+		//this.nameMap.remove( id);
+		Region toRemove = this.map.get( new SCPos(cpos)).getRegion( cpos);
 		this.save();
     }
 	
@@ -174,22 +194,25 @@ public class RegionMap {
 		return -1;
 	}	
 	
-	public String getRegionName( int id) { return this.nameMap.get(id);	}
-	public String getRegionName( ChunkPos pos) { return this.getRegionName( this.getRegionID(pos)); }	
-	public String getRegionName( BlockPos pos) { return this.getRegionName( this.getRegionID(pos));	}
+	//public String getRegionName( int id) { return this.nameMap.get(id);	}
+	//public String getRegionName( ChunkPos pos) { return this.getRegionName( this.getRegionID(pos)); }	
+	//public String getRegionName( BlockPos pos) { return this.getRegionName( this.getRegionID(pos));	}
+	
+	public void setRegionName( ChunkPos pos ,String name) { 
+		this.map.get( new SCPos( pos)).setRegionName( name ,pos); 
+	}
 	
 	public String getPlayerRegionName( EntityPlayer player) {
 		return this.playerMap.get( player);
-	}
-	
+	}	
 	public void setPlayerRegionName( EntityPlayer player ,String name) {
 		this.playerMap.put( player ,name);
 	}
 	
-	public void setRegionName( int id ,String name) {
-		this.nameMap.put( id ,name);
-		this.save();
-	}
+	//public void setRegionName( int id ,String name) {
+	//	this.nameMap.put( id ,name);
+	//	this.save();
+	//}
 	
 	
 	
@@ -201,21 +224,21 @@ public class RegionMap {
 	//should probably optimize saving, so that name updates don't trigger all ChunkPos to be re-set
 	//and *might* want to break up this.map into a new Object. I don't know when this will impact server performance.
 	public NBTTagCompound writeToNBT( NBTTagCompound nbt) {
-		int i = 0;
-		for( ChunkPos cpos : this.map.keySet()) {
-			int[] arr = { cpos.x ,cpos.z ,this.map.get( cpos)};
-			nbt.setIntArray( "Chunk"+i ,arr);
-			i++;
-		}
-		nbt.setInteger( "NumOfChunks" ,i);
+//		int i = 0;
+//		for( ChunkPos cpos : this.map.keySet()) {
+//			int[] arr = { cpos.x ,cpos.z ,this.map.get( cpos)};
+//			nbt.setIntArray( "Chunk"+i ,arr);
+//			i++;
+//		}
+//		nbt.setInteger( "NumOfChunks" ,i);
 		
-		int j = 0;
-		for( Integer id : this.nameMap.keySet()) {
-			nbt.setString( "Region"+j ,this.nameMap.get(id));
-			nbt.setInteger( "ID"+j ,id);
-			j++;
-		}
-		nbt.setInteger( "NumOfRegions" ,j);
+//		int j = 0;
+//		for( Integer id : this.nameMap.keySet()) {
+//			nbt.setString( "Region"+j ,this.nameMap.get(id));
+//			nbt.setInteger( "ID"+j ,id);
+//			j++;
+//		}
+//		nbt.setInteger( "NumOfRegions" ,j);
 
 		
 		return nbt;
@@ -224,18 +247,17 @@ public class RegionMap {
 	
 	
 	public void readFromNBT(NBTTagCompound nbt) {
-		//this.initDataStructs();
 		
-		int numOfChunks = nbt.getInteger( "NumOfChunks");
-		for( int i = 0; i<numOfChunks; i++) {
-			int[] arr = nbt.getIntArray( "Chunk"+i);
-			this.map.put( new ChunkPos(arr[0] ,arr[1]) ,arr[2]);
-		}
-		
-		int numOfRegions = nbt.getInteger( "NumOfRegions");
-		for( int j=0; j<numOfRegions; j++) {
-			this.nameMap.put( nbt.getInteger( "ID"+j) ,nbt.getString( "Region"+j));
-		}
+//		int numOfChunks = nbt.getInteger( "NumOfChunks");
+//		for( int i = 0; i<numOfChunks; i++) {
+//			int[] arr = nbt.getIntArray( "Chunk"+i);
+//			this.map.put( new ChunkPos(arr[0] ,arr[1]) ,arr[2]);
+//		}
+//		
+//		int numOfRegions = nbt.getInteger( "NumOfRegions");
+//		for( int j=0; j<numOfRegions; j++) {
+//			this.nameMap.put( nbt.getInteger( "ID"+j) ,nbt.getString( "Region"+j));
+//		}
 		
 	}
 	
