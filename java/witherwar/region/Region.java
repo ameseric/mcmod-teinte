@@ -36,10 +36,9 @@ public class Region {
 	private HashSet<Integer> rejectedBiomes = Sets.newHashSet( 16 ,25 ,26);
 	private HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();
 
-	private final int CHUNK_CUTOFF = 600;
+	private final int REGION_SIZE_LIMIT = 1000;
 	
 	public Region( String name ,BlockPos startingPosition ,World world) {
-		//this.chunks = chunks;
 		this.name = name;		
 		this.buildBiomeGroups();		
 		this.chunks = this.findRegionChunks( world ,startingPosition);
@@ -120,8 +119,11 @@ public class Region {
     
     
     //breadth-first
+    //Not elegant, but should allow O(1) lookup for duplicates for smaller regions.
+    //For Minecraft, better to take up memory than to take up CPU time.
     private HashSet<ChunkPos> findRegionChunks( ChunkPos origin ,Biome originBiome ,World world) {
     	HashSet<ChunkPos> map = new HashSet<>();
+    	HashSet<ChunkPos> consideredPos = new HashSet<>();
     	ArrayList<SearchNode> queue = new ArrayList<>();
 		//Biome currentBiome = getAverageBiome( world ,origin);
     	queue.add( new SearchNode( origin ,Symbol.XP ,originBiome));
@@ -131,7 +133,7 @@ public class Region {
 		int i = 0;
     	while(true){
 			//System.out.println( "Current queue: " + queue);			
-			if( i >= queue.size() || map.size() > CHUNK_CUTOFF) {
+			if( i >= queue.size() || map.size() > REGION_SIZE_LIMIT) {
 				System.out.println( "----------------> Final Count: " + i);
 				return map;
 			}
@@ -143,15 +145,17 @@ public class Region {
     			map.add( node.pos);
     			//debug viewing here
     	   		int mod = i / 100;
-    			//for( int y=120; y<mod+121; y++) {
-    	   	   	//	world.setBlockState( new BlockPos( node.pos.getXStart()+7 ,y ,node.pos.getZStart()+7) ,Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState());
-    	   		//}
+    			for( int y=120; y<mod+121; y++) {
+    	   	   		world.setBlockState( new BlockPos( node.pos.getXStart()+7 ,y ,node.pos.getZStart()+7) ,Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState());
+    	   		}
    		
 	        	ArrayList<Symbol> arr = Symbol.compliment2D( node.facing);
+	        	arr.add( node.facing); //redundant, but is sigf in literal edge-cases (guidestone is on edge of region) 
 	    		for( Symbol s : arr) {
 	    			ChunkPos childPos = new ChunkPos( node.pos.x+s.getX() ,node.pos.z+s.getZ());
-	    			if( !map.contains( childPos)) {
+	    			if( !consideredPos.contains( childPos)) {
 	    				queue.add( new SearchNode( childPos ,s ,currentBiome));
+	    				consideredPos.add( childPos);
 	    				//world.setBlockState( new BlockPos( node.pos.getXStart()+8 ,120 ,node.pos.getZStart()+8) ,Blocks.RED_GLAZED_TERRACOTTA.getDefaultState());
 	    			}
 	    		}
@@ -164,7 +168,7 @@ public class Region {
     
     //depth-first
     private void findRegionChunks( HashSet<ChunkPos> bmap ,World world ,ChunkPos pos ,Symbol direction ,Biome originBiome ,Biome lastBiome ,int depth) {
-    	if( bmap.contains( pos) || depth > this.CHUNK_CUTOFF ) { return;}
+    	if( bmap.contains( pos) || depth > this.REGION_SIZE_LIMIT ) { return;}
 
     	Biome currentBiome = getAverageBiome( world ,pos);//world.getBiome( pos);
     	if( !isSimilarBiome( originBiome ,currentBiome) && !isPassableRiver( currentBiome ,lastBiome ,depth)) {
@@ -208,7 +212,7 @@ public class Region {
     	int idNew = Biome.getIdForBiome( newBiome); 
     	if( idNew != 7 || idNew != 11) { return false;} //not river
     	
-    	if( (float)depth/CHUNK_CUTOFF < 0.65) { return false;}
+    	if( (float)depth/REGION_SIZE_LIMIT < 0.65) { return false;}
     
     	int idOld = Biome.getIdForBiome( lastBiome);
     	if( (idOld == 7 && idNew == 7) || ( idOld == 11 && idNew == 11)){
