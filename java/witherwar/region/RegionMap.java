@@ -69,14 +69,11 @@ public class RegionMap {
 				//String playerRegion = this.getPlayerRegionName( player);
 				String regionName = this.getRegionName( cpos);
 				
-				//System.out.println( "Checking region name......n->p");
-				//System.out.println( regionName);
-				//System.out.println( playerRegion);
-				if( regionName == null) {
-					this.setPlayerRegionName( player ,"");
-				}else if( regionName != this.getPlayerRegionName( player)) {
-					WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
+				if( regionName != this.getPlayerRegionName( player)) {
 					this.setPlayerRegionName( player ,regionName);
+					if( regionName != "") {
+						WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
+					}
 				}
 			}
 		}

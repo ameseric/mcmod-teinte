@@ -3,7 +3,12 @@ package witherwar.region;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 import com.google.common.collect.Sets;
 
@@ -31,7 +36,7 @@ public class Region {
 	private HashSet<Integer> rejectedBiomes = Sets.newHashSet( 16 ,25 ,26);
 	private HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();
 
-	private final int MAX_SEARCH_DEPTH = 30;
+	private final int CHUNK_CUTOFF = 600;
 	
 	public Region( String name ,BlockPos startingPosition ,World world) {
 		//this.chunks = chunks;
@@ -90,30 +95,77 @@ public class Region {
 	
 	
     private HashSet<ChunkPos> findRegionChunks( World world ,BlockPos pos) {
-    	HashSet<ChunkPos> bmap = new HashSet<>();
+    	HashSet<ChunkPos> bmap;// = new HashSet<>();
     	ChunkPos origin = new ChunkPos(pos);
-    	//map.add( origin);
     	Biome regionBiome = world.getBiome( pos);
     	
-    	Symbol[] dirs = new Symbol[]{ Symbol.XP ,Symbol.ZP ,Symbol.ZN ,Symbol.XN};
-    	//for( Symbol s : dirs) {
-    		findRegionChunks( bmap ,world ,origin ,Symbol.XP ,regionBiome ,regionBiome ,0);
-    		//bmap.remove( origin);
-    	//}
+   		//findRegionChunks( bmap ,world ,origin ,Symbol.XP ,regionBiome ,regionBiome ,0);
+    	bmap = findRegionChunks( origin ,regionBiome ,world);
     	
-//    	return new ArrayList<>(bmap);
     	return bmap; 
     }
-	
     
-    private void findRegionChunks( HashSet<ChunkPos> bmap ,World world ,ChunkPos pos ,Symbol direction ,Biome originBiome ,Biome lastBiome ,int depth) {
-    	//if( bmap.contains( pos) || bmap.size() > 400) {  return;}
-    	if( bmap.contains( pos) || depth > this.MAX_SEARCH_DEPTH ) { return;}
+    
+    private class SearchNode {
+    	public ChunkPos pos;
+    	public Symbol facing;
+    	public Biome parentBiome;
+    	
+    	SearchNode( ChunkPos pos ,Symbol facing ,Biome parentBiome){
+    		this.pos = pos;
+    		this.facing = facing;
+    		this.parentBiome = parentBiome;
+    	}
+    }
+    
+    
+    //breadth-first
+    private HashSet<ChunkPos> findRegionChunks( ChunkPos origin ,Biome originBiome ,World world) {
+    	HashSet<ChunkPos> map = new HashSet<>();
+    	ArrayList<SearchNode> queue = new ArrayList<>();
+		//Biome currentBiome = getAverageBiome( world ,origin);
+    	queue.add( new SearchNode( origin ,Symbol.XP ,originBiome));
+    	
+		//ListIterator<SearchNode> queueIter = queue.listIterator();
+    	
+		int i = 0;
+    	while(true){
+			//System.out.println( "Current queue: " + queue);			
+			if( i >= queue.size() || map.size() > CHUNK_CUTOFF) {
+				System.out.println( "----------------> Final Count: " + i);
+				return map;
+			}
+			
+    		SearchNode node = queue.get(i);
+    		Biome currentBiome = getAverageBiome( world ,node.pos);
+    		
+    		if( isSimilarBiome( originBiome ,currentBiome) || isPassableRiver( currentBiome ,node.parentBiome ,i)) {
+    			map.add( node.pos);
+    			//debug viewing here
+    	   		int mod = i / 100;
+    			//for( int y=120; y<mod+121; y++) {
+    	   	   	//	world.setBlockState( new BlockPos( node.pos.getXStart()+7 ,y ,node.pos.getZStart()+7) ,Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState());
+    	   		//}
+   		
+	        	ArrayList<Symbol> arr = Symbol.compliment2D( node.facing);
+	    		for( Symbol s : arr) {
+	    			ChunkPos childPos = new ChunkPos( node.pos.x+s.getX() ,node.pos.z+s.getZ());
+	    			if( !map.contains( childPos)) {
+	    				queue.add( new SearchNode( childPos ,s ,currentBiome));
+	    				//world.setBlockState( new BlockPos( node.pos.getXStart()+8 ,120 ,node.pos.getZStart()+8) ,Blocks.RED_GLAZED_TERRACOTTA.getDefaultState());
+	    			}
+	    		}
+    		}
+    		i++;
+    	}
+    }
 
-    	
-    	//if( bmap.contains( pos)) { System.out.println( "Already have it."); return;}
-    	//if( bmap.size() > 400) { System.out.println( "Hit cap."); return;}
-    	
+    
+    
+    //depth-first
+    private void findRegionChunks( HashSet<ChunkPos> bmap ,World world ,ChunkPos pos ,Symbol direction ,Biome originBiome ,Biome lastBiome ,int depth) {
+    	if( bmap.contains( pos) || depth > this.CHUNK_CUTOFF ) { return;}
+
     	Biome currentBiome = getAverageBiome( world ,pos);//world.getBiome( pos);
     	if( !isSimilarBiome( originBiome ,currentBiome) && !isPassableRiver( currentBiome ,lastBiome ,depth)) {
     		return;
@@ -126,7 +178,6 @@ public class Region {
    	   		world.setBlockState( new BlockPos( pos.getXStart()+7 ,y ,pos.getZStart()+7) ,Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState());
    		}
    		
-
     	ArrayList<Symbol> arr = Symbol.compliment2D( direction);
     	arr.add( direction);
     	for( Symbol s : arr) {
@@ -139,7 +190,6 @@ public class Region {
     
     private Biome getAverageBiome( World world ,ChunkPos pos) {
     	Biome b =  world.getBiome( new BlockPos( pos.getXStart()+7 ,0 ,pos.getZStart()+7 ));
-    	//System.out.println( "----------------------> " + b.getBiomeName() + " " + Biome.getIdForBiome( b));
     	return b;
     }
     
@@ -158,7 +208,7 @@ public class Region {
     	int idNew = Biome.getIdForBiome( newBiome); 
     	if( idNew != 7 || idNew != 11) { return false;} //not river
     	
-    	if( (float)depth/MAX_SEARCH_DEPTH < 0.65) { return false;}
+    	if( (float)depth/CHUNK_CUTOFF < 0.65) { return false;}
     
     	int idOld = Biome.getIdForBiome( lastBiome);
     	if( (idOld == 7 && idNew == 7) || ( idOld == 11 && idNew == 11)){

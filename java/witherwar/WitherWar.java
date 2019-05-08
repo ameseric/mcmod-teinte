@@ -181,7 +181,7 @@ public class WitherWar
     public void setRegionName( String name ,BlockPos pos) { this.data.regionMap.updateRegionName(name, pos);}
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer player) {
 		if( config.allowRegionOverlay) {
-			this.data.regionMap.guidestoneActivated(world, pos, player);
+			this.data.regionMap.guidestoneActivated( world ,pos, player);
 		}
 	}
 	

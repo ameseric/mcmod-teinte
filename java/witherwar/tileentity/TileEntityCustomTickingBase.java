@@ -77,7 +77,7 @@ public class TileEntityCustomTickingBase extends TileEntity implements ITickable
 			if( traversableBlock.scan(b)) {
 				if( returnBlock.scan( b)) {
 					return pos;
-				}else if( !positions.contains( pos)) {
+				}else if( !positions.contains( pos)) { //inefficient, think about using HashSet?
 					positions.add( pos);
 				}
 			}
