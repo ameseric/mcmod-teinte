@@ -13,6 +13,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -35,6 +36,9 @@ public class Region {
 	public String name;
 	private HashSet<Integer> rejectedBiomes = Sets.newHashSet( 16 ,25 ,26);
 	private HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();
+	
+	public boolean dirty = true;
+	public int index;
 
 	private final int REGION_SIZE_LIMIT = 1000;
 	
@@ -42,6 +46,15 @@ public class Region {
 		this.name = name;		
 		this.buildBiomeGroups();		
 		this.chunks = this.findRegionChunks( world ,startingPosition);
+	}
+	
+	public Region( String name ,HashSet<ChunkPos> chunks) {
+		this.name = name;
+		this.chunks = chunks;
+	}
+	
+	public Region( NBTTagCompound nbt) {
+		//TODO
 	}
 	
 	public HashSet<ChunkPos> getChunks(){
@@ -62,6 +75,11 @@ public class Region {
 	@Override
 	public int hashCode() {
 		return chunks.hashCode();
+	}
+	
+	
+	public boolean isEmpty() {
+		return this.chunks.isEmpty();
 	}
 	
 	
@@ -91,6 +109,17 @@ public class Region {
 			}
 		}		
 	}
+	
+	
+	
+	public void writeToNBT( NBTTagCompound nbt) {
+		if( this.chunks.isEmpty()) {
+			
+		}
+		
+		
+	}
+
 	
 	
     private HashSet<ChunkPos> findRegionChunks( World world ,BlockPos pos) {

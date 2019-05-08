@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
@@ -19,27 +20,20 @@ import net.minecraft.util.math.ChunkPos;
 public class SuperChunk{
 	private HashMap< ChunkPos ,Region> map;
 	public SCPos pos;
-	private boolean dirty = false;
 	
 	public SuperChunk( ChunkPos pos) {	
 		this.map = new HashMap<>();
 		this.pos = new SCPos( pos);
 	}
 	
-	public void markDirty() {	this.dirty = true;	}		
-	public boolean isDirty() {	return this.dirty;	}
-	public void markClean() { this.dirty = false; }
-	
 	
 	public void add( ChunkPos pos ,Region r) {
 		this.map.put( pos, r);
-		this.markDirty();
 	}
 	
 	
 	public void remove( ChunkPos pos) {
 		this.map.remove( pos);
-		this.markDirty();
 	}
 	
 	
@@ -47,6 +41,7 @@ public class SuperChunk{
 	public Region getRegion( ChunkPos pos) {
 		return this.map.get( pos);
 	}
+	
 	
 	
 	public static class SCPos {

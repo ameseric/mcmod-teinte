@@ -1,5 +1,6 @@
 package witherwar.region;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -7,6 +8,7 @@ import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -28,6 +30,7 @@ public class RegionMap {
 	
 	//HashMap<SuperChunkPos ,HashMap< ChunkPos ,Region>> map; //convoluted, but allows for saving/updating to be O(n)
 	HashMap<SCPos ,SuperChunk> map;
+	List<Region> regionList = new ArrayList<Region>();
 //	SuperChunkMap map;
 	//private List< List<SuperChunk>> map;
 
@@ -121,22 +124,6 @@ public class RegionMap {
 	
 	@Nullable
 	private SuperChunk getSuperChunk( ChunkPos pos) {
-//		List<SuperChunk> a;
-//		try{
-//			 a = this.map.get( (pos.x>>5)+2000);
-//		}catch( IndexOutOfBoundsException e){
-//			a = new ArrayList<SuperChunk>();
-//			this.map.add( (pos.x>>5)+2000 ,a);
-//		}
-//		
-//		try {
-//			return a.get( (pos.z>>5)+2000 );
-//		}catch( IndexOutOfBoundsException e){
-//			SuperChunk newSC = new SuperChunk();
-//			a.add( (pos.z>>5)+2000 ,newSC);
-//			return newSC;
-//		}
-		
 		SuperChunk sc = this.map.get( new SCPos( pos));
 		if( sc == null) {
 			sc = new SuperChunk( pos);
@@ -162,9 +149,7 @@ public class RegionMap {
 	
 	private void createNewRegion( String regionName ,BlockPos startingPosition) {
 		Region newRegion = new Region( regionName ,startingPosition ,this.world);
-		for( ChunkPos pos : newRegion.getChunks()) {
-			this.getSuperChunk( pos).add( pos ,newRegion);			
-		}
+		this.addRegion( newRegion);
 	}
 	
 	
@@ -173,17 +158,22 @@ public class RegionMap {
 		return this.getSuperChunk( pos).getRegion(pos);
 	}	
 
+	private void addRegion( Region r) {
+		this.regionList.add( r);
+		r.index = this.regionList.size()-1;
+		for( ChunkPos pos : r.getChunks()) {
+			this.getSuperChunk(pos).add(pos, r);
+		}
+	}
 	
     public void removeRegion( BlockPos pos) {  	removeRegion( new ChunkPos(pos));  }	
 	public void removeRegion( ChunkPos cpos) {
-		//int id = this.getRegionID( cpos);
-		//this.map.entrySet().removeIf( e -> e.getValue() == id); //efficient?
-		//this.nameMap.remove( id);
-		Region toRemove = this.getRegion( cpos);
-		if( toRemove != null) {
-			for( ChunkPos pos : toRemove.getChunks()) {
+		Region r = this.getRegion( cpos);
+		if( r != null) {
+			for( ChunkPos pos : r.getChunks()) {
 				this.getSuperChunk( pos).remove( pos);
 			}
+			r.remove();
 			this.save();
 		}
     }
@@ -255,13 +245,34 @@ public class RegionMap {
 //		}
 //		nbt.setInteger( "NumOfRegions" ,j);
 
+		NBTTagCompound rmnbt = nbt.getCompoundTag( "TeinteRegionMap"); //never null
 		
+		for( Region r : this.regionList) {
+			if( r.dirty) {
+				r.writeToNBT( rmnbt);
+				if( r.isEmpty()) {
+					this.regionList.remove( r.index);
+				}
+			}
+		}
+
 		return nbt;
 	}
 	
 	
 	
 	public void readFromNBT(NBTTagCompound nbt) {
+		
+//		if( !nbt.hasKey("TeinteRegionMap")) { return;}
+		NBTTagCompound rmnbt = nbt.getCompoundTag( "TeinteRegionMap");
+		
+		int numOfRegions = rmnbt.getInteger( "numOfRegions");
+		for( int i=0; i<numOfRegions; i++) {
+			NBTTagCompound regionNBT = rmnbt.getCompoundTag( "Region"+i);
+			Region r = new Region( regionNBT);
+			this.addRegion( r);
+		}
+		
 		
 //		int numOfChunks = nbt.getInteger( "NumOfChunks");
 //		for( int i = 0; i<numOfChunks; i++) {
@@ -274,6 +285,8 @@ public class RegionMap {
 //			this.nameMap.put( nbt.getInteger( "ID"+j) ,nbt.getString( "Region"+j));
 //		}
 		
+		
+		//nbt.removeTag( "TeinteRegionMap");		
 	}
 	
 	
