@@ -2,6 +2,8 @@ package witherwar.region;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,14 +32,16 @@ public class RegionMap {
 	
 	//HashMap<SuperChunkPos ,HashMap< ChunkPos ,Region>> map; //convoluted, but allows for saving/updating to be O(n)
 	HashMap<SCPos ,SuperChunk> map;
-	List<Region> regionList = new ArrayList<Region>();
+	HashSet<Region> regionSet = new HashSet<Region>();
 //	SuperChunkMap map;
 	//private List< List<SuperChunk>> map;
 
+	NBTTagCompound nbt;
 	
 	//public HashMap<Integer ,String> nameMap;
 	public HashMap<EntityPlayer ,String> playerMap;
 	public static ExecutorService saveExecutor = Executors.newFixedThreadPool(1);
+	private int nextID = 0;
 	
 
 	
@@ -72,9 +76,9 @@ public class RegionMap {
 				//String playerRegion = this.getPlayerRegionName( player);
 				String regionName = this.getRegionName( cpos);
 				
-				if( regionName != this.getPlayerRegionName( player)) {
+				if( !regionName.equals( this.getPlayerRegionName( player) ) ) {
 					this.setPlayerRegionName( player ,regionName);
-					if( regionName != "") {
+					if( !regionName.equals("")) {
 						WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
 					}
 				}
@@ -136,13 +140,13 @@ public class RegionMap {
 	
 	
 	public void updateRegionName( String name ,BlockPos startingPosition) {
-		ChunkPos pos = new ChunkPos( startingPosition);
-		//String oldName = this.getRegionName( pos);
-		Region r = this.getRegion(pos);
+		Region r = this.getRegion( new ChunkPos( startingPosition));
 		if( r == null) {
 			this.createNewRegion( name ,startingPosition);
 		}else {
 			r.name = name;
+			r.dirty = true;  //perform internal to object
+			this.save();
 		}
 	}
 	
@@ -158,13 +162,17 @@ public class RegionMap {
 		return this.getSuperChunk( pos).getRegion(pos);
 	}	
 
-	private void addRegion( Region r) {
-		this.regionList.add( r);
-		r.index = this.regionList.size()-1;
+	private void addRegion( Region r) { this.addRegion( r ,false);}
+	private void addRegion( Region r ,boolean skipSave) {
+		this.regionSet.add( r);
 		for( ChunkPos pos : r.getChunks()) {
 			this.getSuperChunk(pos).add(pos, r);
 		}
+		if( !skipSave) {
+			this.save();
+		}
 	}
+	
 	
     public void removeRegion( BlockPos pos) {  	removeRegion( new ChunkPos(pos));  }	
 	public void removeRegion( ChunkPos cpos) {
@@ -173,7 +181,7 @@ public class RegionMap {
 			for( ChunkPos pos : r.getChunks()) {
 				this.getSuperChunk( pos).remove( pos);
 			}
-			r.remove();
+			r.prepareForRemoval();
 			this.save();
 		}
     }
@@ -228,65 +236,42 @@ public class RegionMap {
 	
 	
 	
-	public NBTTagCompound writeToNBT( NBTTagCompound nbt) {
-//		int i = 0;
-//		for( ChunkPos cpos : this.map.keySet()) {
-//			int[] arr = { cpos.x ,cpos.z ,this.map.get( cpos)};
-//			nbt.setIntArray( "Chunk"+i ,arr);
-//			i++;
-//		}
-//		nbt.setInteger( "NumOfChunks" ,i);
-		
-//		int j = 0;
-//		for( Integer id : this.nameMap.keySet()) {
-//			nbt.setString( "Region"+j ,this.nameMap.get(id));
-//			nbt.setInteger( "ID"+j ,id);
-//			j++;
-//		}
-//		nbt.setInteger( "NumOfRegions" ,j);
-
-		NBTTagCompound rmnbt = nbt.getCompoundTag( "TeinteRegionMap"); //never null
-		
-		for( Region r : this.regionList) {
+	public NBTTagCompound writeToNBT( NBTTagCompound compound) {
+		Iterator<Region> iter = this.regionSet.iterator();
+		while( iter.hasNext()) {
+			Region r = iter.next();
 			if( r.dirty) {
-				r.writeToNBT( rmnbt);
+				r.writeToNBT( this.nbt);
 				if( r.isEmpty()) {
-					this.regionList.remove( r.index);
+					iter.remove();
 				}
 			}
 		}
-
-		return nbt;
+		
+		this.nbt.setInteger( "numOfRegions" ,this.regionSet.size());
+		int i = 0;
+		for( Region r : this.regionSet) {
+			this.nbt.setString( "Region"+i ,r.id);
+			i++;
+		}		
+		
+		compound.setTag( "TeinteRegionMap" ,this.nbt);
+		return compound;
 	}
 	
 	
 	
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(NBTTagCompound compound) {		
+		this.nbt = compound.getCompoundTag( "TeinteRegionMap");
+		System.out.println( this.nbt);
 		
-//		if( !nbt.hasKey("TeinteRegionMap")) { return;}
-		NBTTagCompound rmnbt = nbt.getCompoundTag( "TeinteRegionMap");
-		
-		int numOfRegions = rmnbt.getInteger( "numOfRegions");
+		int numOfRegions = this.nbt.getInteger( "numOfRegions");
 		for( int i=0; i<numOfRegions; i++) {
-			NBTTagCompound regionNBT = rmnbt.getCompoundTag( "Region"+i);
+			String id = this.nbt.getString( "Region"+i);
+			NBTTagCompound regionNBT = this.nbt.getCompoundTag( id);
 			Region r = new Region( regionNBT);
-			this.addRegion( r);
+			this.addRegion( r ,true);
 		}
-		
-		
-//		int numOfChunks = nbt.getInteger( "NumOfChunks");
-//		for( int i = 0; i<numOfChunks; i++) {
-//			int[] arr = nbt.getIntArray( "Chunk"+i);
-//			this.map.put( new ChunkPos(arr[0] ,arr[1]) ,arr[2]);
-//		}
-//		
-//		int numOfRegions = nbt.getInteger( "NumOfRegions");
-//		for( int j=0; j<numOfRegions; j++) {
-//			this.nameMap.put( nbt.getInteger( "ID"+j) ,nbt.getString( "Region"+j));
-//		}
-		
-		
-		//nbt.removeTag( "TeinteRegionMap");		
 	}
 	
 	
@@ -296,11 +281,6 @@ public class RegionMap {
 //		return null;
 //	}
 	
-	
-
-    
-    
-    
 
 	
 	

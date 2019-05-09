@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.UUID;
 
 import com.google.common.collect.Sets;
 
@@ -35,26 +36,31 @@ public class Region {
 	private HashSet<ChunkPos> chunks;	
 	public String name;
 	private HashSet<Integer> rejectedBiomes = Sets.newHashSet( 16 ,25 ,26);
-	private HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();
-	
-	public boolean dirty = true;
-	public int index;
-
+	private HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();	
+	public boolean dirty = false;
+	public String id;
 	private final int REGION_SIZE_LIMIT = 1000;
+	
 	
 	public Region( String name ,BlockPos startingPosition ,World world) {
 		this.name = name;		
 		this.buildBiomeGroups();		
 		this.chunks = this.findRegionChunks( world ,startingPosition);
+		this.id = UUID.randomUUID().toString();
+		this.dirty = true;
 	}
 	
-	public Region( String name ,HashSet<ChunkPos> chunks) {
-		this.name = name;
-		this.chunks = chunks;
-	}
-	
+
 	public Region( NBTTagCompound nbt) {
-		//TODO
+		this.id = nbt.getString( "id");
+		this.name = nbt.getString( "name");
+		this.chunks = new HashSet<ChunkPos>();
+		
+		int numOfChunks = nbt.getInteger( "numOfChunks");
+		for( int i=0; i<numOfChunks; i++) {
+			int[] coord = nbt.getIntArray( "Chunk"+i);
+			this.chunks.add( new ChunkPos( coord[0] ,coord[1]));
+		}
 	}
 	
 	public HashSet<ChunkPos> getChunks(){
@@ -111,13 +117,31 @@ public class Region {
 	}
 	
 	
+	public void prepareForRemoval() {
+		this.chunks.clear();
+		this.dirty = true;
+	}
 	
 	public void writeToNBT( NBTTagCompound nbt) {
-		if( this.chunks.isEmpty()) {
-			
+		if( this.isEmpty()) {
+			nbt.removeTag( this.id);
+			return;
 		}
 		
+		NBTTagCompound rnbt = nbt.getCompoundTag( this.id);
 		
+		rnbt.setString( "id" ,this.id);
+		rnbt.setString( "name" ,this.name);
+		rnbt.setInteger( "numOfChunks" ,this.chunks.size());
+		
+		int j = 0;
+		for( ChunkPos pos : this.chunks) {
+			rnbt.setIntArray( "Chunk"+j ,new int[]{ pos.x ,pos.z});
+			j++;
+		}
+		nbt.setTag( this.id ,rnbt);
+		
+		this.dirty = false;
 	}
 
 	

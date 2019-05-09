@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
