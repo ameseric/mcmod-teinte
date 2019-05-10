@@ -263,7 +263,7 @@ public class Region {
     
     private boolean isPassableRiver( Biome newBiome ,Biome lastBiome ,int depth) {
     	int idNew = Biome.getIdForBiome( newBiome); 
-    	if( idNew != 7 || idNew != 11) { return false;} //not river
+    	if( idNew != 7 && idNew != 11) { return false;} //not river
     	
     	if( (float)depth/REGION_SIZE_LIMIT < 0.65) { return false;}
     

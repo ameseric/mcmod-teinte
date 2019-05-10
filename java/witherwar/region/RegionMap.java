@@ -263,7 +263,7 @@ public class RegionMap {
 	
 	public void readFromNBT(NBTTagCompound compound) {		
 		this.nbt = compound.getCompoundTag( "TeinteRegionMap");
-		System.out.println( this.nbt);
+		System.out.println( compound);
 		
 		int numOfRegions = this.nbt.getInteger( "numOfRegions");
 		for( int i=0; i<numOfRegions; i++) {
