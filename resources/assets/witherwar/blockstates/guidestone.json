@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "minecraft:glowstone" }
+        "normal": { "model": "witherwar:guidestone_model" }
     }
 }
