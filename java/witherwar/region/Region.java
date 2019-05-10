@@ -198,10 +198,10 @@ public class Region {
     		if( isSimilarBiome( originBiome ,currentBiome) || isPassableRiver( currentBiome ,node.parentBiome ,i)) {
     			map.add( node.pos);
     			//debug viewing here
-    	   		int mod = i / 100;
-    			for( int y=120; y<mod+121; y++) {
-    	   	   		world.setBlockState( new BlockPos( node.pos.getXStart()+7 ,y ,node.pos.getZStart()+7) ,Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState());
-    	   		}
+//    	   		int mod = i / 100;
+//    			for( int y=120; y<mod+121; y++) {
+//    	   	   		world.setBlockState( new BlockPos( node.pos.getXStart()+7 ,y ,node.pos.getZStart()+7) ,Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState());
+//    	   		}
    		
 	        	ArrayList<Symbol> arr = Symbol.compliment2D( node.facing);
 	        	arr.add( node.facing); //redundant, but is sigf in literal edge-cases (guidestone is on edge of region) 
@@ -210,7 +210,6 @@ public class Region {
 	    			if( !consideredPos.contains( childPos)) {
 	    				queue.add( new SearchNode( childPos ,s ,currentBiome));
 	    				consideredPos.add( childPos);
-	    				//world.setBlockState( new BlockPos( node.pos.getXStart()+8 ,120 ,node.pos.getZStart()+8) ,Blocks.RED_GLAZED_TERRACOTTA.getDefaultState());
 	    			}
 	    		}
     		}
