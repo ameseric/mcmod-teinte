@@ -1,6 +1,5 @@
 package witherwar.region;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -10,7 +9,6 @@ import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -26,22 +24,11 @@ import witherwar.region.SuperChunk.SCPos;
 public class RegionMap {
 	private WorldSavedData data;
 	private World world;
-	//private HashMap<ChunkPos ,Integer> map;
-	
-	//SuperChunkPos HashMap -> ChunkPos HashMap -> Region //convoluted, but for saving purposees lets us break up ChunkPos HashMap
-	
-	//HashMap<SuperChunkPos ,HashMap< ChunkPos ,Region>> map; //convoluted, but allows for saving/updating to be O(n)
-	HashMap<SCPos ,SuperChunk> map;
-	HashSet<Region> regionSet = new HashSet<Region>();
-//	SuperChunkMap map;
-	//private List< List<SuperChunk>> map;
-
-	NBTTagCompound nbt;
-	
-	//public HashMap<Integer ,String> nameMap;
+	private HashMap<SCPos ,SuperChunk> map; //for allowing O(1) player region lookup
+	private HashSet<Region> regionSet = new HashSet<Region>(); //for tracking Regions
+	private NBTTagCompound nbt;
 	public HashMap<EntityPlayer ,String> playerMap;
 	public static ExecutorService saveExecutor = Executors.newFixedThreadPool(1);
-	private int nextID = 0;
 	
 
 	
@@ -57,9 +44,6 @@ public class RegionMap {
 	
 	private void initDataStructs() {
 		this.map = new HashMap<>();
-//		this.map = new SuperChunkMap();
-		//this.nameMap = new HashMap<>();
-		//this.map = new ArrayList< List<SuperChunk>>();
 		this.playerMap = new HashMap<>();
 	}
 	
@@ -97,34 +81,12 @@ public class RegionMap {
     
     
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer playerIn) {
-		//int id = getRegionID( pos);
-//		String name = getRegionName( pos); 
-//		if( name == null) {
-//			name = new Integer( ThreadLocalRandom.current().nextInt(0, 999999 + 1)).toString();
-//			//saveExecutor.submit( this.threadedFindRegionChunks(world, pos, id));
-//			List<ChunkPos> map = findRegionChunks( world ,pos);
-//			addRegion( id ,map);
-//			//this.addRegionID(id);
-//		}
 		String regionName = this.getRegionName( new ChunkPos(pos));
 		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getZ() ,regionName) ,(EntityPlayerMP)playerIn);
 		
 
 	}
 	
-	
-//    public void addRegionID( int id) {
-//    	this.setRegionName( id ,"");
-//    }
-
-	
-//	private void addRegion( int id ,List<ChunkPos> map) {
-//		for( ChunkPos pos : map) {
-//			this.map.put( pos ,id);
-//		}
-//		this.setRegionName( id ,"");
-//	}
-
 	
 	@Nullable
 	private SuperChunk getSuperChunk( ChunkPos pos) {
@@ -186,22 +148,6 @@ public class RegionMap {
 		}
     }
 	
-//	public int getRegionID(BlockPos pos) {
-//		return getRegionID( new ChunkPos(pos));
-//	}
-//	
-//	public int getRegionID( ChunkPos pos) {
-//		if( this.map.containsKey( pos)) {
-//			return this.map.get( pos);
-//		}
-//		return -1;
-//	}	
-	
-	//public String getRegionName( int id) { return this.nameMap.get(id);	}
-	//public String getRegionName( ChunkPos pos) { return this.getRegionName( this.getRegionID(pos)); }	
-	//public String getRegionName( BlockPos pos) { return this.getRegionName( this.getRegionID(pos));	}
-	
-	//private String getRegionName( BlockPos pos) { return this.getRegionName(new ChunkPos(pos));}
 	
 	/**
 	 * 
@@ -215,19 +161,12 @@ public class RegionMap {
 		}
 		return "";
 	}
-	//this.map.get( new SCPos( pos)).getRegion( pos).name;
-	//this.map.get( x>>4).get( z>>4).getRegion( ChunkPos);
 
 	
 	public String getPlayerRegionName( EntityPlayer player) { return this.playerMap.get( player);	}	
 	public void setPlayerRegionName( EntityPlayer player ,String name) {this.playerMap.put( player ,name);	}
 	
-	//public void setRegionName( int id ,String name) {
-	//	this.nameMap.put( id ,name);
-	//	this.save();
-	//}
-	
-	
+
 	
 	public void save() {
 		this.data.markDirty();
@@ -237,6 +176,10 @@ public class RegionMap {
 	
 	
 	public NBTTagCompound writeToNBT( NBTTagCompound compound) {
+		if( this.nbt == null) {
+			this.nbt = new NBTTagCompound();
+		}
+		
 		Iterator<Region> iter = this.regionSet.iterator();
 		while( iter.hasNext()) {
 			Region r = iter.next();
@@ -263,7 +206,6 @@ public class RegionMap {
 	
 	public void readFromNBT(NBTTagCompound compound) {		
 		this.nbt = compound.getCompoundTag( "TeinteRegionMap");
-		System.out.println( compound);
 		
 		int numOfRegions = this.nbt.getInteger( "numOfRegions");
 		for( int i=0; i<numOfRegions; i++) {

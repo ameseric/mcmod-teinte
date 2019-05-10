@@ -187,7 +187,8 @@ public class Region {
     	while(true){
 			//System.out.println( "Current queue: " + queue);			
 			if( i >= queue.size() || map.size() > REGION_SIZE_LIMIT) {
-				System.out.println( "----------------> Final Count: " + i);
+				System.out.println( "----------------> Final Iteration Count: " + i);
+				System.out.println( "----------------> Final Map Size: " + map.size());
 				return map;
 			}
 			
