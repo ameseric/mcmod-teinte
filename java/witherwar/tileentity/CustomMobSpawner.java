@@ -35,35 +35,27 @@ public class CustomMobSpawner extends MobSpawnerBaseLogic{
     private WeightedSpawnerEntity spawnData;// = new WeightedSpawnerEntity();
 	private int maxNearbyEntities = 8;
 	
-	
 	private World world;
 	private BlockPos pos;
-	private Block bs;
+	private Block block;
 	
-	// This constructor currently does not work. End up with NullPointer with ref to either this.world or this.pos
-	public CustomMobSpawner( String mobType ,World world ,BlockPos pos ,Block bs) {
-		super();
+
+	
+	public CustomMobSpawner( String mobType ,World world ,BlockPos pos ,Block block) {
 		NBTTagCompound nbt =  new NBTTagCompound();
 		nbt.setString("id", mobType);
         this.spawnData = new WeightedSpawnerEntity( 1 ,nbt);
-        
+
         this.world = world;
         this.pos = pos;
-        this.bs = bs;
+        this.block = block;
 	}
 	
-	
-	public CustomMobSpawner( String mobType) {
-		super();
-		NBTTagCompound nbt =  new NBTTagCompound();
-		nbt.setString("id", mobType);
-        this.spawnData = new WeightedSpawnerEntity( 1 ,nbt);
-	}
 	
 
 	@Override
 	public void broadcastEvent(int id) {
-    	this.world.addBlockEvent( this.pos ,bs ,id ,0);		
+    	this.world.addBlockEvent( this.pos ,this.block ,id ,0);		
 	}
 
 	@Override
@@ -90,6 +82,7 @@ public class CustomMobSpawner extends MobSpawnerBaseLogic{
     private boolean isActivated()
     {
         BlockPos blockpos = this.getSpawnerPosition();
+        System.out.println( "---------------------> " + this.getSpawnerWorld() );
         return this.getSpawnerWorld().isAnyPlayerWithinRangeAt((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D, (double)this.activatingRangeFromPlayer);
     }
     

@@ -56,57 +56,57 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 
 	
 // MOB SPAWNER SUPPORT
-//	private final CustomMobSpawner spawnerLogic = new CustomMobSpawner( "witherwar:serpent_wither_skeleton" , this.world ,this.pos ,WitherWar.newBlocks.get("serpentmind").block);
-//	private final CustomMobSpawner spawnerLogicB = new CustomMobSpawner( "witherwar:motus_ghast" ,this.world ,this.pos ,WitherWar.newBlocks.get("serpentmind").block);
+	private CustomMobSpawner spawnerLogic;// = new CustomMobSpawner( "witherwar:serpent_wither_skeleton" ,this ,WitherWar.newBlocks.get("terra_kali").block);
+//	private final CustomMobSpawner spawnerLogicB; = new CustomMobSpawner( "witherwar:motus_ghast" ,this ,WitherWar.newBlocks.get("terra_kali").block);
 	
 	
-    private final CustomMobSpawner spawnerLogic = new CustomMobSpawner( "witherwar:serpent_wither_skeleton")
-   {
-        public void broadcastEvent(int id) {
-        	TileEntitySerpentmind.this.world.addBlockEvent( TileEntitySerpentmind.this.pos 
-        			,WitherWar.newBlocks.get("terra_kali").block ,id ,0);
-        }
-        public World getSpawnerWorld(){			return TileEntitySerpentmind.this.world; }
-        public BlockPos getSpawnerPosition(){	return TileEntitySerpentmind.this.pos;   }
-        public void setNextSpawnData(WeightedSpawnerEntity p_184993_1_) {
-            super.setNextSpawnData(p_184993_1_);
-
-            if (this.getSpawnerWorld() != null) 
-            {
-                IBlockState iblockstate = this.getSpawnerWorld().getBlockState(this.getSpawnerPosition());
-                this.getSpawnerWorld().notifyBlockUpdate(TileEntitySerpentmind.this.pos, iblockstate, iblockstate, 4);
-            }
-        }
-    };
+//    private final CustomMobSpawner spawnerLogic = new CustomMobSpawner( "witherwar:serpent_wither_skeleton")
+//   {
+//        public void broadcastEvent(int id) {
+//        	TileEntitySerpentmind.this.world.addBlockEvent( TileEntitySerpentmind.this.pos 
+//        			,WitherWar.newBlocks.get("terra_kali").block ,id ,0);
+//        }
+//        public World getSpawnerWorld(){			return TileEntitySerpentmind.this.world; }
+//        public BlockPos getSpawnerPosition(){	return TileEntitySerpentmind.this.pos;   }
+//        public void setNextSpawnData(WeightedSpawnerEntity p_184993_1_) {
+//            super.setNextSpawnData(p_184993_1_);
+//
+//            if (this.getSpawnerWorld() != null) 
+//            {
+//                IBlockState iblockstate = this.getSpawnerWorld().getBlockState(this.getSpawnerPosition());
+//                this.getSpawnerWorld().notifyBlockUpdate(TileEntitySerpentmind.this.pos, iblockstate, iblockstate, 4);
+//            }
+//        }
+//    };
     
     
     
-    private final CustomMobSpawner spawnerLogicB = new CustomMobSpawner( "witherwar:motus_ghast")
-   {
-        public void broadcastEvent(int id)
-        {
-        	TileEntitySerpentmind.this.world.addBlockEvent( TileEntitySerpentmind.this.pos 
-        			,WitherWar.newBlocks.get("terra_kali").block ,id ,0);
-        }
-        public World getSpawnerWorld()
-        {
-            return TileEntitySerpentmind.this.world;
-        }
-        public BlockPos getSpawnerPosition() 
-        {
-            return TileEntitySerpentmind.this.pos;
-        }
-        public void setNextSpawnData(WeightedSpawnerEntity p_184993_1_)   
-        {
-            super.setNextSpawnData(p_184993_1_);
-
-            if (this.getSpawnerWorld() != null) 
-            {
-                IBlockState iblockstate = this.getSpawnerWorld().getBlockState(this.getSpawnerPosition());
-                this.getSpawnerWorld().notifyBlockUpdate(TileEntitySerpentmind.this.pos, iblockstate, iblockstate, 4);
-            }
-        }
-    };
+//    private final CustomMobSpawner spawnerLogicB = new CustomMobSpawner( "witherwar:motus_ghast" ,this ,WitherWar.newBlocks.get("terra_kali").block)
+//   {
+//        public void broadcastEvent(int id)
+//        {
+//        	TileEntitySerpentmind.this.world.addBlockEvent( TileEntitySerpentmind.this.pos 
+//        			,WitherWar.newBlocks.get("terra_kali").block ,id ,0);
+//        }
+//        public World getSpawnerWorld()
+//        {
+//            return TileEntitySerpentmind.this.world;
+//        }
+//        public BlockPos getSpawnerPosition() 
+//        {
+//            return TileEntitySerpentmind.this.pos;
+//        }
+//        public void setNextSpawnData(WeightedSpawnerEntity p_184993_1_)   
+//        {
+//            super.setNextSpawnData(p_184993_1_);
+//
+//            if (this.getSpawnerWorld() != null) 
+//            {
+//                IBlockState iblockstate = this.getSpawnerWorld().getBlockState(this.getSpawnerPosition());
+//                this.getSpawnerWorld().notifyBlockUpdate(TileEntitySerpentmind.this.pos, iblockstate, iblockstate, 4);
+//            }
+//        }
+//    };
   
 	
 
@@ -125,7 +125,8 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
     
     public boolean receiveClientEvent(int id, int type)
     {
-        if( this.spawnerLogic.setDelayToMin(id) || this.spawnerLogicB.setDelayToMin(id)) {
+    	if( this.spawnerLogic == null) { return false;}
+        if( this.spawnerLogic.setDelayToMin(id)){// || this.spawnerLogicB.setDelayToMin(id)) {
         	return true;
         }
         return false;
@@ -140,8 +141,10 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		
 		super.writeToNBT(compound);
-		this.spawnerLogic.writeToNBT( compound);
-		this.spawnerLogicB.writeToNBT( compound);
+		if( this.spawnerLogic != null){
+			this.spawnerLogic.writeToNBT( compound);
+		}
+//		this.spawnerLogicB.writeToNBT( compound);
 
 		if( this.branches != null) {
 			for( int i=0; i<branches.length; i++) {
@@ -164,8 +167,10 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	public void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
 		
-		this.spawnerLogic.readFromNBT( compound);
-		this.spawnerLogicB.readFromNBT( compound);
+		if( this.spawnerLogic != null) {
+			this.spawnerLogic.readFromNBT( compound);
+		}
+//		this.spawnerLogicB.readFromNBT( compound);
 		
 		this.numOfBranches = compound.getInteger( "numOfBranches");		
 		this.lastBlockPosition = compound.getIntArray( "lastBlockPosition");
@@ -192,30 +197,42 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 // Core Serpentmind code
 	@Override
 	public void update() {
-		this.spawnerLogic.updateSpawner();
-		this.spawnerLogicB.updateSpawner();
-		super.update();
+//		this.spawnerLogic.updateSpawner();
+//		this.spawnerLogicB.updateSpawner();
+		//super.update(); //for chunkloading
 		
-		if (!this.hasWorld() || this.world.isRemote) return; // no client-side work
-		
-		
-		if( this.numOfBranches == 0) {
-			setup();
-			this.markDirty();
-		}
-		
-		++ticks;
-		if( ticks == (20)) {
-			ticks = 0;
-			//BlockPos.getAllInBoxMutable(from, to) use for mouth?
-			//buildSelf();
-			terraform();
+		if( this.hasWorld()) {
+			if ( !this.world.isRemote) {
 			
+				if( this.numOfBranches == 0) {
+					setup();
+					this.markDirty();
+				}
+				
+				++ticks;
+				if( ticks == (20)) {
+					ticks = 0;
+					//BlockPos.getAllInBoxMutable(from, to) use for mouth?
+					//buildSelf();
+					terraform();
+					
+				}
+			}
+			
+			if( this.spawnerLogic == null) {
+				this.spawnerLogic = new CustomMobSpawner( "witherwar:serpent_wither_skeleton" ,this.world ,this.pos ,WitherWar.newBlocks.get("terra_kali").block);
+			}else {
+				this.spawnerLogic.updateSpawner();
+			}
 		}
+
+
 	}
 	
 
 	private void setup() {
+		
+		//this.spawnerLogic.setup( this.world ,this.pos ,WitherWar.newBlocks.get("terra_kali").block);
 		
 		//numOfBranches = 10; //tie to family later, but also save in TE reference for NBTTag
 		//int recursionDepth = 3; //tie to family later

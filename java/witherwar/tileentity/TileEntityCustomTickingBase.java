@@ -32,7 +32,7 @@ import witherwar.util.Symbol;
  * Can be used without Chunk loading by not calling super.update()
  * 
  */
-public class TileEntityCustomTickingBase extends TileEntity implements ITickable{
+public abstract class TileEntityCustomTickingBase extends TileEntity implements ITickable{
 	
 	
 	protected Ticket ticket;
