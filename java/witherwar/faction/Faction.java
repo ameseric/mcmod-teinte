@@ -6,23 +6,34 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.ChunkPos;
 import witherwar.region.Region;
 
+//one action per second, for now
 public abstract class Faction {
 
 	private ResourceList materials;
 	private List<Entity> units;
 	private LinkedList<Event> memory;
+	private List<Action> actions;
+	private List<Reaction> reactions;
 	
-	private Action goal;
+	private Action masterGoal;
+	private Action tempGoal; //trumps masterGoal for period of time? Reaction, basically....
 	
 	private Personality personality;
 	
 	private int counter = 0;
-	private int unitCap = 10; //???
+//	private int unitCap = 10; //rather than hard-coding, we'll have an upkeep cost, and force the AI to scrap.
+	private int upkeepCost = 100; //meaningless right now
 	
 	private Region territory; // used to assign protection units?
+	
+	
+	public Faction() {
+
+	}
 	
 	
 	public void update() {
@@ -33,17 +44,14 @@ public abstract class Faction {
 //		reviewUnits();
 		
 		Action next = chooseNextAction();
-		next.effect();
+		next.perform();
 		
 		
 		counter++;
 	}
 	
 	public Action chooseNextAction() {
-		if( this.counter > 30) {
-			reviewGoal();
-		}
-		
+				
 		
 		
 		return null;
@@ -83,6 +91,7 @@ public abstract class Faction {
 	
 	public class Action{
 		public ResourceList cost;
+		public int level = 1;
 		
 		public boolean tryToPerform( ResourceList materials) {
 			if( this.costMet(materials)) {
@@ -132,6 +141,9 @@ public abstract class Faction {
 		int persistence;
 	}
 	
+	
+	
+	
 }
 
 
@@ -157,25 +169,46 @@ What actions can a faction take?
 	
 	
 	
-	When a faction spawns, what would they do first?
-	They spawn as a core block with minimal resources.
-	First thing you want to do is spawn resource drones.
-	What resource do you want first?
-	More drones = stone and redstone?
-	Would the Terralith even have Drones?
-	Collection points? - Would solve issue of allowing players to raid, if we had
-		timed deliveries of resources.
-		
-		
-		
-		
-		
-	Types of buildings will be faction-dependent....
-	And Terraliths won't need a lot of this...
-	Even Void probably won't.
-	Maybe a generic Faction isn't possible.
-	Might want to just write Aleph, and then if anything's general, move it out.
+
 	
+	
+Take a step back.
+What is the goal of a Faction?
+To expand without being stopped.
+So, acquisiton of resources and protection of 1) core, 2) resources & resource gatherers.
+Resources are used to gather more resources and protect core... more or less. Aleph may have another goal. Ignore for now.
+
+Maybe another way to look at it - 
+Our resources or units go up - good (units are judged by their r.cost).
+Their resources / units go down - neutral / good.
+Evaluate by tradeoffs.
+
+If a bad tradeoff occurs, either invest in more c.units, or different c.units?
+
+Maybe two logic trains - balance resource tradoff with players while also achieving Master Goal?
+Aleph Prime Goal - best c.unit produced at Heart.
+Aleph Post Goal - Meet 
+
+Goals will be lists of Major Actions. Aleph:
+	- best c.unit at Heart
+	- expand housing to accomodate Aleph villagers (reach housing value?)
+	- collect resources for city upkeep
+	- Build anti-rot mechanism? Floating machines for city? TAI
+
+
+OK, so:
+	Aleph are going to be independent of Terraliths. Use Monument Core (or Artifical Anocortex?).
+	Jodh are going to become Terralith / Individual symbiotes. Use Slave Anocortex?
+	Kalimmacinus will be Terralith faction. Use Anocortex.
+	Rot mobs will not be faction-based.
+	
+Decision-process may differ, but underlying mechanics should be same, and located here.
+
+Ages:
+	
+	Breath
+	
+	Silence / Sleep / Repose / Dreams
 	
 	
 	
