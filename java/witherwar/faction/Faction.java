@@ -11,7 +11,7 @@ import witherwar.region.Region;
 
 public abstract class Faction {
 
-	private HashMap<Block,Integer> materials;
+	private ResourceList materials;
 	private List<Entity> units;
 	private LinkedList<Event> memory;
 	
@@ -51,9 +51,9 @@ public abstract class Faction {
 	
 	
 	public void reviewGoal() {
-		if( this.goal.costMet()) {
-			this.goal.effect();
-			this.goal = chooseNewGoal();
+		boolean success = this.goal.tryToPerform( this.materials);
+		if( success) {
+			this.goal = this.chooseNewGoal();
 		}else {
 			this.assignUnits( this.goal.cost);
 		}
@@ -67,11 +67,11 @@ public abstract class Faction {
 	
 	
 	public void unitDestroyed( int id) {
-		this.addMemory( new Event());
+		this.addToMemory( new Event());
 	}
 	
 	
-	public void addMemory(Event e) {
+	public void addToMemory(Event e) {
 		if( this.memory.size() > this.personality.memory) {
 			this.memory.poll();
 		}
@@ -84,7 +84,15 @@ public abstract class Faction {
 	public class Action{
 		public ResourceList cost;
 		
-		public void effect() {
+		public boolean tryToPerform( ResourceList materials) {
+			if( this.costMet(materials)) {
+				this.perform();
+				return true;
+			}
+			return false;
+		}
+		
+		public void perform() {
 			
 		}
 		
@@ -171,7 +179,9 @@ What actions can a faction take?
 	
 	
 	
-	
+        		EntityX entity = new EntityX(worldIn);
+        		entity.setPosition(playerIn.posX, playerIn.posY, playerIn.posZ);
+        		worldIn.spawnEntityInWorld(entity);
 	
 	
 	
