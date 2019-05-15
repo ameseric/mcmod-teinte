@@ -17,10 +17,15 @@ public abstract class Faction {
 	private List<Entity> units;
 	private LinkedList<Event> memory;
 	private List<Action> actions;
-	private List<Reaction> reactions;
+//	private List<Reaction> reactions; //maybe?
+	private Home home; //structure manager, may become a Terralith extension.
+	//there's already -acinus versus -motus, -acinus may be subdivided by
+	//monolithic versus modular (in terms of growth)
+	
+	private int anima = 10; //used to power structures, and perhaps units.
+	
 	
 	private Action masterGoal;
-	private Action tempGoal; //trumps masterGoal for period of time? Reaction, basically....
 	
 	private Personality personality;
 	
@@ -38,46 +43,47 @@ public abstract class Faction {
 	
 	public void update() {
 		
-//		reviewMemory();		
-		reviewGoal();
-//		reviewMaterials();
-//		reviewUnits();
-		
-		Action next = chooseNextAction();
-		next.perform();
+//		reviewMemory();		//looking for reactions
+//		reviewGoal();       //making sure we're on target for Prime Goal
+//		reviewMaterials(); //check that we're not running out of resources
+//		reviewUnits();		//check that we're always running at cap (mol)
 		
 		
-		counter++;
+		switch( counter) {
+			case 1: reviewMemory();
+			case 2: reviewMaterials();
+			case 3: reviewGoal(); break;
+			case 4:{ chooseNextAction().perform(); break;}
+		}		
+		
+		counter = counter > 4 ? 0 : counter++;
 	}
 	
-	public Action chooseNextAction() {
-				
-		
+	
+	public Action chooseNextAction() {	
 		
 		return null;
 	}
 	
 	
 	public void reviewGoal() {
-		boolean success = this.goal.tryToPerform( this.materials);
+		boolean success = this.masterGoal.tryToPerform( this.materials);
 		if( success) {
-			this.goal = this.chooseNewGoal();
+			this.masterGoal = this.chooseNewGoal();
 		}else {
-			this.assignUnits( this.goal.cost);
+			this.assignUnits( this.masterGoal.cost);
 		}
 	}
 	
 	
 	public abstract Action chooseNewGoal();
+
 	
+
 	
-	
-	
-	
-	public void unitDestroyed( int id) {
-		this.addToMemory( new Event());
-	}
-	
+	public void addNewAction( Action a) {
+		this.actions.add( a);
+	}	
 	
 	public void addToMemory(Event e) {
 		if( this.memory.size() > this.personality.memory) {
@@ -89,9 +95,12 @@ public abstract class Faction {
 	
 	
 	
-	public class Action{
+	public abstract class Action{
 		public ResourceList cost;
 		public int level = 1;
+		
+		public Action( Faction f) {
+		}
 		
 		public boolean tryToPerform( ResourceList materials) {
 			if( this.costMet(materials)) {
@@ -101,13 +110,8 @@ public abstract class Faction {
 			return false;
 		}
 		
-		public void perform() {
-			
-		}
-		
-		public boolean costMet( ResourceList materials) {
-			return false;
-		}
+		public abstract void perform();		
+		public abstract boolean costMet( ResourceList materials);
 		
 	}
 
@@ -169,6 +173,17 @@ What actions can a faction take?
 	
 	
 	
+
+review resources
+review current events
+if events have reaction, decide
+	action towards goal, or reaction?
+	
+Do we need to quantify structures, resources, and units in terms of each other?
+
+
+
+
 
 	
 	
