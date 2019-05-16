@@ -2,6 +2,13 @@ package witherwar.faction;
 
 public class FactionAleph extends Faction{
 
+	
+	public FactionAleph() {
+		
+	}
+	
+	
+	
 	@Override
 	public Action chooseNewGoal() {
 		// TODO Auto-generated method stub

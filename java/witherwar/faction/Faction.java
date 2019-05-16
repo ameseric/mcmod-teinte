@@ -14,6 +14,7 @@ import witherwar.region.Region;
 public abstract class Faction {
 
 	private ResourceList materials;
+	private HashMap<Block,Integer> materialWeights = new HashMap<Block,Integer>();
 	private List<Entity> units;
 	private LinkedList<Event> memory;
 	private List<Action> actions;
@@ -29,7 +30,7 @@ public abstract class Faction {
 	
 	private Personality personality;
 	
-	private int counter = 0;
+	private int updateCounter = 0;
 //	private int unitCap = 10; //rather than hard-coding, we'll have an upkeep cost, and force the AI to scrap.
 	private int upkeepCost = 100; //meaningless right now
 	
@@ -37,50 +38,99 @@ public abstract class Faction {
 	
 	
 	public Faction() {
-
+		this.materialWeights.put( Blocks.STONE ,1);
+		this.materialWeights.put( Blocks.REDSTONE_ORE ,1);
+		//....
 	}
 	
 	
 	public void update() {
 		
 //		reviewMemory();		//looking for reactions
-//		reviewGoal();       //making sure we're on target for Prime Goal
+//		reviewGoal();       //making sure we're on target for Prime Goal DISCARD
 //		reviewMaterials(); //check that we're not running out of resources
-//		reviewUnits();		//check that we're always running at cap (mol)
+//		reviewUnits();		//check that we're always running at cap (mol) DISCARD
 		
 		
-		switch( counter) {
-			case 1: reviewMemory();
-			case 2: reviewMaterials();
-			case 3: reviewGoal(); break;
-			case 4:{ chooseNextAction().perform(); break;}
+//		reviewAssignments
+//		influencers:
+//				current goal cost
+//				current material stockpiles
+//				current unit count
+//				active reactions
+//				weights? would be area-based, and triggered by reactions?
+//		
+//		chooseNextAction (weighted)
+		
+		
+		switch( updateCounter) {
+//			case 0: reviewMemory(); 		break;
+			case 1: reviewResourceAssignments(); break;
+			case 0: reviewScoutingAssignments(); break;
+//			case 2: reviewCombatAssignments(); break; //wait
+//			case 3: updateWeights(); 		break;
+//			case 4:{ chooseNextAction().perform(); break;}
+//			case ?: review damage to buildings / units - may fall back to other cate.
 		}		
 		
-		counter = counter > 4 ? 0 : counter++;
+//		updateCounter = updateCounter > 4 ? 0 : updateCounter++;
 	}
 	
 	
-	public Action chooseNextAction() {	
+	/**
+	 * Cycle through list of possible reactions and trigger appropriate items.
+	 */
+	protected void reviewMemory() {
 		
-		return null;
 	}
 	
-	
-	public void reviewGoal() {
-		boolean success = this.masterGoal.tryToPerform( this.materials);
-		if( success) {
-			this.masterGoal = this.chooseNewGoal();
-		}else {
-			this.assignUnits( this.masterGoal.cost);
+
+	protected void reviewResourceAssignments() {
+		//review current drone distribution
+		//do we have drones allocated for the current project materials?
+		//are we out (or low) of a certain material? do we have a source to gather?
+		//are we reacting (danger?)
+		//!!!!! we could have the resources themselves weighted. THey could start near-equal,
+		//then adjust from reactions and goals. Works like a request system.
+		//need, at some point, to account for building structures as well?
+		//Also repairing structures? need blueprints and comparison
+		
+		//how do we perform the calculation?
+
+		//check weight of resource
+		//check current stockpile of resource
+		//high amount, lower weight, and vice versa
+		
+		for( each resource) {
+			updateWeight( resource);			
 		}
+		
+		find highest- and lowest-weight resources
+		if free unit, reassign to highest
+		otherwise reassign lowest to highest
+		
+/**
+ * if we do priority queue, you can end up with the lowest-prioirity still being fairly high
+ * since everything's being segmented, you can't choose between them.
+ * but you also want some momentum to a task, which that would automatically provide.
+ * 
+ * random weighted choice means we might assign back-and-forth between competing objectives.
+ * either need to manually assign momentum, or...
+ */
+		
 	}
 	
 	
-	public abstract Action chooseNewGoal();
+	public void reviewScoutingAssignments() {
+		//going to keep this simple, go for nearest unexplored chunks
+		
+	}
 
 	
-
 	
+	
+	
+	//---------- Utility Methods -------------------//
 	public void addNewAction( Action a) {
 		this.actions.add( a);
 	}	
@@ -92,14 +142,21 @@ public abstract class Faction {
 		this.memory.add( e);
 	}
 	
+	public void produce( ) {
+		this.architect.
+	}
 	
 	
+	
+	//---------------- Structuring Classes -------------------//
 	
 	public abstract class Action{
 		public ResourceList cost;
 		public int level = 1;
+		protected Faction faction;
 		
 		public Action( Faction f) {
+			this.faction = f;
 		}
 		
 		public boolean tryToPerform( ResourceList materials) {
@@ -126,6 +183,23 @@ public abstract class Faction {
 	
 	public class ResourceList {
 		private HashMap<Block,Integer> materials;
+		
+		public void add( Block b ,Integer i) {
+			this.materials.put( b ,i);
+		}
+		
+		public boolean has( Block b ,Integer i) {
+			Integer j = this.materials.get( b);
+			return (j != null) && j >= i;
+		}
+		
+		public boolean compare( ResourceList rl) {
+			boolean costMet = true;
+			for( Block b : this.materials.keySet()) {
+				costMet = costMet && rl.has( b ,this.materials.get(b));
+			}
+			return costMet;
+		}
 	}
 	
 	
@@ -148,93 +222,42 @@ public abstract class Faction {
 	
 	
 	
+	//---------- Instantiated Helper Classes -------------------//
+
+	public class BuildCUnit extends Action{
+
+		public BuildCUnit(Faction f) {
+			super(f);
+			this.cost.add( Blocks.COBBLESTONE ,8);
+		}
+
+		@Override
+		public void perform() {
+			this.faction.produce( new Entity());
+		}
+
+		@Override
+		public boolean costMet(ResourceList materials) {
+			return this.faction.units.combat.two.cost;
+		}
+		
+		
+		
+	}
+	
+	
+	
 }
 
 
-/**
-
-Leaning towards centralized logic right now, bypassing tile entities (maybe).
-
-Would that work for all faction implementations though?
-
-This would necessitate two "versions" of each faction, for loaded/unloaded.
-Or, two logic paths for each unit / faction act.
-Maybe just for each unit.
-
-
-What actions can a faction take?
-	- build structure
-	- build unit
-	- assign unit
-		- to collect resources
-		- to build structure
-	- activate alert ( set combat units to repel invaders )
-	
-	
-	
-	
-
-review resources
-review current events
-if events have reaction, decide
-	action towards goal, or reaction?
-	
-Do we need to quantify structures, resources, and units in terms of each other?
-
-
-
-
-
-	
-	
-Take a step back.
-What is the goal of a Faction?
-To expand without being stopped.
-So, acquisiton of resources and protection of 1) core, 2) resources & resource gatherers.
-Resources are used to gather more resources and protect core... more or less. Aleph may have another goal. Ignore for now.
-
-Maybe another way to look at it - 
-Our resources or units go up - good (units are judged by their r.cost).
-Their resources / units go down - neutral / good.
-Evaluate by tradeoffs.
-
-If a bad tradeoff occurs, either invest in more c.units, or different c.units?
-
-Maybe two logic trains - balance resource tradoff with players while also achieving Master Goal?
-Aleph Prime Goal - best c.unit produced at Heart.
-Aleph Post Goal - Meet 
-
-Goals will be lists of Major Actions. Aleph:
-	- best c.unit at Heart
-	- expand housing to accomodate Aleph villagers (reach housing value?)
-	- collect resources for city upkeep
-	- Build anti-rot mechanism? Floating machines for city? TAI
-
-
-OK, so:
-	Aleph are going to be independent of Terraliths. Use Monument Core (or Artifical Anocortex?).
-	Jodh are going to become Terralith / Individual symbiotes. Use Slave Anocortex?
-	Kalimmacinus will be Terralith faction. Use Anocortex.
-	Rot mobs will not be faction-based.
-	
-Decision-process may differ, but underlying mechanics should be same, and located here.
-
-Ages:
-	
-	Breath
-	
-	Silence / Sleep / Repose / Dreams
-	
-	
+/**	
 	
         		EntityX entity = new EntityX(worldIn);
         		entity.setPosition(playerIn.posX, playerIn.posY, playerIn.posZ);
         		worldIn.spawnEntityInWorld(entity);
 	
 	
-	
-	
-	
+		
 	
 	
 	
