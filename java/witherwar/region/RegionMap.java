@@ -25,7 +25,7 @@ public class RegionMap {
 	private WorldSavedData data;
 	private World world;
 	private HashMap<SCPos ,SuperChunk> map; //for allowing O(1) player region lookup
-	private HashSet<Region> regionSet = new HashSet<Region>(); //for tracking Regions
+	private HashSet<RegionBiome> regionSet = new HashSet<RegionBiome>(); //for tracking Regions
 	private NBTTagCompound nbt;
 	public HashMap<EntityPlayer ,String> playerMap;
 	public static ExecutorService saveExecutor = Executors.newFixedThreadPool(1);
@@ -102,7 +102,7 @@ public class RegionMap {
 	
 	
 	public void updateRegionName( String name ,BlockPos startingPosition) {
-		Region r = this.getRegion( new ChunkPos( startingPosition));
+		RegionBiome r = this.getRegion( new ChunkPos( startingPosition));
 		if( r == null) {
 			this.createNewRegion( name ,startingPosition);
 		}else {
@@ -114,18 +114,18 @@ public class RegionMap {
 	
 	
 	private void createNewRegion( String regionName ,BlockPos startingPosition) {
-		Region newRegion = new Region( regionName ,startingPosition ,this.world);
+		RegionBiome newRegion = new RegionBiome( regionName ,startingPosition ,this.world);
 		this.addRegion( newRegion);
 	}
 	
 	
 	@Nullable
-	private Region getRegion( ChunkPos pos) {
+	private RegionBiome getRegion( ChunkPos pos) {
 		return this.getSuperChunk( pos).getRegion(pos);
 	}	
 
-	private void addRegion( Region r) { this.addRegion( r ,false);}
-	private void addRegion( Region r ,boolean skipSave) {
+	private void addRegion( RegionBiome r) { this.addRegion( r ,false);}
+	private void addRegion( RegionBiome r ,boolean skipSave) {
 		this.regionSet.add( r);
 		for( ChunkPos pos : r.getChunks()) {
 			this.getSuperChunk(pos).add(pos, r);
@@ -138,7 +138,7 @@ public class RegionMap {
 	
     public void removeRegion( BlockPos pos) {  	removeRegion( new ChunkPos(pos));  }	
 	public void removeRegion( ChunkPos cpos) {
-		Region r = this.getRegion( cpos);
+		RegionBiome r = this.getRegion( cpos);
 		if( r != null) {
 			for( ChunkPos pos : r.getChunks()) {
 				this.getSuperChunk( pos).remove( pos);
@@ -155,7 +155,7 @@ public class RegionMap {
 	 * @return Returns empty string if no Region exists.
 	 */
 	private String getRegionName( ChunkPos pos) { 
-		Region r = this.getRegion( pos);
+		RegionBiome r = this.getRegion( pos);
 		if( r != null) {
 			return r.name;
 		}
@@ -180,9 +180,9 @@ public class RegionMap {
 			this.nbt = new NBTTagCompound();
 		}
 		
-		Iterator<Region> iter = this.regionSet.iterator();
+		Iterator<RegionBiome> iter = this.regionSet.iterator();
 		while( iter.hasNext()) {
-			Region r = iter.next();
+			RegionBiome r = iter.next();
 			if( r.dirty) {
 				r.writeToNBT( this.nbt);
 				if( r.isEmpty()) {
@@ -193,7 +193,7 @@ public class RegionMap {
 		
 		this.nbt.setInteger( "numOfRegions" ,this.regionSet.size());
 		int i = 0;
-		for( Region r : this.regionSet) {
+		for( RegionBiome r : this.regionSet) {
 			this.nbt.setString( "Region"+i ,r.id);
 			i++;
 		}		
@@ -211,7 +211,7 @@ public class RegionMap {
 		for( int i=0; i<numOfRegions; i++) {
 			String id = this.nbt.getString( "Region"+i);
 			NBTTagCompound regionNBT = this.nbt.getCompoundTag( id);
-			Region r = new Region( regionNBT);
+			RegionBiome r = new RegionBiome( regionNBT);
 			this.addRegion( r ,true);
 		}
 	}

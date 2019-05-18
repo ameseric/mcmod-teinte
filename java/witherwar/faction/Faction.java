@@ -8,7 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.ChunkPos;
-import witherwar.region.Region;
+import witherwar.region.RegionBiome;
 
 //one action per second, for now
 public abstract class Faction {
@@ -25,6 +25,7 @@ public abstract class Faction {
 	
 	private int anima = 10; //used to power structures, and perhaps units.
 	
+	 
 	
 	private Action masterGoal;
 	
@@ -34,7 +35,7 @@ public abstract class Faction {
 //	private int unitCap = 10; //rather than hard-coding, we'll have an upkeep cost, and force the AI to scrap.
 	private int upkeepCost = 100; //meaningless right now
 	
-	private Region territory; // used to assign protection units?
+	private RegionBiome territory; // used to assign protection units?
 	
 	
 	public Faction() {
@@ -65,7 +66,7 @@ public abstract class Faction {
 		
 		switch( updateCounter) {
 //			case 0: reviewMemory(); 		break;
-			case 1: reviewResourceAssignments(); break;
+//			case 1: reviewResourceAssignments(); break;
 			case 0: reviewScoutingAssignments(); break;
 //			case 2: reviewCombatAssignments(); break; //wait
 //			case 3: updateWeights(); 		break;
@@ -84,6 +85,8 @@ public abstract class Faction {
 		
 	}
 	
+	
+	
 
 	protected void reviewResourceAssignments() {
 		//review current drone distribution
@@ -101,13 +104,13 @@ public abstract class Faction {
 		//check current stockpile of resource
 		//high amount, lower weight, and vice versa
 		
-		for( each resource) {
-			updateWeight( resource);			
-		}
-		
-		find highest- and lowest-weight resources
-		if free unit, reassign to highest
-		otherwise reassign lowest to highest
+//		for( each resource) {
+//			updateWeight( resource);			
+//		}
+//		
+//		find highest- and lowest-weight resources
+//		if free unit, reassign to highest
+//		otherwise reassign lowest to highest
 		
 /**
  * if we do priority queue, you can end up with the lowest-prioirity still being fairly high
@@ -115,14 +118,13 @@ public abstract class Faction {
  * but you also want some momentum to a task, which that would automatically provide.
  * 
  * random weighted choice means we might assign back-and-forth between competing objectives.
- * either need to manually assign momentum, or...
+ * either need to manually assign momentum, or...?
  */
 		
 	}
 	
 	
 	public void reviewScoutingAssignments() {
-		//going to keep this simple, go for nearest unexplored chunks
 		
 	}
 
@@ -143,7 +145,7 @@ public abstract class Faction {
 	}
 	
 	public void produce( ) {
-		this.architect.
+//		this.architect.
 	}
 	
 	
@@ -233,12 +235,12 @@ public abstract class Faction {
 
 		@Override
 		public void perform() {
-			this.faction.produce( new Entity());
+			//this.faction.produce( new Entity());
 		}
 
 		@Override
 		public boolean costMet(ResourceList materials) {
-			return this.faction.units.combat.two.cost;
+			//return this.faction.units.combat.two.cost;
 		}
 		
 		

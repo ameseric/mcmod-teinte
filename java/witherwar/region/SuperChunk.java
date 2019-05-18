@@ -17,7 +17,7 @@ import net.minecraft.util.math.ChunkPos;
  *
  */
 public class SuperChunk{
-	private HashMap< ChunkPos ,Region> map;
+	private HashMap< ChunkPos ,RegionBiome> map;
 	public SCPos pos;
 	
 	public SuperChunk( ChunkPos pos) {	
@@ -26,7 +26,7 @@ public class SuperChunk{
 	}
 	
 	
-	public void add( ChunkPos pos ,Region r) {
+	public void add( ChunkPos pos ,RegionBiome r) {
 		this.map.put( pos, r);
 	}
 	
@@ -37,7 +37,7 @@ public class SuperChunk{
 	
 	
 	@Nullable
-	public Region getRegion( ChunkPos pos) {
+	public RegionBiome getRegion( ChunkPos pos) {
 		return this.map.get( pos);
 	}
 	
