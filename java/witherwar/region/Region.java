@@ -12,6 +12,7 @@ import net.minecraft.util.math.ChunkPos;
  * 
  * A consecutive series of ChunkPos that share an identifier (name).
  * The name is displayed to the player when first traversing the region.
+ * (If used with a RegionMap object)
  * 
  * The Region contains its own ChunkPos HashSet because, while being already contained by the RegionMap HashMap, it allows for O(n) removal
  * from the HashMap.
@@ -21,7 +22,7 @@ public class Region {
 	public String name;
 	protected boolean dirty = false;
 	public String id;
-	protected HashSet<ChunkPos> chunks;	
+	protected HashSet<ChunkPos> chunks = new HashSet<ChunkPos>();	
 
 
 	

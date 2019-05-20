@@ -8,40 +8,42 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.ChunkPos;
+import witherwar.region.Region;
 import witherwar.region.RegionBiome;
+import witherwar.util.WeightedHashMap;
 
 //one action per second, for now
 public abstract class Faction {
 
 	private ResourceList materials;
-	private HashMap<Block,Integer> materialWeights = new HashMap<Block,Integer>();
 	private List<Entity> units;
 	private LinkedList<Event> memory;
 	private List<Action> actions;
 //	private List<Reaction> reactions; //maybe?
 	private Home home; //structure manager, may become a Terralith extension.
-	//there's already -acinus versus -motus, -acinus may be subdivided by
-	//monolithic versus modular (in terms of growth)
 	
 	private int anima = 10; //used to power structures, and perhaps units.
-	
-	 
 	
 	private Action masterGoal;
 	
 	private Personality personality;
 	
 	private int updateCounter = 0;
-//	private int unitCap = 10; //rather than hard-coding, we'll have an upkeep cost, and force the AI to scrap.
 	private int upkeepCost = 100; //meaningless right now
+	private int scoutRadius = 4; //chunk radius	
+	private Region territory; // used to assign protection units? and map resources?
 	
-	private RegionBiome territory; // used to assign protection units?
+	//weights
+	private WeightedHashMap scoutWeights = new WeightedHashMap();
+	private WeightedHashMap materialWeights = new WeightedHashMap();
 	
 	
 	public Faction() {
 		this.materialWeights.put( Blocks.STONE ,1);
 		this.materialWeights.put( Blocks.REDSTONE_ORE ,1);
 		//....
+		this.scoutWeights.put( "patrol" ,0);
+		this.scoutWeights.put( "explore" ,4);
 	}
 	
 	
@@ -126,6 +128,30 @@ public abstract class Faction {
 	
 	public void reviewScoutingAssignments() {
 		
+//		we want to look at explored chunks in terms of
+//		- resources?
+//		- y-map, and y-grade (average height, min/max height diff)
+//		- biome?
+//		- distance from core? (radius)
+//		- aleph structures, units
+//		- player activity
+		
+		boolean increaseRadius = true;
+		for( int i = this.scoutRadius; i>0; i--) {
+			if( this.MAP[i].size() < i*8) {
+				increaseRadius = false;
+				break;
+			}
+		}
+		if( increaseRadius) {
+			this.scoutRadius = this.scoutRadius + 3;
+			this.scoutWeights.increment( "patrol");
+		}
+		
+		//this.scoutWeights.checkBalance( this.units.scouts.size() );
+		//either need to do weighted reassign every time (silly)
+		//or calculate and compare resource division
+		
 	}
 
 	
@@ -205,6 +231,7 @@ public abstract class Faction {
 	}
 	
 	
+	
 	public class Reaction{
 		public Action action;
 		public boolean trigger() {
@@ -256,7 +283,8 @@ public abstract class Faction {
 	
         		EntityX entity = new EntityX(worldIn);
         		entity.setPosition(playerIn.posX, playerIn.posY, playerIn.posZ);
-        		worldIn.spawnEntityInWorld(entity);
+        		//DISCARD worldIn.spawnEntityInWorld(entity);
+        		worldIn.spawnEntity( entity);
 	
 	
 		
