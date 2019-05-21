@@ -35,15 +35,36 @@ public abstract class Faction {
 	
 	//weights
 	private WeightedHashMap scoutWeights = new WeightedHashMap();
-	private WeightedHashMap materialWeights = new WeightedHashMap();
+	private WeightedHashMap materialWeights;
 	
 	
 	public Faction() {
-		this.materialWeights.put( Blocks.STONE ,1);
-		this.materialWeights.put( Blocks.REDSTONE_ORE ,1);
-		//....
+		//still debating universal weight vs current weight....
+		//because some Factions may need more of a resource than others...
+		//but I don't know.
+		Object[] os = new Block[] { Blocks.STONE ,Blocks.REDSTONE_ORE ,Blocks.LOG};
+		this.materialWeights = new WeightedHashMap( os);
+
 		this.scoutWeights.put( "patrol" ,0);
 		this.scoutWeights.put( "explore" ,4);
+		/*
+		 * note we're switching without thought between weighted probabilities
+		 * and using those weights as priority in a queue.
+		 * 
+		 * THESE ARE NOT THE SAME THING. Figure out what you're doing!
+		 * 
+		 * We might want priority... weighted probabilities are an easy way to introduce
+		 * unpredictability, but could also result in system killing itself, which is boring
+		 * to players.
+		 * 
+		 * But we also want some fuzziness...
+		 * 
+		 * 
+		 * Could we use weights to calculate a distribution, then assign our units to
+		 * match that distribution? I mean, we can, but would that work any better?
+		 * 
+		 * 
+		 */
 	}
 	
 	
@@ -136,7 +157,14 @@ public abstract class Faction {
 //		- aleph structures, units
 //		- player activity
 		
+//		NEED map representation
+//		NEED unit representation
+		
 		boolean increaseRadius = true;
+		int weight = this.MAP.size() / 9;
+		this.scoutWeights.updateWeight( "patrol" ,weight);
+		//this.scoutWeights.updateWeight( "explore" ,weight);
+		
 		for( int i = this.scoutRadius; i>0; i--) {
 			if( this.MAP[i].size() < i*8) {
 				increaseRadius = false;
@@ -145,12 +173,15 @@ public abstract class Faction {
 		}
 		if( increaseRadius) {
 			this.scoutRadius = this.scoutRadius + 3;
-			this.scoutWeights.increment( "patrol");
 		}
 		
-		//this.scoutWeights.checkBalance( this.units.scouts.size() );
-		//either need to do weighted reassign every time (silly)
-		//or calculate and compare resource division
+		this.units.scouts.allocation {"patrol":[entityA] ,"explore":[entityB,entityC] ,"idle"}
+		HashMap<String,List> al = this.scoutWeights.allocate( this.units.scouts.size());//num of scouts
+		
+		for( String s : al) {
+			
+		}
+		
 		
 	}
 
