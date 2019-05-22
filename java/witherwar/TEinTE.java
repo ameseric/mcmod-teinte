@@ -59,7 +59,7 @@ import witherwar.util.TeinteWorldSavedData;
 public class TEinTE
 {
     public static final String MODID = "teinte";
-    public static final String VERSION = "0.1";
+    public static final String VERSION = "0.1.00";
     public static final int TICKSASECOND = 20;
 	public static final SimpleNetworkWrapper snwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
 	private TeinteWorldSavedData data;
