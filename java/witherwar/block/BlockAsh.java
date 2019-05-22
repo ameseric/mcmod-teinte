@@ -5,7 +5,7 @@ import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockSand;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 
 
 public class BlockAsh extends BlockFalling{
@@ -14,7 +14,7 @@ public class BlockAsh extends BlockFalling{
 		super( Material.SAND);
 		setUnlocalizedName( "dead_ash");
 		setRegistryName( "dead_ash");
-		setCreativeTab( WitherWar.teinteTab);
+		setCreativeTab( TEinTE.teinteTab);
 	}
 
 }

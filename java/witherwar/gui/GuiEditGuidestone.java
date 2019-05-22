@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 import witherwar.network.MessageEditGuidestone;
 
 
@@ -43,7 +43,7 @@ public class GuiEditGuidestone extends GuiScreen{
         Keyboard.enableRepeatEvents(false);
 		super.onGuiClosed();
 		this.plaintext = this.text.getText();
-		WitherWar.snwrapper.sendToServer( new MessageEditGuidestone( msg.x ,msg.z ,this.plaintext));
+		TEinTE.snwrapper.sendToServer( new MessageEditGuidestone( msg.x ,msg.z ,this.plaintext));
 	}
 	 
 

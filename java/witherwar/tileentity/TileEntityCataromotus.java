@@ -9,7 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 
 public class TileEntityCataromotus extends TileEntityCustomTickingBase{
 	
@@ -21,7 +21,7 @@ public class TileEntityCataromotus extends TileEntityCustomTickingBase{
 	private ArrayList<TileEntityMaw> maws = new ArrayList<TileEntityMaw>(); 
 	private BlockPos[] form = null;
 	
-	Block deadSkin = WitherWar.newBlocks.get("dead_ash").block;
+	Block deadSkin = TEinTE.newBlocks.get("dead_ash").block;
 	ArrayList<String> markedPlayerIDs = new ArrayList<String>(); 
 	
 	// NBT TAG SUPPORT

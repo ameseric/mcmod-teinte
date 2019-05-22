@@ -9,4 +9,16 @@ public class EntityFactionFlying extends EntityFlying implements IFactionUnit{
 		super(worldIn);
 	}
 
+	@Override
+	public void enterPuppetState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void leavePuppetState() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

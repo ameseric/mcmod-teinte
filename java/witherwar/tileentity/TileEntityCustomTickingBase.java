@@ -20,7 +20,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 import witherwar.util.Symbol;
 
 
@@ -296,7 +296,7 @@ public abstract class TileEntityCustomTickingBase extends TileEntity implements 
 		if( !triedToAssignTicket){
 			triedToAssignTicket = true;
 			if(ticket==null)
-				ticket = ForgeChunkManager.requestTicket( WitherWar.instance ,world ,Type.NORMAL);
+				ticket = ForgeChunkManager.requestTicket( TEinTE.instance ,world ,Type.NORMAL);
 			if(ticket==null)
 				System.out.println( "No tickets left!");
 			else {

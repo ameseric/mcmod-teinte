@@ -10,7 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 import witherwar.network.MessageEditGuidestone;
 
 

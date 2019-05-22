@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 import witherwar.tileentity.TileEntityGuidestone;
 
 public class MessageEditGuidestone implements IMessage{
@@ -64,10 +64,10 @@ public class MessageEditGuidestone implements IMessage{
 			
 			if( FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ) { 
 				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
-					WitherWar.proxy.openGui( 0 ,msg));
+					TEinTE.proxy.openGui( 0 ,msg));
 			}else {
 				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() ->
-					WitherWar.instance.setRegionName( msg.regionName , new BlockPos( msg.x ,0 ,msg.z) ));
+					TEinTE.instance.setRegionName( msg.regionName , new BlockPos( msg.x ,0 ,msg.z) ));
 	//				this.serverHandler( msg));
 			}
 			return null;

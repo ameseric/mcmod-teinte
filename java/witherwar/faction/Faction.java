@@ -7,38 +7,49 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
+import witherwar.entity.EntityFactionFlying;
 import witherwar.region.Region;
 import witherwar.region.RegionBiome;
 import witherwar.util.WeightedHashMap;
 
+/*
+ * Note that, for this class, "materials" denote items collected from the world
+ * (ores, wood, etc.) while "resources" refer to everything at the Factions' disposal,
+ * e.g. materials, units, structures, etc.
+ */
+
 //one action per second, for now
 public abstract class Faction {
 
-	private ResourceList materials;
-	private List<Entity> units;
+	private MaterialList materials;
 	private LinkedList<Event> memory;
 	private List<Action> actions;
+	private Personality personality;
+
 //	private List<Reaction> reactions; //maybe?
+
+	//managers
 	private Home home; //structure manager, may become a Terralith extension.
-	
-	private int anima = 10; //used to power structures, and perhaps units.
+	private UnitCategory scouts = new UnitCategory();
+	private ResourceMap map;
 	
 	private Action masterGoal;
 	
-	private Personality personality;
-	
 	private int updateCounter = 0;
 	private int upkeepCost = 100; //meaningless right now
-	private int scoutRadius = 4; //chunk radius	
-	private Region territory; // used to assign protection units? and map resources?
+	private int scoutRadius = 4; //chunk radius
+	private int anima = 10; //used to power structures, and perhaps units.
+
 	
 	//weights
 	private WeightedHashMap scoutWeights = new WeightedHashMap();
 	private WeightedHashMap materialWeights;
 	
 	
-	public Faction() {
+	public Faction( World world) {
 		//still debating universal weight vs current weight....
 		//because some Factions may need more of a resource than others...
 		//but I don't know.
@@ -47,6 +58,9 @@ public abstract class Faction {
 
 		this.scoutWeights.put( "patrol" ,0);
 		this.scoutWeights.put( "explore" ,4);
+		
+		this.scouts.add( new EntityFactionFlying( world));
+		
 		/*
 		 * note we're switching without thought between weighted probabilities
 		 * and using those weights as priority in a queue.
@@ -68,12 +82,7 @@ public abstract class Faction {
 	}
 	
 	
-	public void update() {
-		
-//		reviewMemory();		//looking for reactions
-//		reviewGoal();       //making sure we're on target for Prime Goal DISCARD
-//		reviewMaterials(); //check that we're not running out of resources
-//		reviewUnits();		//check that we're always running at cap (mol) DISCARD
+	public void update( World world) {
 		
 		
 //		reviewAssignments
@@ -97,7 +106,7 @@ public abstract class Faction {
 //			case ?: review damage to buildings / units - may fall back to other cate.
 		}		
 		
-//		updateCounter = updateCounter > 4 ? 0 : updateCounter++;
+		updateCounter = updateCounter > 4 ? 0 : updateCounter++;
 	}
 	
 	
@@ -147,26 +156,17 @@ public abstract class Faction {
 	}
 	
 	
-	public void reviewScoutingAssignments() {
-		
-//		we want to look at explored chunks in terms of
-//		- resources?
-//		- y-map, and y-grade (average height, min/max height diff)
-//		- biome?
-//		- distance from core? (radius)
-//		- aleph structures, units
-//		- player activity
-		
-//		NEED map representation
-//		NEED unit representation ( individually and collectively)
+	protected void reviewScoutingAssignments() {
 		
 		boolean increaseRadius = true;
-		int weight = this.MAP.size() / 9;
+		int weight = this.map.size() / 9;
 		this.scoutWeights.updateWeight( "patrol" ,weight);
+		//this.scouts.updateJobWeight( "patrol" ,weight);
+		
 		//this.scoutWeights.updateWeight( "explore" ,weight);
 		
 		for( int i = this.scoutRadius; i>0; i--) {
-			if( this.MAP[i].size() < i*8) {
+			if( this.map.getRadial(i).size() < i*8) {
 				increaseRadius = false;
 				break;
 			}
@@ -175,11 +175,24 @@ public abstract class Faction {
 			this.scoutRadius = this.scoutRadius + 3;
 		}
 		
-		this.scoutWeights.allocate( this.units.scouts.size() ,this.units.scouts.allocation);		
+		this.scoutWeights.allocate( this.scouts.size() ,this.scouts.jobAssignments);
+		//this.scouts.assignJobs()
 		
 	}
 
+	//---------- NBT Save / Load -------------------//
 	
+	public NBTTagCompound save( NBTTagCompound nbt) {
+		/*
+		 * will need to save:
+		 * 		ResourceMap Chunks
+		 * 		Unit count, and some stats (such as position)
+		 * 			we'll want to save them from puppet state
+		 * 		All weights, of course
+		 * 		Home structures
+		 */
+		return nbt;
+	}
 	
 	
 	
@@ -204,7 +217,7 @@ public abstract class Faction {
 	//---------------- Structuring Classes -------------------//
 	
 	public abstract class Action{
-		public ResourceList cost;
+		public MaterialList cost;
 		public int level = 1;
 		protected Faction faction;
 		
@@ -212,7 +225,7 @@ public abstract class Faction {
 			this.faction = f;
 		}
 		
-		public boolean tryToPerform( ResourceList materials) {
+		public boolean tryToPerform( MaterialList materials) {
 			if( this.costMet(materials)) {
 				this.perform();
 				return true;
@@ -221,7 +234,7 @@ public abstract class Faction {
 		}
 		
 		public abstract void perform();		
-		public abstract boolean costMet( ResourceList materials);
+		public abstract boolean costMet( MaterialList materials);
 		
 	}
 
@@ -234,7 +247,7 @@ public abstract class Faction {
 	}
 	
 	
-	public class ResourceList {
+	public class MaterialList {
 		private HashMap<Block,Integer> materials;
 		
 		public void add( Block b ,Integer i) {
@@ -246,7 +259,7 @@ public abstract class Faction {
 			return (j != null) && j >= i;
 		}
 		
-		public boolean compare( ResourceList rl) {
+		public boolean compare( MaterialList rl) {
 			boolean costMet = true;
 			for( Block b : this.materials.keySet()) {
 				costMet = costMet && rl.has( b ,this.materials.get(b));
@@ -291,7 +304,7 @@ public abstract class Faction {
 		}
 
 		@Override
-		public boolean costMet(ResourceList materials) {
+		public boolean costMet(MaterialList materials) {
 			//return this.faction.units.combat.two.cost;
 		}
 		

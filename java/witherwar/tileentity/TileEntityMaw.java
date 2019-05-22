@@ -9,7 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import scala.actors.threadpool.Arrays;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 import witherwar.util.Symbol;
 import witherwar.util.WeightedChoice;
 
@@ -26,7 +26,7 @@ public class TileEntityMaw extends TileEntityCustomTickingBase{
 	private int maxRange = 60;
 	boolean retracting = false;
 	
-	Block deadSkin = WitherWar.newBlocks.get("dead_ash").block;
+	Block deadSkin = TEinTE.newBlocks.get("dead_ash").block;
 	
 	
 // NBT TAG SUPPORT

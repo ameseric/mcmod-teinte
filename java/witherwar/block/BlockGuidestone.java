@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 
 
 public class BlockGuidestone extends Block{
@@ -23,7 +23,7 @@ public class BlockGuidestone extends Block{
 		super( Material.ROCK);
 		setUnlocalizedName( "guidestone");
 		setRegistryName( "guidestone");
-		setCreativeTab( WitherWar.teinteTab);
+		setCreativeTab( TEinTE.teinteTab);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class BlockGuidestone extends Block{
 	
 	@Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-		WitherWar.instance.removeRegion( pos);
+		TEinTE.instance.removeRegion( pos);
 		super.breakBlock( worldIn ,pos, state);
 	}
 	//import java.util.concurrent.ThreadLocalRandom;
@@ -67,7 +67,7 @@ public class BlockGuidestone extends Block{
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand
     		,EnumFacing facing ,float hitX ,float hitY ,float hitZ) {
     	if( !worldIn.isRemote) {
-    		WitherWar.instance.guidestoneActivated( worldIn ,pos ,playerIn);
+    		TEinTE.instance.guidestoneActivated( worldIn ,pos ,playerIn);
     	}
     	return true;
     } 

@@ -10,7 +10,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 
 public class BlockFlesh extends Block{
 	
@@ -25,7 +25,7 @@ public class BlockFlesh extends Block{
         this.setDefaultState( this.blockState.getBaseState());
         this.setHarvestLevel("axe" ,1);
 		//setCreativeTab( CreativeTabs.BUILDING_BLOCKS);
-		setCreativeTab( WitherWar.teinteTab);
+		setCreativeTab( TEinTE.teinteTab);
 //"nether_wart_block", (new Block(Material.GRASS, MapColor.RED)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS).setHardness(1.0F).setSoundType(SoundType.WOOD).setUnlocalizedName("netherWartBlock"));
 	}
 	

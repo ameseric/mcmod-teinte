@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 import witherwar.tileentity.TileEntityCataromotus;
 
 public class BlockCatarCortex extends Block{
@@ -23,7 +23,7 @@ public class BlockCatarCortex extends Block{
 		//this.setHarvestLevel("pickaxe" ,2);
 		//setLightLevel(0.8F);
 		//setCreativeTab( CreativeTabs.MISC);
-		setCreativeTab( WitherWar.teinteTab);
+		setCreativeTab( TEinTE.teinteTab);
 	}
 	
 	

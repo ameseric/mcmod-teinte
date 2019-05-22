@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.region.SuperChunk.SCPos;
@@ -63,7 +63,7 @@ public class RegionMap {
 				if( !regionName.equals( this.getPlayerRegionName( player) ) ) {
 					this.setPlayerRegionName( player ,regionName);
 					if( !regionName.equals("")) {
-						WitherWar.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
+						TEinTE.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
 					}
 				}
 			}
@@ -82,7 +82,7 @@ public class RegionMap {
     
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer playerIn) {
 		String regionName = this.getRegionName( new ChunkPos(pos));
-		WitherWar.snwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getZ() ,regionName) ,(EntityPlayerMP)playerIn);
+		TEinTE.snwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getZ() ,regionName) ,(EntityPlayerMP)playerIn);
 		
 
 	}

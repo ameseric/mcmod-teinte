@@ -41,6 +41,7 @@ import witherwar.block.BlockRefHolder;
 import witherwar.block.BlockSerpentmind;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
+import witherwar.faction.FactionAleph;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
 import witherwar.network.*;//MessageRegionOverlayOn.MessageHandleRegionOverlayOn;
@@ -54,14 +55,17 @@ import witherwar.util.TeinteWorldSavedData;
 
 
 
-@Mod(modid = WitherWar.MODID, version = WitherWar.VERSION)
-public class WitherWar
+@Mod(modid = TEinTE.MODID, version = TEinTE.VERSION)
+public class TEinTE
 {
-    public static final String MODID = "witherwar";
+    public static final String MODID = "teinte";
     public static final String VERSION = "0.1";
     public static final int TICKSASECOND = 20;
 	public static final SimpleNetworkWrapper snwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
 	private TeinteWorldSavedData data;
+	
+	//Factions
+	private FactionAleph aleph; 
 	
     public static CreativeTabs teinteTab;
     public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
@@ -72,7 +76,7 @@ public class WitherWar
 	public static IProxy proxy;
 	
 	@Mod.Instance("witherwar")
-	public static WitherWar instance;
+	public static TEinTE instance;
 
 
 	
@@ -121,14 +125,14 @@ public class WitherWar
     
     
     private void registerBlocks() {   //modelResourceLocation strings refer only to the item model file (SRC.models.item) i.e. the strings below are texture only
-    	WitherWar.newBlocks.put( "terra_kali"      ,new BlockRefHolder( new BlockSerpentmind() ,"witherwar:terra_kali"));
-    	WitherWar.newBlocks.put( "flesh"           ,new BlockRefHolder( new BlockFlesh()       ,"minecraft:nether_wart_block"));
-    	WitherWar.newBlocks.put( "terra_catar_maw" ,new BlockRefHolder( new BlockCatarMaw()    ,"minecraft:nether_wart_block"));
-    	WitherWar.newBlocks.put( "dead_ash"        ,new BlockRefHolder( new BlockAsh()         ,"witherwar:dead_ash"));
-    	WitherWar.newBlocks.put( "terra_catar"     ,new BlockRefHolder( new BlockCatarCortex() ,"witherwar:terra_kali"));
-    	WitherWar.newBlocks.put( "guidestone"	   ,new BlockRefHolder( new BlockGuidestone()  ,"minecraft:glowstone"));
+    	TEinTE.newBlocks.put( "terra_kali"      ,new BlockRefHolder( new BlockSerpentmind() ,"witherwar:terra_kali"));
+    	TEinTE.newBlocks.put( "flesh"           ,new BlockRefHolder( new BlockFlesh()       ,"minecraft:nether_wart_block"));
+    	TEinTE.newBlocks.put( "terra_catar_maw" ,new BlockRefHolder( new BlockCatarMaw()    ,"minecraft:nether_wart_block"));
+    	TEinTE.newBlocks.put( "dead_ash"        ,new BlockRefHolder( new BlockAsh()         ,"witherwar:dead_ash"));
+    	TEinTE.newBlocks.put( "terra_catar"     ,new BlockRefHolder( new BlockCatarCortex() ,"witherwar:terra_kali"));
+    	TEinTE.newBlocks.put( "guidestone"	   ,new BlockRefHolder( new BlockGuidestone()  ,"minecraft:glowstone"));
     	
-    	for( BlockRefHolder brh : WitherWar.newBlocks.values()) {
+    	for( BlockRefHolder brh : TEinTE.newBlocks.values()) {
     		brh.registerBlock();
     	}    	
     }    
@@ -137,7 +141,7 @@ public class WitherWar
     private void registerEntities() {
     	EntityEntry entry1 = EntityEntryBuilder.create()
         	    .entity( EntitySerpentWither.class)
-        	    .id( new ResourceLocation( WitherWar.MODID ,"serpent_wither_skeleton"), 2)
+        	    .id( new ResourceLocation( TEinTE.MODID ,"serpent_wither_skeleton"), 2)
         	    .name( "serpent_wither_skeleton")
         	    .egg( 0xFFFFFF, 0xAAAAAA)
         	    .tracker( 80, 3, false)
@@ -146,7 +150,7 @@ public class WitherWar
     	
     	EntityEntry entry2 = EntityEntryBuilder.create()
         	    .entity( EntityMotusGhast.class)
-        	    .id( new ResourceLocation( WitherWar.MODID ,"motus_ghast"), 3)
+        	    .id( new ResourceLocation( TEinTE.MODID ,"motus_ghast"), 3)
         	    .name( "motus_ghast")
         	    .egg( 0xFFFFFA, 0xAAAAAA)
         	    .tracker( 80, 3, false)
@@ -195,13 +199,17 @@ public class WitherWar
 		if( tickcount == TICKSASECOND ){
 			tickcount = 0;
 			
-			//tickRegions( tickcount ,event.world);
 			if( config.allowRegionOverlay) {
 				this.data.regionMap.tick( tickcount ,event.world);
 			}
+			
+			if( this.aleph == null) {
+				this.aleph = new FactionAleph( event.world);
+			}
+			
 			//tickTerraliths();
 			//tickVoid();
-			//tickAleph();
+			aleph.update( event.world);
 
 /**			int rand = new Random().nextInt(120);
 			if( rand > 1) {

@@ -10,7 +10,7 @@ import net.minecraft.tileentity.TileEntitySign;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import witherwar.WitherWar;
+import witherwar.TEinTE;
 import witherwar.block.BlockRefHolder;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
@@ -23,7 +23,7 @@ public class ClientOnlyProxy implements IProxy{
 	
 	public void preInit() {
 		
-		for( BlockRefHolder brh : WitherWar.newBlocks.values()) {
+		for( BlockRefHolder brh : TEinTE.newBlocks.values()) {
 			brh.setModelResourceLocation();
 		}		
 	}
