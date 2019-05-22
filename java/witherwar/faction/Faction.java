@@ -158,7 +158,7 @@ public abstract class Faction {
 //		- player activity
 		
 //		NEED map representation
-//		NEED unit representation
+//		NEED unit representation ( individually and collectively)
 		
 		boolean increaseRadius = true;
 		int weight = this.MAP.size() / 9;
@@ -175,13 +175,7 @@ public abstract class Faction {
 			this.scoutRadius = this.scoutRadius + 3;
 		}
 		
-		this.units.scouts.allocation {"patrol":[entityA] ,"explore":[entityB,entityC] ,"idle"}
-		HashMap<String,List> al = this.scoutWeights.allocate( this.units.scouts.size());//num of scouts
-		
-		for( String s : al) {
-			
-		}
-		
+		this.scoutWeights.allocate( this.units.scouts.size() ,this.units.scouts.allocation);		
 		
 	}
 
