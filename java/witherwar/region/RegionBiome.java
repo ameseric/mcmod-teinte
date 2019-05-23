@@ -30,27 +30,13 @@ import witherwar.util.Symbol;
  *
  */
 public class RegionBiome extends Region{
+	private static final HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();	
+	
 	private HashSet<Integer> rejectedBiomes = Sets.newHashSet( 16 ,25 ,26);
-	private HashMap<Integer ,HashSet<Integer>> similarBiomes = new HashMap<Integer ,HashSet<Integer>>();	
-	private final int REGION_SIZE_LIMIT = 1000;
+	private final int REGION_SIZE_LIMIT = 1000;	
 	
-	
-	public RegionBiome( String name ,BlockPos startingPosition ,World world) {
-		super( name);
-		this.buildBiomeGroups();		
-		this.chunks = this.findRegionChunks( world ,startingPosition);
-	}
-	
-
-	public RegionBiome( NBTTagCompound nbt) {
-		super( nbt);
-	}
-	
-	
-	
-	
-	private void buildBiomeGroups() {
-		//messy, but allows us O(1) lookup, and we'll have 1k+ lookups in one tick.
+	//similarBiome setup
+	static {
 		List< HashSet<Integer>> biomeGroups = new ArrayList<>();		
 		biomeGroups.add( Sets.newHashSet( 0 ,24 ,46 ,49 ,45 ,48 ,44 ,47)); //oceans
 		biomeGroups.add( Sets.newHashSet( 4 ,18 ,132)); //forest
@@ -71,10 +57,23 @@ public class RegionBiome extends Region{
 
 		for( HashSet<Integer> biomeGroup : biomeGroups) {
 			for( Integer i : biomeGroup) {
-				this.similarBiomes.put( i ,biomeGroup);
+				similarBiomes.put( i ,biomeGroup);
 			}
 		}		
 	}
+	
+	
+	public RegionBiome( String name ,BlockPos startingPosition ,World world) {
+		super( name);
+		this.chunks = this.findRegionChunks( world ,startingPosition);
+	}
+	
+
+	public RegionBiome( NBTTagCompound nbt) {
+		super( nbt);
+	}
+	
+	
 	
 	
     private HashSet<ChunkPos> findRegionChunks( World world ,BlockPos pos) {

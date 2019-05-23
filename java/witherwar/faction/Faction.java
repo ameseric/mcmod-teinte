@@ -24,42 +24,42 @@ import witherwar.util.WeightedHashMap;
 //one action per second, for now
 public abstract class Faction {
 
-	private MaterialList materials;
-	private LinkedList<Event> memory;
-	private List<Action> actions;
-	private Personality personality;
+	protected MaterialList materials;
+	protected LinkedList<Event> memory;
+	protected List<Action> actions;
+	protected Personality personality;
 
 //	private List<Reaction> reactions; //maybe?
 
 	//managers
-	private Home home; //structure manager, may become a Terralith extension.
-	private UnitCategory scouts = new UnitCategory();
-	private ResourceMap map;
+	protected Home home; //structure manager, may become a Terralith extension.
+	protected Troop<Job> scouts = new Troop<>();
+	protected Troop<Block> gathers = new Troop<>();
+//	protected Troop<Block> fighters = new Troop<>();
+	protected ResourceMap map;
 	
-	private Action masterGoal;
+	protected Action masterGoal;
 	
-	private int updateCounter = 0;
-	private int upkeepCost = 100; //meaningless right now
-	private int scoutRadius = 4; //chunk radius
-	private int anima = 10; //used to power structures, and perhaps units.
+	protected int updateCounter = 0;
+	protected int upkeepCost = 100; //meaningless right now
+	protected int scoutRadius = 4; //chunk radius
+	protected int anima = 10; //used to power structures, and perhaps units.
 
 	
 	//weights
-	private WeightedHashMap scoutWeights = new WeightedHashMap();
-	private WeightedHashMap materialWeights;
+//	protected WeightedHashMap<String> scoutWeights = new WeightedHashMap<String>();
+	protected WeightedHashMap<Block> materialWeights;
 	
 	
 	public Faction( World world) {
-		//still debating universal weight vs current weight....
-		//because some Factions may need more of a resource than others...
-		//but I don't know.
-		Object[] os = new Block[] { Blocks.STONE ,Blocks.REDSTONE_ORE ,Blocks.LOG};
-		this.materialWeights = new WeightedHashMap( os);
+		//I think I've decided: The weights will be independent of unit assignments.  
+		this.materialWeights = new WeightedHashMap<Block>( 
+				new Block[] { Blocks.STONE ,Blocks.REDSTONE_ORE ,Blocks.LOG ,Blocks.COAL_ORE 
+						,Blocks.GOLD_ORE ,Blocks.IRON_ORE ,Blocks.DIAMOND_ORE});
 
-		this.scoutWeights.put( "patrol" ,0);
-		this.scoutWeights.put( "explore" ,4);
+		this.scouts.weights.put( Job.PATROL ,0);
+		this.scouts.weights.put( Job.SCOUT ,4);
 		
-		this.scouts.add( new EntityFactionFlying( world));
 		
 		/*
 		 * note we're switching without thought between weighted probabilities
@@ -101,10 +101,11 @@ public abstract class Faction {
 //			case 1: reviewResourceAssignments(); break;
 			case 0: reviewScoutingAssignments(); break;
 //			case 2: reviewCombatAssignments(); break; //wait
-//			case 3: updateWeights(); 		break;
-//			case 4:{ chooseNextAction().perform(); break;}
 //			case ?: review damage to buildings / units - may fall back to other cate.
-		}		
+		}
+		
+		this.scouts.updateMemberActions();
+//		this.gathers.update();
 		
 		updateCounter = updateCounter > 4 ? 0 : updateCounter++;
 	}
@@ -160,8 +161,8 @@ public abstract class Faction {
 		
 		boolean increaseRadius = true;
 		int weight = this.map.size() / 9;
-		this.scoutWeights.updateWeight( "patrol" ,weight);
-		//this.scouts.updateJobWeight( "patrol" ,weight);
+		//this.scoutWeights.updateWeight( "patrol" ,weight);
+		this.scouts.weights.update( Job.PATROL ,weight);
 		
 		//this.scoutWeights.updateWeight( "explore" ,weight);
 		
@@ -175,9 +176,7 @@ public abstract class Faction {
 			this.scoutRadius = this.scoutRadius + 3;
 		}
 		
-		this.scoutWeights.allocate( this.scouts.size() ,this.scouts.jobAssignments);
-		//this.scouts.assignJobs()
-		
+		this.scouts.updateJobAssignments();		
 	}
 
 	//---------- NBT Save / Load -------------------//

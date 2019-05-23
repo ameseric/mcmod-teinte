@@ -10,9 +10,10 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 /*
  * Aggregate class for performing a number of standard registry actions on new block types.
  * 
- * registerBlock() and setModelResourceLocation() are split and called separately due to the structure of Forge
+ * registerBlock() and setModelResourceLocation() are split and called separately due to the Forge API
  * Both must be called in preInit(), to be available for init() usage.
- * setModel...() must be callled client-side only, and is so relegated to the client-side proxy.
+ * 
+ * setModel...() must be called client-side only, and is so relegated to the client-side proxy.
  * registerBlock() has no limitations, and is thus called in the master class.
  * 
  */
