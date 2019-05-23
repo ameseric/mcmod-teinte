@@ -58,27 +58,9 @@ public abstract class Faction {
 						,Blocks.GOLD_ORE ,Blocks.IRON_ORE ,Blocks.DIAMOND_ORE});
 
 		this.scouts.weights.put( Job.PATROL ,0);
-		this.scouts.weights.put( Job.SCOUT ,4);
+		this.scouts.weights.put( Job.EXPLORE ,4);
 		
 		
-		/*
-		 * note we're switching without thought between weighted probabilities
-		 * and using those weights as priority in a queue.
-		 * 
-		 * THESE ARE NOT THE SAME THING. Figure out what you're doing!
-		 * 
-		 * We might want priority... weighted probabilities are an easy way to introduce
-		 * unpredictability, but could also result in system killing itself, which is boring
-		 * to players.
-		 * 
-		 * But we also want some fuzziness...
-		 * 
-		 * 
-		 * Could we use weights to calculate a distribution, then assign our units to
-		 * match that distribution? I mean, we can, but would that work any better?
-		 * 
-		 * 
-		 */
 	}
 	
 	
@@ -161,10 +143,8 @@ public abstract class Faction {
 		
 		boolean increaseRadius = true;
 		int weight = this.map.size() / 9;
-		//this.scoutWeights.updateWeight( "patrol" ,weight);
 		this.scouts.weights.update( Job.PATROL ,weight);
-		
-		//this.scoutWeights.updateWeight( "explore" ,weight);
+		this.scouts.weights.update( Job.EXPLORE ,weight);
 		
 		for( int i = this.scoutRadius; i>0; i--) {
 			if( this.map.getRadial(i).size() < i*8) {

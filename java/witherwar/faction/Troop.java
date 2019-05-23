@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.world.World;
 import witherwar.util.WeightedHashMap;
 
 
@@ -25,15 +26,9 @@ public class Troop<T> {
 		this.units.add( UnitEntity.getNewScout());
 	}
 	
-	public void updateMemberActions() {
-		//pushNonPuppetUnits() //???
-
-
-		//direct puppet units to act
+	public void updateMemberActions( World world) {
 		for( UnitEntity u : this.units) {
-			if( u.isPuppet()) {
-				u.act();
-			}
+			u.update( world);
 		}
 	}
 	
