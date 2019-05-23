@@ -1,13 +1,13 @@
 package witherwar.util;
 
 
-import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
 
 import scala.util.Random;
 
 
 public class WeightedChoice{
+	private static final Random rng = new Random();
+	
 	public int[] weights;
 	public Object[] choices;
 	private int max = 0;
@@ -22,7 +22,7 @@ public class WeightedChoice{
 	}
 	
 	public Object pick() {
-		int randint = new Random().nextInt( max);
+		int randint = rng.nextInt( max);
 		int fullWeight = 0;
 		
 		for( int i=0; i < weights.length; i++) {

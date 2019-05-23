@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 public class WeightedHashMap {
+	private static final Random rng = new Random();
+	
 	private HashMap<Object,Integer> map;
 	private int max = 0;
 
@@ -58,7 +60,7 @@ public class WeightedHashMap {
 	public Object pick() {
 		Object rObj = null;
 		
-		int randint = new Random().nextInt( this.max);
+		int randint = rng.nextInt( this.max);
 		int addedWeight = 0;
 		
 		for( Object o : this.map.keySet()) {
