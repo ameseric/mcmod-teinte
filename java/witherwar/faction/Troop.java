@@ -12,11 +12,10 @@ import witherwar.util.WeightedHashMap;
 /**
  *  
  * @author Guiltygate
- * @param <T>
+ * @param <T> Object that is being weighted by HashMap
  * 
  */
-public class Troop<T> {
-	
+public class Troop<T> {	
 	private HashMap< T ,List<UnitEntity>> jobAssignments;
 	private ArrayList< UnitEntity> units;
 	public WeightedHashMap<T> weights = new WeightedHashMap<T>();

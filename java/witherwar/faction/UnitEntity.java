@@ -1,44 +1,73 @@
 package witherwar.faction;
 
-import net.minecraft.world.World;
+import java.util.ArrayList;
+import java.util.HashSet;
 
-public abstract class UnitEntity {
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import witherwar.util.Symbol;
+
+public class UnitEntity {
 	private boolean isPuppet = true;
+	private EntityLiving e;
+	public BlockPos pos;
+	public BlockPos moveTo;	
+	private HashSet<Job> allowedJobs = new HashSet<>();
+	private Job assignment = Job.IDLE;
+	
+	
+	private UnitEntity() {
+		this.addJob( Job.IDLE);
+	}
+	
+	public static UnitEntity getNewScout() {
+		UnitEntity ue = new UnitEntity();
+		ue.addJob( Job.PATROL);
+		ue.addJob( Job.EXPLORE);
+		return ue;
+	}
+	
 	
 	
 	public void update( World world) {
-//		this.job.update();
+		this.assignment.update();
+	}
+	
+	private void addJob( Job j) {
+		this.allowedJobs.add(j);
 	}
 	
 	public boolean isPuppet() {
 		return this.isPuppet;
 	}
 	
-	public static UEScout getNewScout() {
-		return new UEScout();
+	public void moveTo( ChunkPos pos) {
+		if( this.isPuppet()) {
+			//e.moveToBlockPosAndAngles( pos, 0.0, 0.0);
+			
+		}else {
+			//tell entity to move to location
+		}
 	}
+	
+	
+	public ChunkPos getCPos() {
+		return new ChunkPos( this.pos);
+	}
+	
 
 	
 	
-}
 
-
-/*
- * Not sure how to treat units or jobs.
- * 
- * Jobs could be just an enum title for id, or
- * full classes similar to Faction Actions/Goals.
- * 
- * So a UnitEntity class might be implemented, and hard-coded to do certain tasks.
- * Or we could have tasks/jobs independent of UnitEntity.
- * 
- * I lean towards the latter, since this allows more flexibility later.
- * 
- * 
- * 
- */
-
-
-class UEScout extends UnitEntity{
 	
 }
+
+
+
+
+
+
+

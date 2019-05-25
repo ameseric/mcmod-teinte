@@ -86,7 +86,7 @@ public abstract class Faction {
 //			case ?: review damage to buildings / units - may fall back to other cate.
 		}
 		
-		this.scouts.updateMemberActions();
+		this.scouts.updateMemberActions( world);
 //		this.gathers.update();
 		
 		updateCounter = updateCounter > 4 ? 0 : updateCounter++;

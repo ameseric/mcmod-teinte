@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import net.minecraft.util.math.BlockPos;
 
+//could use ordinal instead of hardcoding tx, but would still need to hardcode conversion back
 
 public enum Symbol{ //not a generic Symbol class, which bothers me, but I think it's cleaner in the long-run.
 	 YP( new BlockPos(0,1,0) ,0)
