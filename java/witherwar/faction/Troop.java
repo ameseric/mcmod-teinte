@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.util.WeightedHashMap;
 
@@ -19,10 +20,15 @@ public class Troop<T> {
 	private HashMap< T ,List<UnitEntity>> jobAssignments;
 	private ArrayList< UnitEntity> units;
 	public WeightedHashMap<T> weights = new WeightedHashMap<T>();
+	private UnitEntity.Type troopType;
 	
 	
-	public void add( ){ //TODO: fix for first test
-		this.units.add( UnitEntity.getNewScout());
+	public Troop( UnitEntity.Type t) {
+		this.troopType = t;
+	}	
+	
+	public void add( BlockPos pos){
+		this.units.add( new UnitEntity( this.troopType ,pos));
 	}
 	
 	public void updateMemberActions( World world) {
