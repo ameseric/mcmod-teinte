@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Objects;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -15,12 +16,14 @@ public class UnitEntity {
 	private boolean isPuppet = true;
 	private EntityLiving e;
 	public BlockPos pos;
+	private BlockPos lastPos;
 	public BlockPos moveTo;	
 	private HashSet<Job> allowedJobs = new HashSet<>();
 	private Job assignment = Job.IDLE;
 	private Timer moveTimer = new Timer(4);
 	private Timer gatherTimer = new Timer(2);
 	private ArrayList<ChunkPos> path;
+	private Action action = Action.IDLE;
 	
 	public enum Type{
 		 SCOUT
@@ -29,10 +32,23 @@ public class UnitEntity {
 		,FIGHTER
 	}
 	
+	public enum Action{
+		 IDLE
+		,RECORD
+		,MOVE
+		,GATHER;
+	}
+	
+	interface asdf{
+		int run();
+	}
+	
 	
 	
 	public UnitEntity( Type t ,BlockPos pos) {
 		this.addJob( Job.IDLE);
+		asdf g = () -> { this.isPuppet(); return 0;};
+		g.run();
 		this.pos = pos;
 		//this.e = new ... we're going to have to extend the class, aren't we?
 		
@@ -61,18 +77,34 @@ public class UnitEntity {
 		
 		this.assignment.update( this);
 
-		if( this.moveTo != null && this.moveTo != this.pos) {
-			if( this.path == null) {
-				this.generatePuppetPath();
-			}
-			this.move();
+		if( this.isPuppet()) {
+			this.takeAction( world);
 		}
 		
 	}
 	
+	
+	private void takeAction( World world) {
+		switch( this.action) {
+		case GATHER:
+			break;
+		case IDLE:
+			break;
+		case MOVE:
+			this.move( world);
+			break;
+		case RECORD:
+			this.record();
+			break;
+		}
+			
+	}
+	
+	
 	private void addJob( Job j) {
 		this.allowedJobs.add(j);
 	}
+	
 	
 	//We don't directly call the chunk.isLoaded to save lookups. Need to be careful
 	//that the flag is kept updated.
@@ -96,24 +128,23 @@ public class UnitEntity {
 	
 	
 	//------------- Core Actions ------------------//
-	public void move() {
-		if( this.isPuppet()) {
-			moveTimer.tick();
-			if( moveTimer.done()) {
-				this.placeUnit( this.moveTo);
-				moveTimer.reset();
-			}
-			
-		}else {
-			//tell entity to move to location
-		}
+	private void move( World world) {
+		moveTimer.tick();
+		if( moveTimer.done()) {
+			this.setPosition( this.moveTo ,world);
+			moveTimer.reset();
+		}			
 	}
 	
-	public void gather() {
+	public void record() {
 		
 	}
 	
-	public void fight() {
+	private void gather() {
+		
+	}
+	
+	private void fight() {
 		
 	}
 	
@@ -124,9 +155,17 @@ public class UnitEntity {
 	
 
 	
-	//------------------ CHeat Actions ---------------//
-	public void placeUnit( BlockPos pos) {
+	//------------------ World Actions ---------------//
+	public void setPosition( BlockPos pos ,World world) {
+		this.lastPos = this.pos;
 		this.pos = pos;
+		
+//		this.e.setPosition( this.pos.getX() ,this.pos.getY() ,this.pos.getZ());
+//		world.getChunkFromBlockCoords( this.lastPos).removeEntity( this.e);
+//		world.getChunkFromBlockCoords( this.pos).addEntity( this.e);
+		
+		world.setBlockToAir( this.lastPos);
+		world.setBlockState( this.pos ,Blocks.CYAN_GLAZED_TERRACOTTA.getDefaultState());
 	}
 	
 	

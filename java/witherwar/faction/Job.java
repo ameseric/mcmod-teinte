@@ -8,9 +8,10 @@ public enum Job{
 	PATROL{
 		public void update( UnitEntity ue) {
 			if( ue.moveTo == null) {
-				calculate final position and return
+//				calculate final position and return (but ONLY position)
+				
 			}else if( ue.moveTo == ue.pos) {
-				ue.record();
+				ue.setAction( Action.RECORD);
 			}
 		}
 
@@ -32,7 +33,6 @@ public enum Job{
 	
 	
 }	
-
 
 
 

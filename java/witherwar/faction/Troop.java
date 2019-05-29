@@ -37,7 +37,7 @@ public class Troop<T> {
 		}
 	}
 	
-	// First attempt at moving UnitEntites around the job assignment map.
+	// First attempt at moving UnitEntities around the job assignment map.
 	// Probably can be improved upon.
 	public void updateJobAssignments() {
 		HashMap<T ,Integer> newUnitAllocation = this.weights.allocate( this.units.size());		
