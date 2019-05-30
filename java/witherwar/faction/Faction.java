@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import witherwar.entity.EntityFactionFlying;
+import witherwar.faction.UnitEntity.Job;
 import witherwar.region.Region;
 import witherwar.region.RegionBiome;
 import witherwar.util.WeightedHashMap;

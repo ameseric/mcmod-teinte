@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import witherwar.faction.UnitEntity.Job;
 import witherwar.util.WeightedHashMap;
 
 
@@ -25,7 +26,13 @@ public class Troop<T> {
 	
 	public Troop( UnitEntity.Type t) {
 		this.troopType = t;
-	}	
+	}
+	
+	public Troop( UnitEntity.Type t ,WeightedHashMap<T> map) {
+		this.troopType = t;
+		this.weights = map;
+	}
+	
 	
 	public void add( BlockPos pos){
 		this.units.add( new UnitEntity( this.troopType ,pos));
@@ -58,7 +65,9 @@ public class Troop<T> {
 			int diff = newUnitAllocation.get(t) - this.jobAssignments.get(t).size();
 			if( diff > 0) {
 				for( int i=0; i<diff; i++) {
-					this.jobAssignments.get(t).add( unitsToReassign.remove(0));
+					UnitEntity ue = unitsToReassign.remove(0);
+					this.jobAssignments.get(t).add( ue);
+					ue.assignJob( t); //TODO
 				}
 			}
 		}
