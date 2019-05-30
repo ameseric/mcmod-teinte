@@ -144,7 +144,7 @@ public class UnitEntity {
 	//----------------- Jobs --------------------------//
 	private void patrol( World world) {
 		if( this.move.idle()) {
-			this.move.to( new BlockPos(0,0,0));
+			
 		}else if( this.move.finished() ) {
 			this.record();
 			this.move.reset();

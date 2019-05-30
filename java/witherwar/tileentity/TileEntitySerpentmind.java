@@ -13,7 +13,9 @@ import net.minecraft.util.WeightedSpawnerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
+import witherwar.util.HashBlockFilter;
 import witherwar.util.LSystem;
+import witherwar.util.SearchBlock.FilterBlock;
 import witherwar.util.Symbol;
 import witherwar.util.WeightedChoice;
 
@@ -27,7 +29,7 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	private int[] lastBlockPosition;
 	private int numOfBranches = 0;
 	private int fullCycleCount = 0;
-	private ArrayList<Block> nativeBlocks;
+	private HashBlockFilter nativeBlocks;
 	private Block terraformBlock;
 	private int blocksPlaced = 0;
 	private boolean isFullCycle() {
@@ -247,7 +249,12 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 		//Layer.FLESH.setBlockStateType( WitherWar.newBlocks.get("flesh").block);
 		//Layer.BONE.setBlockStateType( Blocks.BONE_BLOCK);
 		
-		this.nativeBlocks = new ArrayList<Block>( Arrays.asList( Blocks.OBSIDIAN ,Blocks.BONE_BLOCK ,TEinTE.newBlocks.get("flesh").block ,this.getBlockType() ));
+		this.nativeBlocks = new HashBlockFilter();
+		this.nativeBlocks.add( Blocks.OBSIDIAN);
+		this.nativeBlocks.add( Blocks.BONE_BLOCK);
+		this.nativeBlocks.add( TEinTE.newBlocks.get("flesh").block);
+		this.nativeBlocks.add( this.getBlockType());
+		
 		this.terraformBlock = TEinTE.newBlocks.get("dead_ash").block;
 		
 		//for( int i=0; i<numOfBranches; i++) {
@@ -259,13 +266,13 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	
 	private void terraform() {
 		
-		BlockFilter filterReturnBlock = ( b) -> {
+		FilterBlock filterReturnBlock = ( b) -> {
 			//return !isOfBlockSet( b ,this.nativeBlocks) && b != this.terraformBlock && b != Blocks.BEDROCK;
 			return b != this.terraformBlock;
 		};
 		
-		BlockFilter filterTraversableBlock = ( b) -> {
-			return b != Blocks.AIR && !isOfBlockSet( b ,this.nativeBlocks) && b != Blocks.BEDROCK;
+		FilterBlock filterTraversableBlock = ( b) -> {
+			return b != Blocks.AIR && this.nativeBlocks.allows(b) && b != Blocks.BEDROCK;
 		};
 		
 		BlockPos pos = searchForTouchingBlock( this.pos ,filterReturnBlock ,filterTraversableBlock ,10000 ,true);
