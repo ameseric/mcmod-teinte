@@ -12,6 +12,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import witherwar.faction.ResourceMap.RMChunk;
 import witherwar.util.BlockUtil;
+import witherwar.util.SearchBlock;
+import witherwar.util.SearchBlock.FilterBlock;
 
 public class UnitEntity {
 	private static int count = 0;
@@ -23,7 +25,12 @@ public class UnitEntity {
 	private ArrayList<ChunkPos> path;
 	private Troop parent;
 	
+	private SearchBlock findWood;
 	private PuppetMovement move;
+	
+	private static FilterBlock woodTraversable;
+	private static FilterBlock woodReturn;
+	
 	
 	
 	public enum Type{
@@ -35,14 +42,23 @@ public class UnitEntity {
 	
 	
 	public enum Job{
-		  IDLE
-		  ,PATROL
-		  ,EXPLORE;
+		 IDLE
+		,PATROL
+		,EXPLORE
+		,HARVEST
+		,MINE;
+	}
+	
+	
+	static{ //Block searching and filters setup
+		woodTraversable = (b) -> { 
+			return (b == Blocks.AIR) || (b == Blocks.LEAVES); };
+		woodReturn = (b) -> { return b == Blocks.LOG;};
 	}
 	
 	
 	
-	public UnitEntity( Type t ,ChunkPos pos ,Troop troop) {
+	public UnitEntity( Type t ,ChunkPos pos ,Troop troop ,World world) {
 		this.addJob( Job.IDLE);
 		this.move = new PuppetMovement( pos ,count ,count%16);
 		//this.e = new ... we're going to have to extend the class, aren't we?
@@ -54,6 +70,7 @@ public class UnitEntity {
 			this.parent = troop;
 			break;
 		case GATHER:
+			this.findWood = new SearchBlock( world ,woodReturn ,woodTraversable ,16);
 			break;
 		case FIGHTER:
 			break;
@@ -81,6 +98,7 @@ public class UnitEntity {
 		case PATROL:
 			this.patrol(world);
 			break;
+			
 		}
 		
 
@@ -144,9 +162,6 @@ public class UnitEntity {
 		this.getMap().record( this.move.getPos() ,world );
 	}
 	
-	private void gather() {
-		
-	}
 	
 	private void fight() {
 		
@@ -182,6 +197,15 @@ public class UnitEntity {
 	//switch exploration to linear radial progression
 	private void explore( World world) {
 		this.patrol(world); //for now, they're the same.
+	}
+	
+	
+	private void harvest( World world) {
+		if( this.getMap().getChunk( this.move.getPos()).hasWood ) {
+			BlockPos pos = this.findWood.search( this.move.getBXYZPos() ,true);
+		}else {
+			
+		}
 	}
 	
 	
