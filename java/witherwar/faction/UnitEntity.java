@@ -10,15 +10,17 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import witherwar.faction.ResourceMap.RMChunk;
 import witherwar.util.BlockUtil;
 
 public class UnitEntity {
+	private static int count = 0;
+	
 	private boolean isPuppet = true;
 	private EntityLiving e;
 	private HashSet<Job> allowedJobs = new HashSet<>();
 	private Job assignment = Job.PATROL;
 	private ArrayList<ChunkPos> path;
-	
 	private Troop parent;
 	
 	private PuppetMovement move;
@@ -40,9 +42,9 @@ public class UnitEntity {
 	
 	
 	
-	public UnitEntity( Type t ,BlockPos pos ,Troop troop) {
+	public UnitEntity( Type t ,ChunkPos pos ,Troop troop) {
 		this.addJob( Job.IDLE);
-		this.move = new PuppetMovement( pos);
+		this.move = new PuppetMovement( pos ,count ,count%16);
 		//this.e = new ... we're going to have to extend the class, aren't we?
 		
 		switch(t) {
@@ -61,6 +63,7 @@ public class UnitEntity {
 			break;
 			
 		}
+		++UnitEntity.count;
 	}
 	
 	
@@ -106,7 +109,8 @@ public class UnitEntity {
 	
 	public void updateState( World world) {
 		boolean oldState = this.isPuppet;
-		this.isPuppet = !world.getChunkFromBlockCoords( this.move.getPos()).isLoaded();
+		this.isPuppet = !world.getChunkFromBlockCoords( this.move.getBXYZPos()).isLoaded();
+
 		if( oldState != this.isPuppet) {
 			this.switchState();
 		}
@@ -118,6 +122,10 @@ public class UnitEntity {
 	
 	private Faction getFaction() {
 		return this.parent.getParent();
+	}
+	
+	private ResourceMap getMap() {
+		return this.getFaction().getMap();
 	}
 	
 	
@@ -133,7 +141,7 @@ public class UnitEntity {
 //	}
 	
 	public void record( World world) {
-		this.getFaction().getMap().record( new ChunkPos( this.move.getPos()) ,world );
+		this.getMap().record( this.move.getPos() ,world );
 	}
 	
 	private void gather() {
@@ -145,25 +153,25 @@ public class UnitEntity {
 	}
 	
 	
-	public ChunkPos getCPos() {
-		return new ChunkPos( this.move.getPos());
-	}
-	
-	
 	
 	//----------------- Jobs --------------------------//
 	//switch patrols to radial, with occasional random r jumps
 	private void patrol( World world) {
 		if( this.move.idle()) {
-			HashSet<ChunkPos> neighbors = BlockUtil.getNeighborChunks( this.move.getPos() ,world);
-			neighbors.remove( this.move.getLastPos());
-			
-			for( ChunkPos pos : neighbors) {
-				if( !this.getFaction().getMap().hasChunk( pos) ) {
-					this.move.to( BlockUtil.chunkCenterPos( pos) );
-					break;
+			int randint = world.rand.nextInt( 10);
+
+			HashSet<ChunkPos> chunks = BlockUtil.getNeighborChunks( this.move.getPos());
+
+			if( randint == 0) {
+				this.move.to( (ChunkPos) chunks.toArray()[0] );
+			}else {			
+				for( ChunkPos pos : chunks) {
+					RMChunk chunk = this.getMap().getChunk(pos);
+					if( chunk != null && chunk.r == this.getMap().calcR( this.move.getPos()) ) {
+						this.move.to( pos);
+					}
 				}
-			}
+			}			
 			
 		}else if( this.move.finished() ) {
 			this.record( world);
@@ -173,25 +181,7 @@ public class UnitEntity {
 	
 	//switch exploration to linear radial progression
 	private void explore( World world) {
-		if( this.move.idle()) {
-			HashSet<ChunkPos> neighbors = BlockUtil.getNeighborChunks( this.move.getPos() ,world);
-			neighbors.remove( new ChunkPos( this.move.getLastPos()));
-			
-			for( ChunkPos pos : neighbors) {
-				if( !this.getFaction().getMap().isExplorable( pos) ) {
-					this.move.to( BlockUtil.chunkCenterPos( pos) );
-					break;
-				}
-			}
-			
-			if( this.move.idle()) {
-				this.move.to( BlockUtil.chunkCenterPos( this.getFaction().getMap().getExplorableChunk() ));
-			}
-			
-		}else if( this.move.finished() ) {
-			this.record();
-			this.move.reset();
-		}
+		this.patrol(world); //for now, they're the same.
 	}
 	
 	
@@ -243,20 +233,28 @@ class Timer{
 
 class PuppetMovement{
 	private Timer timer = new Timer( 4);
-	private BlockPos moveTo;
-	private BlockPos pos;
-	private BlockPos lastPos;
-//	boolean haveReset = false;
+	private ChunkPos moveTo;
+	private ChunkPos pos;
+	private ChunkPos lastPos;
+	
+	private int rx;
+	private int rz;
+	private int ry;
 	
 	
-	public PuppetMovement( BlockPos pos) {
+	public PuppetMovement( ChunkPos pos ,int rx ,int rz) {
 		this.pos = pos;
-		this.lastPos = new BlockPos(0,0,0);
+		this.lastPos = new ChunkPos(0,0);
+		this.rx = rx;
+		this.rz = rz;
 	}
 	
 	public void to( BlockPos pos) {
+		this.to( new ChunkPos(pos));
+	}
+	
+	public void to( ChunkPos pos) {
 		this.moveTo = pos;
-//		this.haveReset = false;
 	}
 	
 	public void update( World world) {
@@ -273,17 +271,19 @@ class PuppetMovement{
 		this.lastPos = this.pos;
 		this.pos = moveTo;
 		
-		world.setBlockToAir( this.lastPos);
-		world.setBlockState( this.pos ,Blocks.CYAN_GLAZED_TERRACOTTA.getDefaultState());
+		world.setBlockToAir( this.getBXYZPos());
+		world.setBlockState( this.getBXYZPos() ,Blocks.CYAN_GLAZED_TERRACOTTA.getDefaultState());
+		
+		this.calcDebugY( world);
 	}
 	
-	public void setStartingPosition( BlockPos pos) {
-		this.lastPos = new BlockPos(0,0,0);
+	public void setStartingPosition( ChunkPos pos) {
+		this.lastPos = new ChunkPos(0,0);
 		this.pos = pos;
 	}
 	
 	public boolean finished() {
-		return (this.moveTo == this.pos);// && !this.haveReset;
+		return (this.moveTo == this.pos);
 	}
 	
 	public boolean idle() {
@@ -293,15 +293,38 @@ class PuppetMovement{
 	public void reset() {
 		this.moveTo = null;
 		this.timer.reset();
-//		this.haveReset = true;
 	}
 	
-	public BlockPos getPos() {
+	public ChunkPos getPos() {
 		return this.pos;
 	}
 	
-	public BlockPos getLastPos() {
+	public BlockPos getBXZPos() {
+		return new BlockPos( this.pos.x + this.rx ,0 ,this.pos.z+this.rz);
+	}
+	
+	public BlockPos getBXYZPos() {
+		return new BlockPos( this.pos.x + this.rx ,this.ry ,this.pos.z+this.rz);
+	}
+	
+	public ChunkPos getLastPos() {
 		return this.lastPos;
+	}
+	
+	
+	private void calcDebugY( World world) {
+		int y = 240;		
+		Block b;
+		
+		do{
+			b = world.getBlockState( this.getBXZPos().add(0,0,0) ).getBlock();
+			--y;
+			
+		}while( b == Blocks.AIR);
+		
+		this.ry = y+15;
+		
+		
 	}
 	
 	

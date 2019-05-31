@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import witherwar.faction.ResourceMap;
 import witherwar.util.SearchBlock.FilterBlock;
 
 
@@ -51,17 +52,16 @@ public class BlockUtil {
 		}
 		return map;
 	}
-	
-	
-	public static HashSet<ChunkPos> getNeighborChunks( BlockPos pos ,World world){
-		ChunkPos cpos = new ChunkPos(pos);
-		return getNeighborChunks( cpos ,Symbol.values() ,world);
+
+	public static HashSet<ChunkPos> getNeighborChunks( BlockPos pos){
+		return getNeighborChunks( new ChunkPos(pos));
 	}
+
 	
-	public static HashSet<ChunkPos> getNeighborChunks( ChunkPos pos ,Symbol[] array ,World world){
+	public static HashSet<ChunkPos> getNeighborChunks( ChunkPos pos){
 		HashSet<ChunkPos> set = new HashSet<ChunkPos>();
 		
-		for( Symbol direction : array) {
+		for( Symbol direction : Symbol.values2D()) {
 			set.add( new ChunkPos( pos.x+direction.mod.getX() ,pos.z+direction.mod.getZ() ));
 		}
 		return set;
@@ -69,6 +69,13 @@ public class BlockUtil {
 	
 	public static BlockPos chunkCenterPos( ChunkPos pos) {
 		return new BlockPos( pos.getXStart()+7 ,0 ,pos.getZStart()+7);
+	}
+	
+	
+	public static int calcR( ChunkPos pos ,ChunkPos center) {
+		int xDiff = Math.abs( pos.x - center.x);
+		int zDiff = Math.abs( pos.z - center.z);
+		return xDiff > zDiff ? xDiff : zDiff;
 	}
 	
 	

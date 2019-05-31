@@ -46,6 +46,15 @@ public enum Symbol{ //not a generic Symbol class, which bothers me, but I think 
 		return list;
 	}
 	
+	public static ArrayList<Symbol> values2D() {
+		ArrayList<Symbol> s = new ArrayList<>();
+		s.add( Symbol.XN);
+		s.add( Symbol.XP);
+		s.add( Symbol.ZP);
+		s.add( Symbol.ZN);
+		return s;
+	}
+	
 	public static Symbol[] randomValues( int numOfValues) {
 		if( numOfValues > 6) { numOfValues = 6; } //silent error, need to throw exception
 		

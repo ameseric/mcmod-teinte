@@ -1,25 +1,21 @@
 package witherwar.faction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import witherwar.util.BlockUtil;
 
 public class ResourceMap {
-	/*
-	 * Index options:
-	 * 		ChunkPos
-	 * 		Materials (discard)
-	 * 		Player events
-	 * 		radial distance
-	 */
 	
 	private HashMap<ChunkPos ,RMChunk> chunkMap;
-	private HashMap<Integer ,List<RMChunk>> radialMap;
+	private HashMap<Integer ,HashSet<RMChunk>> radialMap;
 	private ChunkPos center;
-	private int boundary = 5;
+	public int boundary = 5;
 	
 	
 	public ResourceMap( ChunkPos centerPos) {
@@ -37,19 +33,21 @@ public class ResourceMap {
 		this.radialMap.get( chunk.r).add( chunk);
 	}
 	
+	public RMChunk getChunk( ChunkPos pos) {
+		return this.chunkMap.get(pos);
+	}
+	
 	public int size() {
 		return this.chunkMap.size();
 	}
 	
-	public List<RMChunk> getRadial( int index){
+	public HashSet<RMChunk> getRadial( int index){
 		return this.radialMap.get( index);
 	}
 	
 	public void record( ChunkPos pos ,World world) {
 		RMChunk rmc = new RMChunk( pos);
 		
-		rmc.calculateYValues( pos);
-		rmc.r = 
 		
 		this.add( rmc);
 	}
@@ -58,13 +56,9 @@ public class ResourceMap {
 		return this.chunkMap.containsKey( pos);
 	}
 	
-	public boolean isExplorable( ChunkPos pos) {
-		int xDiff = Math.abs( pos.x - this.center.x);
-		int zDiff = Math.abs( pos.z - this.center.z);
-		int r = xDiff > zDiff ? xDiff : zDiff;
-		return !this.hasChunk(pos) && r < boundary; 
+	public int calcR( ChunkPos pos) {
+		return BlockUtil.calcR( pos ,this.center);
 	}
-	
 	
 	
 	
@@ -86,6 +80,9 @@ public class ResourceMap {
 		public RMChunk( ChunkPos pos) {
 			this.pos = pos;
 		}
+		
+		
+
 		
 		
 		

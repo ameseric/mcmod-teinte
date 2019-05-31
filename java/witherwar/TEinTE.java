@@ -212,6 +212,7 @@ public class TEinTE
 			aleph.update( event.world);
 
 /**			int rand = new Random().nextInt(120);
+ * 			int rand = event.world.rand.nextInt(120);
 			if( rand > 1) {
 				
 				WorldInfo wi = world.getWorldInfo();

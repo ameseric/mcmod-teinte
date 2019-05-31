@@ -5,15 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import witherwar.entity.EntityFactionFlying;
 import witherwar.faction.UnitEntity.Job;
-import witherwar.region.Region;
-import witherwar.region.RegionBiome;
+import witherwar.faction.UnitEntity.Type;
 import witherwar.util.WeightedHashMap;
 
 /*
@@ -34,8 +31,8 @@ public abstract class Faction {
 
 	//managers
 	protected Home home; //structure manager, may become a Terralith extension.
-	protected Troop<Job> scouts = new Troop<>();
-	protected Troop<Block> gathers = new Troop<>();
+	protected Troop<Job> scouts = new Troop<>( Type.SCOUT ,this);
+	protected Troop<Block> gathers = new Troop<>( Type.GATHER ,this);
 //	protected Troop<Block> fighters = new Troop<>();
 	protected ResourceMap map;
 	
@@ -78,6 +75,7 @@ public abstract class Faction {
 //		
 //		chooseNextAction (weighted)
 		
+		this.map.update();
 		
 		switch( updateCounter) {
 //			case 0: reviewMemory(); 		break;
@@ -147,14 +145,14 @@ public abstract class Faction {
 		this.scouts.weights.update( Job.PATROL ,weight);
 		this.scouts.weights.update( Job.EXPLORE ,weight);
 		
-		for( int i = this.scoutRadius; i>0; i--) {
-			if( this.map.getRadial(i).size() < i*8) {
+		for( int i = this.map.boundary; i>0; i--) {
+			if( this.map.getRadial(i).size() < (i*8) - (i*2)) {
 				increaseRadius = false;
 				break;
 			}
 		}
 		if( increaseRadius) {
-			this.scoutRadius = this.scoutRadius + 3;
+			this.map.boundary = this.map.boundary + 2;
 		}
 		
 		this.scouts.updateJobAssignments();		
@@ -290,6 +288,7 @@ public abstract class Faction {
 		@Override
 		public boolean costMet(MaterialList materials) {
 			//return this.faction.units.combat.two.cost;
+			return true; //TODO
 		}
 		
 		
