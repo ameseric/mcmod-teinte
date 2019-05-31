@@ -5,14 +5,14 @@ package witherwar.util;
 import scala.util.Random;
 
 
-public class WeightedChoice{
+public class WeightedChoice<T>{
 	private static final Random rng = new Random();
 	
 	public int[] weights;
-	public Object[] choices;
+	public T[] choices;
 	private int max = 0;
 	
-	public WeightedChoice( Object[] choices ,int[] weights ) {
+	public WeightedChoice( T[] choices ,int[] weights ) {
 		this.weights = weights;
 		this.choices = choices;
 		
@@ -21,7 +21,7 @@ public class WeightedChoice{
 		}
 	}
 	
-	public Object pick() {
+	public T pick() {
 		int randint = rng.nextInt( max);
 		int fullWeight = 0;
 		

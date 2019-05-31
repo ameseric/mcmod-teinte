@@ -192,6 +192,10 @@ public abstract class Faction {
 //		this.architect.
 	}
 	
+	public ResourceMap getMap() {
+		return this.map;
+	}
+	
 	
 	
 	//---------------- Structuring Classes -------------------//

@@ -23,8 +23,10 @@ public class Troop<T> {
 	public WeightedHashMap<T> weights = new WeightedHashMap<T>();
 	private UnitEntity.Type troopType;
 	
+	private Faction parent;
 	
-	public Troop( UnitEntity.Type t) {
+	
+	public Troop( UnitEntity.Type t ,Faction parent) {
 		this.troopType = t;
 	}
 	
@@ -35,13 +37,17 @@ public class Troop<T> {
 	
 	
 	public void add( BlockPos pos){
-		this.units.add( new UnitEntity( this.troopType ,pos));
+		this.units.add( new UnitEntity( this.troopType ,pos ,this));
 	}
 	
 	public void updateMemberActions( World world) {
 		for( UnitEntity u : this.units) {
 			u.update( world);
 		}
+	}
+	
+	public Faction getParent() {
+		return this.parent;
 	}
 	
 	// First attempt at moving UnitEntities around the job assignment map.

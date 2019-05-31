@@ -3,6 +3,8 @@ package witherwar.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import net.minecraft.util.math.BlockPos;
 
@@ -38,23 +40,28 @@ public enum Symbol{ //not a generic Symbol class, which bothers me, but I think 
 		return Symbol.randomValues( 3);
 	}
 	
+	public static List<Symbol> shuffledValues() {
+		List<Symbol> list = Arrays.asList( Symbol.values());
+		Collections.shuffle( list);
+		return list;
+	}
+	
 	public static Symbol[] randomValues( int numOfValues) {
-		if( numOfValues > 6) { numOfValues = 6; }
+		if( numOfValues > 6) { numOfValues = 6; } //silent error, need to throw exception
 		
 		Symbol[] choices = Symbol.nonNullValues();
 		int[] weights = new int[] { 1 ,1 ,1 ,1 ,1 ,1};
-		WeightedChoice a = new WeightedChoice( choices ,weights);
+		WeightedChoice<Symbol> a = new WeightedChoice<>( choices ,weights);
 		
 		Symbol[] output = new Symbol[numOfValues];
 		for( int i=0; i<numOfValues; i++) {
-			output[i] = (Symbol) a.pick();
+			output[i] = a.pick();
 		}
 		return output;
 	}
 	
 	public static Symbol[] nonNullValues() {
-		Symbol[] noNull = Arrays.copyOfRange( Symbol.values() ,0 ,6);
-		return noNull;
+		return Arrays.copyOfRange( Symbol.values() ,0 ,6);
 	}
 	
 	public static ArrayList<Symbol> compliment2D( Symbol a) {

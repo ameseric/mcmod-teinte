@@ -35,14 +35,10 @@ import witherwar.util.Symbol;
  * In the process of tearing this apart, most functions are being ripped into a separte block searcher class.
  * 
  */
-public abstract class TileEntityCustomTickingBase extends TileEntity implements ITickable{
-	
+public abstract class TileEntityCustomTickingBase extends TileEntity implements ITickable{	
 	
 	protected Ticket ticket;
-	private boolean triedToAssignTicket = false;
-	
-
-	
+	private boolean triedToAssignTicket = false;	
 	
 	
 	

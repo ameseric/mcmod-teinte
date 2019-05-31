@@ -1,13 +1,16 @@
 package witherwar.faction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import witherwar.util.BlockUtil;
 
 public class UnitEntity {
 	private boolean isPuppet = true;
@@ -15,6 +18,8 @@ public class UnitEntity {
 	private HashSet<Job> allowedJobs = new HashSet<>();
 	private Job assignment = Job.PATROL;
 	private ArrayList<ChunkPos> path;
+	
+	private Troop parent;
 	
 	private PuppetMovement move;
 	
@@ -35,7 +40,7 @@ public class UnitEntity {
 	
 	
 	
-	public UnitEntity( Type t ,BlockPos pos) {
+	public UnitEntity( Type t ,BlockPos pos ,Troop troop) {
 		this.addJob( Job.IDLE);
 		this.move = new PuppetMovement( pos);
 		//this.e = new ... we're going to have to extend the class, aren't we?
@@ -44,6 +49,7 @@ public class UnitEntity {
 		case SCOUT:
 			this.addJob( Job.PATROL);
 			this.addJob( Job.EXPLORE);
+			this.parent = troop;
 			break;
 		case GATHER:
 			break;
@@ -110,6 +116,10 @@ public class UnitEntity {
 		this.move.reset();
 	}
 	
+	private Faction getFaction() {
+		return this.parent.getParent();
+	}
+	
 	
 	
 	//------------- Core Actions ------------------//
@@ -122,8 +132,8 @@ public class UnitEntity {
 //		}			
 //	}
 	
-	public void record() {
-		
+	public void record( World world) {
+		this.getFaction().getMap().record( new ChunkPos( this.move.getPos()) ,world );
 	}
 	
 	private void gather() {
@@ -142,17 +152,46 @@ public class UnitEntity {
 	
 	
 	//----------------- Jobs --------------------------//
+	//switch patrols to radial, with occasional random r jumps
 	private void patrol( World world) {
 		if( this.move.idle()) {
+			HashSet<ChunkPos> neighbors = BlockUtil.getNeighborChunks( this.move.getPos() ,world);
+			neighbors.remove( this.move.getLastPos());
+			
+			for( ChunkPos pos : neighbors) {
+				if( !this.getFaction().getMap().hasChunk( pos) ) {
+					this.move.to( BlockUtil.chunkCenterPos( pos) );
+					break;
+				}
+			}
+			
+		}else if( this.move.finished() ) {
+			this.record( world);
+			this.move.reset();
+		}
+	}
+	
+	//switch exploration to linear radial progression
+	private void explore( World world) {
+		if( this.move.idle()) {
+			HashSet<ChunkPos> neighbors = BlockUtil.getNeighborChunks( this.move.getPos() ,world);
+			neighbors.remove( new ChunkPos( this.move.getLastPos()));
+			
+			for( ChunkPos pos : neighbors) {
+				if( !this.getFaction().getMap().isExplorable( pos) ) {
+					this.move.to( BlockUtil.chunkCenterPos( pos) );
+					break;
+				}
+			}
+			
+			if( this.move.idle()) {
+				this.move.to( BlockUtil.chunkCenterPos( this.getFaction().getMap().getExplorableChunk() ));
+			}
 			
 		}else if( this.move.finished() ) {
 			this.record();
 			this.move.reset();
 		}
-	}
-	
-	private void explore( World world) {
-		
 	}
 	
 	
@@ -259,6 +298,10 @@ class PuppetMovement{
 	
 	public BlockPos getPos() {
 		return this.pos;
+	}
+	
+	public BlockPos getLastPos() {
+		return this.lastPos;
 	}
 	
 	
