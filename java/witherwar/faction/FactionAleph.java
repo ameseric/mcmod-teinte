@@ -1,14 +1,15 @@
 package witherwar.faction;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
+import witherwar.TEinTE;
 
 public class FactionAleph extends Faction{
 
 	
 	public FactionAleph( World world) {
-		super( world);
-		this.scouts.add( );
-		this.scouts.add( );
+//		super( world ,TEinTE.blocks.get( "aleph_core").block);
+		super( world ,Blocks.BEACON);
 	}
 	
 	

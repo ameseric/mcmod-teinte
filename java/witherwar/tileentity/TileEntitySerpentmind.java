@@ -39,7 +39,7 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	
 	private enum Layer{
 		 SKIN( Blocks.OBSIDIAN)
-		,FLESH( TEinTE.newBlocks.get("flesh").block)
+		,FLESH( TEinTE.blocks.get("flesh").block)
 		,BONE( Blocks.BONE_BLOCK);
 		
 		private IBlockState bs;
@@ -222,7 +222,7 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 			}
 			
 			if( this.spawnerLogic == null) {
-				this.spawnerLogic = new CustomMobSpawner( "witherwar:serpent_wither_skeleton" ,this.world ,this.pos ,TEinTE.newBlocks.get("terra_kali").block);
+				this.spawnerLogic = new CustomMobSpawner( "witherwar:serpent_wither_skeleton" ,this.world ,this.pos ,TEinTE.blocks.get("terra_kali").block);
 			}else {
 				this.spawnerLogic.updateSpawner();
 			}
@@ -252,10 +252,10 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 		this.nativeBlocks = new HashBlockFilter();
 		this.nativeBlocks.add( Blocks.OBSIDIAN);
 		this.nativeBlocks.add( Blocks.BONE_BLOCK);
-		this.nativeBlocks.add( TEinTE.newBlocks.get("flesh").block);
+		this.nativeBlocks.add( TEinTE.blocks.get("flesh").block);
 		this.nativeBlocks.add( this.getBlockType());
 		
-		this.terraformBlock = TEinTE.newBlocks.get("dead_ash").block;
+		this.terraformBlock = TEinTE.blocks.get("dead_ash").block;
 		
 		//for( int i=0; i<numOfBranches; i++) {
 //			branches[ i] = this.pattern.grow();
@@ -275,7 +275,8 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 			return b != Blocks.AIR && this.nativeBlocks.allows(b) && b != Blocks.BEDROCK;
 		};
 		
-		BlockPos pos = searchForTouchingBlock( this.pos ,filterReturnBlock ,filterTraversableBlock ,10000 ,true);
+//TODO
+		//		BlockPos pos = searchForTouchingBlock( this.pos ,filterReturnBlock ,filterTraversableBlock ,10000 ,true);
 		if( !pos.equals( new BlockPos(0,0,0))) {
 			++blocksPlaced;
 			System.out.println( "Blocks placed: " + blocksPlaced);

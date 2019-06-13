@@ -18,12 +18,14 @@ import witherwar.util.SearchBlock.FilterBlock;
 public class UnitEntity {
 	private static int count = 0;
 	
+	public World world;
+	
 	private boolean isPuppet = true;
 	private EntityLiving e;
 	private HashSet<Job> allowedJobs = new HashSet<>();
 	private Job assignment = Job.PATROL;
 	private ArrayList<ChunkPos> path;
-	private Troop parent;
+	private Troop troop;
 	
 	private SearchBlock findWood;
 	private PuppetMovement move;
@@ -46,7 +48,7 @@ public class UnitEntity {
 		,PATROL
 		,EXPLORE
 		,HARVEST
-		,MINE;
+		,MINE //5-15, with slight variation.
 	}
 	
 	
@@ -67,7 +69,7 @@ public class UnitEntity {
 		case SCOUT:
 			this.addJob( Job.PATROL);
 			this.addJob( Job.EXPLORE);
-			this.parent = troop;
+			this.troop = troop;
 			break;
 		case GATHER:
 			this.findWood = new SearchBlock( world ,woodReturn ,woodTraversable ,16);
@@ -139,7 +141,7 @@ public class UnitEntity {
 	}
 	
 	private Faction getFaction() {
-		return this.parent.getParent();
+		return this.troop.getParent();
 	}
 	
 	private ResourceMap getMap() {

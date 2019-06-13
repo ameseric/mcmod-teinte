@@ -26,7 +26,7 @@ public class TileEntityMaw extends TileEntityCustomTickingBase{
 	private int maxRange = 60;
 	boolean retracting = false;
 	
-	Block deadSkin = TEinTE.newBlocks.get("dead_ash").block;
+	Block deadSkin = TEinTE.blocks.get("dead_ash").block;
 	
 	
 // NBT TAG SUPPORT

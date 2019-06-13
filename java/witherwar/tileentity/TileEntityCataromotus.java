@@ -21,7 +21,7 @@ public class TileEntityCataromotus extends TileEntityCustomTickingBase{
 	private ArrayList<TileEntityMaw> maws = new ArrayList<TileEntityMaw>(); 
 	private BlockPos[] form = null;
 	
-	Block deadSkin = TEinTE.newBlocks.get("dead_ash").block;
+	Block deadSkin = TEinTE.blocks.get("dead_ash").block;
 	ArrayList<String> markedPlayerIDs = new ArrayList<String>(); 
 	
 	// NBT TAG SUPPORT

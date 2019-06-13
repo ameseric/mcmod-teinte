@@ -58,7 +58,7 @@ import witherwar.util.TeinteWorldSavedData;
 @Mod(modid = TEinTE.MODID, version = TEinTE.VERSION)
 public class TEinTE
 {
-    public static final String MODID = "teinte";
+    public static final String MODID = "witherwar";
     public static final String VERSION = "0.1.00";
     public static final int TICKSASECOND = 20;
 	public static final SimpleNetworkWrapper snwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
@@ -68,7 +68,7 @@ public class TEinTE
 	private FactionAleph aleph; 
 	
     public static CreativeTabs teinteTab;
-    public static HashMap<String ,BlockRefHolder> newBlocks = new HashMap<String,BlockRefHolder>();
+    public static HashMap<String ,BlockRefHolder> blocks = new HashMap<String,BlockRefHolder>();
     //private HashMap<ChunkPos ,TileEntityGuidestone> regionalMap;
 	private int tickcount = 0;
 	
@@ -125,14 +125,14 @@ public class TEinTE
     
     
     private void registerBlocks() {   //modelResourceLocation strings refer only to the item model file (SRC.models.item) i.e. the strings below are texture only
-    	TEinTE.newBlocks.put( "terra_kali"      ,new BlockRefHolder( new BlockSerpentmind() ,"witherwar:terra_kali"));
-    	TEinTE.newBlocks.put( "flesh"           ,new BlockRefHolder( new BlockFlesh()       ,"minecraft:nether_wart_block"));
-    	TEinTE.newBlocks.put( "terra_catar_maw" ,new BlockRefHolder( new BlockCatarMaw()    ,"minecraft:nether_wart_block"));
-    	TEinTE.newBlocks.put( "dead_ash"        ,new BlockRefHolder( new BlockAsh()         ,"witherwar:dead_ash"));
-    	TEinTE.newBlocks.put( "terra_catar"     ,new BlockRefHolder( new BlockCatarCortex() ,"witherwar:terra_kali"));
-    	TEinTE.newBlocks.put( "guidestone"	   ,new BlockRefHolder( new BlockGuidestone()  ,"minecraft:glowstone"));
+    	TEinTE.blocks.put( "terra_kali"      ,new BlockRefHolder( new BlockSerpentmind() ,"witherwar:terra_kali"));
+    	TEinTE.blocks.put( "flesh"           ,new BlockRefHolder( new BlockFlesh()       ,"minecraft:nether_wart_block"));
+    	TEinTE.blocks.put( "terra_catar_maw" ,new BlockRefHolder( new BlockCatarMaw()    ,"minecraft:nether_wart_block"));
+    	TEinTE.blocks.put( "dead_ash"        ,new BlockRefHolder( new BlockAsh()         ,"witherwar:dead_ash"));
+    	TEinTE.blocks.put( "terra_catar"     ,new BlockRefHolder( new BlockCatarCortex() ,"witherwar:terra_kali"));
+    	TEinTE.blocks.put( "guidestone"	   ,new BlockRefHolder( new BlockGuidestone()  ,"minecraft:glowstone"));
     	
-    	for( BlockRefHolder brh : TEinTE.newBlocks.values()) {
+    	for( BlockRefHolder brh : TEinTE.blocks.values()) {
     		brh.registerBlock();
     	}    	
     }    
@@ -196,7 +196,7 @@ public class TEinTE
 		if( event.world.isRemote) { return;} //if logical client, return
 		tickcount += 1;
 		
-		if( tickcount == TICKSASECOND ){
+		if( tickcount == TICKSASECOND / 2 ){
 			tickcount = 0;
 			
 			if( config.allowRegionOverlay) {
@@ -233,7 +233,7 @@ public class TEinTE
 
 	
 /**	
-	private void birthTeralith() {
+	private void birthTerralith() {
 		World world = DimensionManager.getWorld(0);
 
 		List<EntityPlayer> players = world.playerEntities;

@@ -23,7 +23,7 @@ public class ClientOnlyProxy implements IProxy{
 	
 	public void preInit() {
 		
-		for( BlockRefHolder brh : TEinTE.newBlocks.values()) {
+		for( BlockRefHolder brh : TEinTE.blocks.values()) {
 			brh.setModelResourceLocation();
 		}		
 	}

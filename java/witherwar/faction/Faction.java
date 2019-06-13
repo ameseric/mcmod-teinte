@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import witherwar.faction.UnitEntity.Job;
@@ -31,8 +32,8 @@ public abstract class Faction {
 
 	//managers
 	protected Home home; //structure manager, may become a Terralith extension.
-	protected Troop<Job> scouts = new Troop<>( Type.SCOUT ,this);
-	protected Troop<Block> gathers = new Troop<>( Type.GATHER ,this);
+	protected Troop scouts = new Troop( Type.SCOUT ,this);
+	protected Troop gathers = new Troop( Type.GATHER ,this);
 //	protected Troop<Block> fighters = new Troop<>();
 	protected ResourceMap map;
 	
@@ -42,18 +43,20 @@ public abstract class Faction {
 	protected int upkeepCost = 100; //meaningless right now
 	protected int scoutRadius = 4; //chunk radius
 	protected int anima = 10; //used to power structures, and perhaps units.
-
 	
-	//weights
-//	protected WeightedHashMap<String> scoutWeights = new WeightedHashMap<String>();
-	protected WeightedHashMap<Block> materialWeights;
+	protected BlockPos corePos;
+	protected Block coreBlock;
 	
 	
-	public Faction( World world) {
-		//I think I've decided: The weights will be independent of unit assignments.  
-		this.materialWeights = new WeightedHashMap<Block>( 
-				new Block[] { Blocks.STONE ,Blocks.REDSTONE_ORE ,Blocks.LOG ,Blocks.COAL_ORE 
-						,Blocks.GOLD_ORE ,Blocks.IRON_ORE ,Blocks.DIAMOND_ORE});
+	protected HashMap<Block ,Job> materialJobs = new HashMap<>();
+	
+	
+	
+	public Faction( World world ,Block coreBlockType) {
+		//I think I've decided: The weights will be independent of unit assignments.
+		this.coreBlock = coreBlockType;
+		
+		this.setupMaterialJobs();
 
 		this.scouts.weights.put( Job.PATROL ,0);
 		this.scouts.weights.put( Job.EXPLORE ,4);
@@ -62,20 +65,16 @@ public abstract class Faction {
 	}
 	
 	
-	public void update( World world) {
+	public void update( World world) {		
 		
+		if( this.coreBlock == null) {
+			this.tryToPlaceCore( world);
+			return;
+		} //TODO questions - do we want cores? Should they always pick new place?
 		
-//		reviewAssignments
-//		influencers:
-//				current goal cost
-//				current material stockpiles
-//				current unit count
-//				active reactions
-//				weights? would be area-based, and triggered by reactions?
-//		
-//		chooseNextAction (weighted)
 		
 		this.map.update();
+		
 		
 		switch( updateCounter) {
 //			case 0: reviewMemory(); 		break;
@@ -90,6 +89,26 @@ public abstract class Faction {
 		
 		updateCounter = updateCounter > 4 ? 0 : updateCounter++;
 	}
+	
+	
+	private void tryToPlaceCore( World world) {
+		//get random chunk x distance from player
+		//examine surrounding chunks
+		//check no buildings, villages, serious terrain elevation, etc.
+		//world.setBlockState( this.corePos ,this.coreBlock.getDefaultState());
+	}
+	
+	
+	private void setupMaterialJobs() {
+		this.materialJobs.put( Blocks.LOG ,Job.HARVEST);
+
+		this.materialJobs.put( Blocks.REDSTONE_ORE ,Job.MINE);
+		this.materialJobs.put( Blocks.DIAMOND_ORE ,Job.MINE);
+		this.materialJobs.put( Blocks.GOLD_ORE ,Job.MINE);
+		this.materialJobs.put( Blocks.STONE ,Job.MINE);
+		this.materialJobs.put( Blocks.COAL_ORE ,Job.MINE);
+	}
+	
 	
 	
 	/**
