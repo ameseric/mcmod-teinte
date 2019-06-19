@@ -11,6 +11,12 @@ public class FactionAleph extends Faction{
 //		super( world ,TEinTE.blocks.get( "aleph_core").block);
 		super( world ,Blocks.BEACON);
 	}
+
+	@Override
+	public void setupJobWeights() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	

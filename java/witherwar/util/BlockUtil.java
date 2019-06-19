@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -67,8 +68,25 @@ public class BlockUtil {
 		return set;
 	}
 	
+	
+	
 	public static BlockPos chunkCenterPos( ChunkPos pos) {
 		return new BlockPos( pos.getXStart()+7 ,0 ,pos.getZStart()+7);
+	}
+	
+	
+	
+	public static BlockPos getAirYPos( BlockPos pos ,World world) {
+		int y = 240;		
+		Block b;
+		
+		do{
+			b = world.getBlockState( pos.add(0,y,0) ).getBlock();
+			--y;
+			
+		}while( b == Blocks.AIR);
+		
+		return pos.add( 0 ,y+2 ,0);
 	}
 	
 	

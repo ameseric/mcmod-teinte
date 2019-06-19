@@ -11,7 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import witherwar.faction.UnitEntity.Job;
-import witherwar.faction.UnitEntity.Type;
+import witherwar.faction.UnitEntity.UnitType;
+import witherwar.util.BlockUtil;
 import witherwar.util.WeightedHashMap;
 
 /*
@@ -32,20 +33,22 @@ public abstract class Faction {
 
 	//managers
 	protected Home home; //structure manager, may become a Terralith extension.
-	protected Troop scouts = new Troop( Type.SCOUT ,this);
-	protected Troop gathers = new Troop( Type.GATHER ,this);
-//	protected Troop<Block> fighters = new Troop<>();
-	protected ResourceMap map;
+	protected Troop scouts = new Troop( UnitType.SCOUT ,this);
+	protected Troop gathers = new Troop( UnitType.GATHER ,this);
+	//fighters
+	//movers?
+	protected ResourceMap map = new ResourceMap();
 	
 	protected Action masterGoal;
 	
 	protected int updateCounter = 0;
-	protected int upkeepCost = 100; //meaningless right now
 	protected int scoutRadius = 4; //chunk radius
 	protected int anima = 10; //used to power structures, and perhaps units.
 	
 	protected BlockPos corePos;
+	protected BlockPos oldCorePos; //only used for generating new cores after original is destroyed
 	protected Block coreBlock;
+	protected int respawnTimer; //amount of time before trying to respawn a core block.
 	
 	
 	protected HashMap<Block ,Job> materialJobs = new HashMap<>();
@@ -55,20 +58,17 @@ public abstract class Faction {
 	public Faction( World world ,Block coreBlockType) {
 		//I think I've decided: The weights will be independent of unit assignments.
 		this.coreBlock = coreBlockType;
-		
-		this.setupMaterialJobs();
-
-		this.scouts.weights.put( Job.PATROL ,0);
-		this.scouts.weights.put( Job.EXPLORE ,4);
-		
-		
+		this.setupMaterialJobs();		
 	}
 	
 	
 	public void update( World world) {		
 		
-		if( this.coreBlock == null) {
-			this.tryToPlaceCore( world);
+		if( this.corePos == null) {
+			boolean success = this.tryToPlaceCore( world);
+			if( success) {
+				this.setup(world);
+			}
 			return;
 		} //TODO questions - do we want cores? Should they always pick new place?
 		
@@ -82,6 +82,7 @@ public abstract class Faction {
 			case 0: reviewScoutingAssignments(); break;
 //			case 2: reviewCombatAssignments(); break; //wait
 //			case ?: review damage to buildings / units - may fall back to other cate.
+//			case ?: look through arraylist of additional reviews? Can't remove default...
 		}
 		
 		this.scouts.updateMemberActions( world);
@@ -91,23 +92,39 @@ public abstract class Faction {
 	}
 	
 	
-	private void tryToPlaceCore( World world) {
+	private boolean tryToPlaceCore( World world) {
 		//get random chunk x distance from player
 		//examine surrounding chunks
 		//check no buildings, villages, serious terrain elevation, etc.
 		//world.setBlockState( this.corePos ,this.coreBlock.getDefaultState());
+		
+		this.corePos = BlockUtil.getAirYPos( new BlockPos(0,0,0) ,world);
+		world.setBlockState( this.corePos ,this.coreBlock.getDefaultState());
+		
+		return true;
+	}
+	
+	private void setup( World world) {
+		this.map.setCenterPos( new ChunkPos( this.corePos));
+		this.scouts.addUnit( this.corePos.add( 1,0,1), world);
+		this.scouts.addUnit( this.corePos.add( -1,0,-1), world);
 	}
 	
 	
-	private void setupMaterialJobs() {
+	protected void setupMaterialJobs() {
 		this.materialJobs.put( Blocks.LOG ,Job.HARVEST);
-
 		this.materialJobs.put( Blocks.REDSTONE_ORE ,Job.MINE);
 		this.materialJobs.put( Blocks.DIAMOND_ORE ,Job.MINE);
 		this.materialJobs.put( Blocks.GOLD_ORE ,Job.MINE);
 		this.materialJobs.put( Blocks.STONE ,Job.MINE);
 		this.materialJobs.put( Blocks.COAL_ORE ,Job.MINE);
 	}
+	
+
+	/*
+	 * use to override the default job weights
+	 */
+	public abstract void setupJobWeights();
 	
 	
 	
@@ -156,7 +173,7 @@ public abstract class Faction {
 		
 	}
 	
-	
+	//TODO
 	protected void reviewScoutingAssignments() {
 		
 		boolean increaseRadius = true;
@@ -168,6 +185,8 @@ public abstract class Faction {
 			if( this.map.getRadial(i).size() < (i*8) - (i*2)) {
 				increaseRadius = false;
 				break;
+			}else {
+				System.out.println("Failed boundary increase.");
 			}
 		}
 		if( increaseRadius) {

@@ -22,7 +22,6 @@ public class UnitEntity {
 	
 	private boolean isPuppet = true;
 	private EntityLiving e;
-	private HashSet<Job> allowedJobs = new HashSet<>();
 	private Job assignment = Job.PATROL;
 	private ArrayList<ChunkPos> path;
 	private Troop troop;
@@ -35,7 +34,7 @@ public class UnitEntity {
 	
 	
 	
-	public enum Type{
+	public enum UnitType{
 		 SCOUT
 		,GATHER
 		,MOVER
@@ -60,28 +59,13 @@ public class UnitEntity {
 	
 	
 	
-	public UnitEntity( Type t ,ChunkPos pos ,Troop troop ,World world) {
-		this.addJob( Job.IDLE);
+	public UnitEntity( UnitType t ,ChunkPos pos ,Troop troop ,World world) {
 		this.move = new PuppetMovement( pos ,count ,count%16);
+		this.troop = troop;
 		//this.e = new ... we're going to have to extend the class, aren't we?
 		
-		switch(t) {
-		case SCOUT:
-			this.addJob( Job.PATROL);
-			this.addJob( Job.EXPLORE);
-			this.troop = troop;
-			break;
-		case GATHER:
-			this.findWood = new SearchBlock( world ,woodReturn ,woodTraversable ,16);
-			break;
-		case FIGHTER:
-			break;
-		case MOVER:
-			break;
-		default:
-			break;
-			
-		}
+		this.findWood = new SearchBlock( world ,woodReturn ,woodTraversable ,16);
+		
 		++UnitEntity.count;
 	}
 	
@@ -100,6 +84,10 @@ public class UnitEntity {
 		case PATROL:
 			this.patrol(world);
 			break;
+		case HARVEST:
+			break;
+		case MINE:
+			break;
 			
 		}
 		
@@ -108,16 +96,13 @@ public class UnitEntity {
 			this.move.update( world);
 		}
 		
-	}	
-
-	
-	private void addJob( Job j) {
-		this.allowedJobs.add(j);
 	}
+	
 	
 	public void assignJob( Job j) {
 		this.assignment = j;
 	}
+
 	
 	
 	//We don't directly call the chunk.isLoaded to save lookups. Need to be careful
@@ -141,7 +126,7 @@ public class UnitEntity {
 	}
 	
 	private Faction getFaction() {
-		return this.troop.getParent();
+		return this.troop.getFaction();
 	}
 	
 	private ResourceMap getMap() {
@@ -151,14 +136,9 @@ public class UnitEntity {
 	
 	
 	//------------- Core Actions ------------------//
-//	private void move( World world) {
-//		moveTimer.tick();
-//		if( moveTimer.done()) {
-//			this.setPosition( this.moveTo ,world);
-//			moveTimer.reset();
-//			this.moveTo = null;
-//		}			
-//	}
+	public void move() {
+		
+	}
 	
 	public void record( World world) {
 		this.getMap().record( this.move.getPos() ,world );
@@ -198,7 +178,26 @@ public class UnitEntity {
 	
 	//switch exploration to linear radial progression
 	private void explore( World world) {
-		this.patrol(world); //for now, they're the same.
+		if( this.move.idle()) {
+			int randint = world.rand.nextInt( 10);
+
+			HashSet<ChunkPos> chunks = BlockUtil.getNeighborChunks( this.move.getPos());
+
+			if( randint == 0) {
+				this.move.to( (ChunkPos) chunks.toArray()[0] );
+			}else {			
+				for( ChunkPos pos : chunks) {
+					RMChunk chunk = this.getMap().getChunk(pos);
+					if( chunk != null && chunk.r == this.getMap().calcR( this.move.getPos()) ) {
+						this.move.to( pos);
+					}
+				}
+			}			
+			
+		}else if( this.move.finished() ) {
+			this.record( world);
+			this.move.reset();
+		}
 	}
 	
 	
@@ -300,7 +299,7 @@ class PuppetMovement{
 		world.setBlockToAir( this.getBXYZPos());
 		world.setBlockState( this.getBXYZPos() ,Blocks.CYAN_GLAZED_TERRACOTTA.getDefaultState());
 		
-		this.calcDebugY( world);
+		this.calcBlockY( world);
 	}
 	
 	public void setStartingPosition( ChunkPos pos) {
@@ -338,19 +337,11 @@ class PuppetMovement{
 	}
 	
 	
-	private void calcDebugY( World world) {
-		int y = 240;		
-		Block b;
-		
-		do{
-			b = world.getBlockState( this.getBXZPos().add(0,0,0) ).getBlock();
-			--y;
-			
-		}while( b == Blocks.AIR);
-		
-		this.ry = y+15;
-		
-		
+	/*
+	 * For debug purposes only.
+	 */
+	private void calcBlockY( World world) {
+		this.ry = BlockUtil.getAirYPos( this.getBXZPos() ,world).getY() + 15;		
 	}
 	
 	

@@ -95,14 +95,15 @@ public class TileEntityMaw extends TileEntityCustomTickingBase{
 		BlockPos pos = null;
 		while( itr.hasNext()) {
 			pos = itr.next();
-			if( !isOfBlockSet( this.world.getBlockState(pos).getBlock() ,set) ) {
-				this.target = pos;
-				break;
-			}
+//TODO
+//			if( !isOfBlockSet( this.world.getBlockState(pos).getBlock() ,set) ) {
+//				this.target = pos;
+//				break;
+//			}
 		}
 		
 		if( this.target != null) {
-			Symbol[] path = getPath( this.pos ,pos);
+			Symbol[] path = null;//TODO = getPath( this.pos ,pos);
 			BlockPos currentPos = this.pos;
 			this.branch = new ArrayList<BlockPos>();
 			for( Symbol direction : path) {

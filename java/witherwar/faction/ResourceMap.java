@@ -18,10 +18,13 @@ public class ResourceMap {
 	public int boundary = 5;
 	
 	
-	public ResourceMap( ChunkPos centerPos) {
-		this.center = centerPos;
+	public ResourceMap() {
 	}
 	
+	
+	public void setCenterPos( ChunkPos pos) {
+		this.center = pos;
+	}
 	
 	public void update() {
 		//update map boundary?
@@ -75,6 +78,7 @@ public class ResourceMap {
 		
 		public RMChunk( int x ,int z) {
 			this.pos = new ChunkPos( x ,z);
+			this.r = BlockUtil.calcR( pos ,ResourceMap.this.center);
 		}
 		
 		public RMChunk( ChunkPos pos) {
