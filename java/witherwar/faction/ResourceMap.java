@@ -40,8 +40,12 @@ public class ResourceMap {
 		return this.chunkMap.get(pos);
 	}
 	
-	public int size() {
+	public int chunkSize() {
 		return this.chunkMap.size();
+	}
+	
+	public int radialSize() {
+		return this.radialMap.size();
 	}
 	
 	public HashSet<RMChunk> getRadial( int index){

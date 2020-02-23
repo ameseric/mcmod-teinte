@@ -74,6 +74,8 @@ public class Troop {
 	// First attempt at moving UnitEntities around the job assignment map.
 	// Probably can be improved upon.
 	public void updateJobAssignments() {
+		if( this.jobAssignments.size() == 1) { return;}
+		
 		HashMap<Job ,Integer> newUnitAllocation = this.weights.allocate( this.units.size());		
 		ArrayList<UnitEntity> unitsToReassign = new ArrayList<UnitEntity>();
 		

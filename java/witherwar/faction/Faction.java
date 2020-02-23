@@ -30,6 +30,8 @@ public abstract class Faction {
 	protected Personality personality;
 
 //	private List<Reaction> reactions; //maybe?
+	
+	//group troops into a list, along with review logic (interface needed)
 
 	//managers
 	protected Home home; //structure manager, may become a Terralith extension.
@@ -48,7 +50,7 @@ public abstract class Faction {
 	protected BlockPos corePos;
 	protected BlockPos oldCorePos; //only used for generating new cores after original is destroyed
 	protected Block coreBlock;
-	protected int respawnTimer; //amount of time before trying to respawn a core block.
+	protected int respawnTimer = 600; //amount of time before trying to respawn a core block.
 	
 	
 	protected HashMap<Block ,Job> materialJobs = new HashMap<>();
@@ -176,24 +178,22 @@ public abstract class Faction {
 	//TODO
 	protected void reviewScoutingAssignments() {
 		
-		boolean increaseRadius = true;
-		int weight = this.map.size() / 9;
+//		boolean increaseRadius = true; //until proven otherwise
+		int weight = this.map.radialSize() / 9;
 		this.scouts.weights.update( Job.PATROL ,weight);
 		this.scouts.weights.update( Job.EXPLORE ,weight);
 		
-		for( int i = this.map.boundary; i>0; i--) {
-			if( this.map.getRadial(i).size() < (i*8) - (i*2)) {
-				increaseRadius = false;
-				break;
-			}else {
-				System.out.println("Failed boundary increase.");
-			}
-		}
-		if( increaseRadius) {
-			this.map.boundary = this.map.boundary + 2;
-		}
+//		for( int i = this.map.boundary; i>0; i--) {
+//			if( this.map.getRadial(i).size() < (i*8) - (i*2)) {
+//				increaseRadius = false;
+//				break;
+//			}
+//		}
+//		if( increaseRadius) {
+//			this.map.boundary = this.map.boundary + 2;
+//		}
 		
-		this.scouts.updateJobAssignments();		
+		this.scouts.updateJobAssignments();
 	}
 
 	//---------- NBT Save / Load -------------------//

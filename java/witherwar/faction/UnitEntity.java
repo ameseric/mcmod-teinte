@@ -30,8 +30,7 @@ public class UnitEntity {
 	private PuppetMovement move;
 	
 	private static FilterBlock woodTraversable;
-	private static FilterBlock woodReturn;
-	
+	private static FilterBlock woodReturn;	
 	
 	
 	public enum UnitType{
@@ -39,8 +38,7 @@ public class UnitEntity {
 		,GATHER
 		,MOVER
 		,FIGHTER
-	}
-	
+	}	
 	
 	public enum Job{
 		 IDLE
@@ -48,8 +46,7 @@ public class UnitEntity {
 		,EXPLORE
 		,HARVEST
 		,MINE //5-15, with slight variation.
-	}
-	
+	}	
 	
 	static{ //Block searching and filters setup
 		woodTraversable = (b) -> { 
