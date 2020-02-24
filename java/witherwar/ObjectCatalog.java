@@ -89,7 +89,7 @@ public class ObjectCatalog {
 	
 	
 	
-	//Pre-Init call only!  Client-only code followup in the client proxy.
+	//Pre-Init call only!  Client-only code followup in the client proxy for Block and Entity Rendering.
 	public static void registerPreInitObjects() {
 		for( NewBlock nb : getNewBlocks()) {
 			ForgeRegistries.BLOCKS.register( nb.block);

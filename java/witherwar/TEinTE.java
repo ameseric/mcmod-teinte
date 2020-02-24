@@ -1,10 +1,8 @@
 package witherwar;
 
-import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,13 +22,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import witherwar.ObjectCatalog.NewBlock;
-import witherwar.ObjectCatalog.NewEntity;
-import witherwar.ObjectCatalog.NewTileEntity;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
 import witherwar.network.*;//MessageRegionOverlayOn.MessageHandleRegionOverlayOn;
