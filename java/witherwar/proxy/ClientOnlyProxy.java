@@ -2,43 +2,72 @@ package witherwar.proxy;
 
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderGhast;
 import net.minecraft.client.renderer.entity.RenderWitherSkeleton;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import witherwar.TEinTE;
-import witherwar.block.BlockRefHolder;
+import witherwar.ObjectCatalog;
+import witherwar.ObjectCatalog.NewBlock;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
 import witherwar.gui.GuiEditGuidestone;
 import witherwar.gui.TeinteGUI;
-import witherwar.tileentity.TileEntityGuidestone;
 
 public class ClientOnlyProxy implements IProxy{
 	public static TeinteGUI teinteGUI;
 	
-	public void preInit() {
+//	private HashMap< Class<? extends Entity> ,Class<? extends Render>> entityRenderTable = new HashMap<>();
+//	{
+//		this.entityRenderTable.put( EntitySerpentWither.class ,RenderWitherSkeleton.class);
+//	}
+	
+	
+	
+	
+	public void preInit() {		
 		
-		for( BlockRefHolder brh : TEinTE.blocks.values()) {
-			brh.setModelResourceLocation();
-		}		
+		for( NewBlock nb : ObjectCatalog.getNewBlocks()) {
+			System.out.println( nb.item);
+			System.out.println( nb.resourceLocation);
+			this.setModelResourceLocation( nb.item ,nb.resourceLocation);
+		}
+
 	}
+	
+	
+	
 	
 	public void init() {
 		Minecraft mc = Minecraft.getMinecraft();
+		
+//		for( NewEntity ne : TEinTE.catalog.getNewEntities()) {
+//			mc.getRenderManager().entityRenderMap.put( ne.entityClass ,)
+//		}
+		
         mc.getRenderManager().entityRenderMap.put( EntitySerpentWither.class, new RenderWitherSkeleton( mc.getRenderManager()));
         mc.getRenderManager().entityRenderMap.put( EntityMotusGhast.class, new RenderGhast( mc.getRenderManager()));
+		
 	}
+	
+	
+	
 	
 	public void postInit() {
     	teinteGUI = new TeinteGUI();
     	MinecraftForge.EVENT_BUS.register( teinteGUI.renderHandler);
 	}
 
+	
+	
+	
+	
+	
 	@Override
 	public boolean isDedicatedServer() {
 		// TODO Auto-generated method stub
@@ -53,6 +82,9 @@ public class ClientOnlyProxy implements IProxy{
 		return null;
 		//return (ctx.side.isClient() ? Minecraft.getMinecraft().player : WitherWar.proxy.getPlayerEntityFromContext(ctx));
 	}
+	
+	
+	
 
 	@Override
 	public void openGui(int ID ,IMessage msg) {
@@ -60,6 +92,15 @@ public class ClientOnlyProxy implements IProxy{
 			Minecraft.getMinecraft().displayGuiScreen( new GuiEditGuidestone( msg));
 		}
 		
+	}
+	
+	
+	
+	
+	private void setModelResourceLocation( ItemBlock item ,ResourceLocation rl){
+		final int DEFAULT_ITEM_SUBTYPE = 0;
+		ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation( rl ,"inventory");
+		ModelLoader.setCustomModelResourceLocation( item ,DEFAULT_ITEM_SUBTYPE ,itemModelResourceLocation);
 	}
 
 	

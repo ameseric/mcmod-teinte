@@ -179,7 +179,7 @@ public abstract class Faction {
 	protected void reviewScoutingAssignments() {
 		
 //		boolean increaseRadius = true; //until proven otherwise
-		int weight = this.map.radialSize() / 9;
+		int weight = 0;//this.map.radialSize() / 9;
 		this.scouts.weights.update( Job.PATROL ,weight);
 		this.scouts.weights.update( Job.EXPLORE ,weight);
 		

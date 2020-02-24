@@ -63,7 +63,7 @@ public class RegionMap {
 				if( !regionName.equals( this.getPlayerRegionName( player) ) ) {
 					this.setPlayerRegionName( player ,regionName);
 					if( !regionName.equals("")) {
-						TEinTE.snwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
+						TEinTE.networkwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
 					}
 				}
 			}
@@ -82,7 +82,7 @@ public class RegionMap {
     
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer playerIn) {
 		String regionName = this.getRegionName( new ChunkPos(pos));
-		TEinTE.snwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getZ() ,regionName) ,(EntityPlayerMP)playerIn);
+		TEinTE.networkwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getZ() ,regionName) ,(EntityPlayerMP)playerIn);
 		
 
 	}

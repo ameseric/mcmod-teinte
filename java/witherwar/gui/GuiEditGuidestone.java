@@ -43,7 +43,7 @@ public class GuiEditGuidestone extends GuiScreen{
         Keyboard.enableRepeatEvents(false);
 		super.onGuiClosed();
 		this.plaintext = this.text.getText();
-		TEinTE.snwrapper.sendToServer( new MessageEditGuidestone( msg.x ,msg.z ,this.plaintext));
+		TEinTE.networkwrapper.sendToServer( new MessageEditGuidestone( msg.x ,msg.z ,this.plaintext));
 	}
 	 
 

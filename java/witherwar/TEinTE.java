@@ -1,14 +1,12 @@
 package witherwar;
 
-import java.util.HashMap;
-
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,30 +24,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.common.registry.EntityEntry;
-import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import witherwar.block.BlockAsh;
-import witherwar.block.BlockCatarCortex;
-import witherwar.block.BlockFlesh;
-import witherwar.block.BlockGuidestone;
-import witherwar.block.BlockCatarMaw;
-import witherwar.block.BlockRefHolder;
-import witherwar.block.BlockSerpentmind;
-import witherwar.entity.EntityMotusGhast;
-import witherwar.entity.EntitySerpentWither;
-import witherwar.faction.FactionAleph;
+import witherwar.ObjectCatalog.NewBlock;
+import witherwar.ObjectCatalog.NewEntity;
+import witherwar.ObjectCatalog.NewTileEntity;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
 import witherwar.network.*;//MessageRegionOverlayOn.MessageHandleRegionOverlayOn;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.IProxy;
-import witherwar.tileentity.TileEntityCataromotus;
-import witherwar.tileentity.TileEntityMaw;
-import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.util.ChunkManager;
 import witherwar.util.TeinteWorldSavedData;
 
@@ -61,15 +47,10 @@ public class TEinTE
     public static final String MODID = "witherwar";
     public static final String VERSION = "0.1.00";
     public static final int TICKSASECOND = 20;
-	public static final SimpleNetworkWrapper snwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
-	private TeinteWorldSavedData data;
-	
-	//Factions
-	private FactionAleph aleph; 
-	
+	public static final SimpleNetworkWrapper networkwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
     public static CreativeTabs teinteTab;
-    public static HashMap<String ,BlockRefHolder> blocks = new HashMap<String,BlockRefHolder>();
-    //private HashMap<ChunkPos ,TileEntityGuidestone> regionalMap;
+	
+	private TeinteWorldSavedData data;
 	private int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
@@ -91,18 +72,19 @@ public class TEinTE
 			public ItemStack getTabIconItem() {
 				return new ItemStack( Items.END_CRYSTAL);
 			}};
+			
+		ObjectCatalog.registerPreInitObjects();		
    	
-    	registerBlocks(); //followup code in proxy.preInit()    	
-    	registerEntities();
-    	registerTileEntities();
     	
-    	snwrapper.registerMessage( HandleMessageRegionOverlayOn.class, MessageRegionOverlayOn.class, 0, Side.CLIENT);
-    	snwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.CLIENT);
-    	snwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.SERVER);
+    	networkwrapper.registerMessage( HandleMessageRegionOverlayOn.class, MessageRegionOverlayOn.class, 0, Side.CLIENT);
+    	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.CLIENT);
+    	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.SERVER);
     	
 		proxy.preInit();
 		
-    }   
+    }
+
+    
     
     
 	
@@ -120,52 +102,13 @@ public class TEinTE
     @EventHandler
     public void postInit( FMLPostInitializationEvent event) {
   	 	proxy.postInit();
-    }
-    
-    
-    
-    private void registerBlocks() {   //modelResourceLocation strings refer only to the item model file (SRC.models.item) i.e. the strings below are texture only
-    	TEinTE.blocks.put( "terra_kali"      ,new BlockRefHolder( new BlockSerpentmind() ,"witherwar:terra_kali"));
-    	TEinTE.blocks.put( "flesh"           ,new BlockRefHolder( new BlockFlesh()       ,"minecraft:nether_wart_block"));
-    	TEinTE.blocks.put( "terra_catar_maw" ,new BlockRefHolder( new BlockCatarMaw()    ,"minecraft:nether_wart_block"));
-    	TEinTE.blocks.put( "dead_ash"        ,new BlockRefHolder( new BlockAsh()         ,"witherwar:dead_ash"));
-    	TEinTE.blocks.put( "terra_catar"     ,new BlockRefHolder( new BlockCatarCortex() ,"witherwar:terra_kali"));
-    	TEinTE.blocks.put( "guidestone"	   ,new BlockRefHolder( new BlockGuidestone()  ,"minecraft:glowstone"));
-    	
-    	for( BlockRefHolder brh : TEinTE.blocks.values()) {
-    		brh.registerBlock();
-    	}    	
     }    
-    
-    
-    private void registerEntities() {
-    	EntityEntry entry1 = EntityEntryBuilder.create()
-        	    .entity( EntitySerpentWither.class)
-        	    .id( new ResourceLocation( TEinTE.MODID ,"serpent_wither_skeleton"), 2)
-        	    .name( "serpent_wither_skeleton")
-        	    .egg( 0xFFFFFF, 0xAAAAAA)
-        	    .tracker( 80, 3, false)
-        	    .build();
-    	ForgeRegistries.ENTITIES.register( entry1);    	
-    	
-    	EntityEntry entry2 = EntityEntryBuilder.create()
-        	    .entity( EntityMotusGhast.class)
-        	    .id( new ResourceLocation( TEinTE.MODID ,"motus_ghast"), 3)
-        	    .name( "motus_ghast")
-        	    .egg( 0xFFFFFA, 0xAAAAAA)
-        	    .tracker( 80, 3, false)
-        	    .build();
-    	ForgeRegistries.ENTITIES.register( entry2);
-    }
+
     
     
     
+ //------------------------------  END Initialization ------------------------------------------------------------//   
     
-    private void registerTileEntities() {
-		GameRegistry.registerTileEntity( TileEntitySerpentmind.class ,new ResourceLocation("witherwar:tile_entity_serpentmind"));
-		GameRegistry.registerTileEntity( TileEntityMaw.class ,new ResourceLocation("witherwar:tile_entity_maw"));
-		GameRegistry.registerTileEntity( TileEntityCataromotus.class ,new ResourceLocation("witherwar:tile_entity_cataromotus"));
-    }
     
     
     
@@ -203,13 +146,12 @@ public class TEinTE
 				this.data.regionMap.tick( tickcount ,event.world);
 			}
 			
-			if( this.aleph == null) {
-				this.aleph = new FactionAleph( event.world);
-			}
+//			if( this.aleph == null) {
+//				this.aleph = new FactionAleph( event.world);
+//			}
 			
-			//tickTerraliths();
-			//tickVoid();
-			aleph.update( event.world);
+
+			//aleph.update( event.world);
 
 /**			int rand = new Random().nextInt(120);
  * 			int rand = event.world.rand.nextInt(120);

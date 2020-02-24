@@ -8,10 +8,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import scala.actors.threadpool.Arrays;
-import witherwar.TEinTE;
+import witherwar.ObjectCatalog;
 import witherwar.util.Symbol;
-import witherwar.util.WeightedChoice;
 
 //Needs cleaning, too many flag variables.
 public class TileEntityMaw extends TileEntityCustomTickingBase{
@@ -26,7 +24,7 @@ public class TileEntityMaw extends TileEntityCustomTickingBase{
 	private int maxRange = 60;
 	boolean retracting = false;
 	
-	Block deadSkin = TEinTE.blocks.get("dead_ash").block;
+	Block deadSkin = ObjectCatalog.DEAD_ASH;//blocks.get("dead_ash").block;
 	
 	
 // NBT TAG SUPPORT

@@ -12,6 +12,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.WeightedSpawnerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import witherwar.ObjectCatalog;
 import witherwar.TEinTE;
 import witherwar.util.HashBlockFilter;
 import witherwar.util.LSystem;
@@ -39,7 +40,8 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	
 	private enum Layer{
 		 SKIN( Blocks.OBSIDIAN)
-		,FLESH( TEinTE.blocks.get("flesh").block)
+		//,FLESH( TEinTE.blocks.get("flesh").block)
+		,FLESH( ObjectCatalog.FLESH)
 		,BONE( Blocks.BONE_BLOCK);
 		
 		private IBlockState bs;
@@ -222,7 +224,7 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 			}
 			
 			if( this.spawnerLogic == null) {
-				this.spawnerLogic = new CustomMobSpawner( "witherwar:serpent_wither_skeleton" ,this.world ,this.pos ,TEinTE.blocks.get("terra_kali").block);
+				this.spawnerLogic = new CustomMobSpawner( "witherwar:serpent_wither_skeleton" ,this.world ,this.pos ,ObjectCatalog.TERRA_KALI);
 			}else {
 				this.spawnerLogic.updateSpawner();
 			}
@@ -252,10 +254,10 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 		this.nativeBlocks = new HashBlockFilter();
 		this.nativeBlocks.add( Blocks.OBSIDIAN);
 		this.nativeBlocks.add( Blocks.BONE_BLOCK);
-		this.nativeBlocks.add( TEinTE.blocks.get("flesh").block);
+		this.nativeBlocks.add( ObjectCatalog.FLESH);
 		this.nativeBlocks.add( this.getBlockType());
 		
-		this.terraformBlock = TEinTE.blocks.get("dead_ash").block;
+		this.terraformBlock = ObjectCatalog.DEAD_ASH;
 		
 		//for( int i=0; i<numOfBranches; i++) {
 //			branches[ i] = this.pattern.grow();
