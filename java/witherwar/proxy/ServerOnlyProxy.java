@@ -3,7 +3,6 @@ package witherwar.proxy;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import witherwar.ObjectCatalog;
 
 public class ServerOnlyProxy implements IProxy{
 	
