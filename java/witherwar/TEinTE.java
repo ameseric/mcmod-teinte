@@ -6,12 +6,13 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.Config.Name;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -19,21 +20,33 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
-import witherwar.network.*;//MessageRegionOverlayOn.MessageHandleRegionOverlayOn;
+import witherwar.command.CommandDarkenSky;
+import witherwar.command.CommandTeleportWW;
+import witherwar.faction.FactionManager;
+import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.IProxy;
-import witherwar.util.ChunkManager;
+import witherwar.region.RegionManager;
+import witherwar.system.SystemBlockDegrade;
+import witherwar.system.SystemPower;
+import witherwar.util.NBTSaveFormat;
 import witherwar.util.TeinteWorldSavedData;
-import witherwar.worlds.WorldManager;
+import witherwar.worlds.WorldCatalog;
+import witherwar.worlds.WorldTypeTeinte;
 
+
+//TODO: Decide whether Manager classes can/should be discarded.
 
 
 @Mod(modid = TEinTE.MODID, version = TEinTE.VERSION)
@@ -44,8 +57,13 @@ public class TEinTE
     public static final int TICKSASECOND = 20;
 	public static final SimpleNetworkWrapper networkwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
     public static CreativeTabs teinteTab;
+    
+    public FactionManager factions = new FactionManager();
 	
-	private TeinteWorldSavedData data;
+	private TeinteWorldSavedData savedata;
+	private RegionManager regions;  //TODO regionMap is going to leave savedata for clarity
+	private SystemBlockDegrade sysBlockDegrade;  
+	private SystemPower sysPower;
 	private int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
@@ -75,19 +93,18 @@ public class TEinTE
     	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.CLIENT);
     	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.SERVER);
     	
-    	WorldManager.registerDimensions();
+    	WorldCatalog.registerDimensions();
     	
 		proxy.preInit();
 		
     }
 
     
-    
-    
+
 	
 	@EventHandler
     public void init( FMLInitializationEvent event){
-    	ForgeChunkManager.setForcedChunkLoadingCallback( instance, new ChunkManager());
+    	//ForgeChunkManager.setForcedChunkLoadingCallback( instance, new ChunkManager());
     	MinecraftForge.EVENT_BUS.register( instance);
     	proxy.init();
     }
@@ -107,69 +124,141 @@ public class TEinTE
  //------------------------------  END Initialization ------------------------------------------------------------//   
     
     
+ 
+
+ //------------------------------  Non-Init Event Handlers ------------------------------------------------------------//
+    
+    @SubscribeEvent
+    //Triggers on client and server
+    public void onWorldLoad( WorldEvent.Load event) {
+    	
+    	
+//    	if( this.data == null) {
+//    		if( !event.getWorld().isRemote) {
+//    			//stuff
+//    		}
+//    	}
+    	
+//    	System.out.println(event.getWorld().isRemote);
+    	
+//    	proxy.onWorldLoad( event);
+    	
+    	
+//    	World world = event.getWorld();
+//    	if( world.provider.getDimension() == 0 && !world.isRemote) {
+//    		if( world.getWorldType() == WorldCatalog.worldTypePillar) {
+//    			System.out.println( "Got'em Chief.-----------------------------");
+//    		}
+//
+//    	}
+    	
+    }
     
     
     @SubscribeEvent
-    public void onWorldLoad( WorldEvent.Load event) {
-    	if( event.getWorld().provider.getDimension() == 0 && !event.getWorld().isRemote) {
-    		this.data = TeinteWorldSavedData.get( event.getWorld());
-    		this.data.regionMap.setWorld( event.getWorld());
-    		MinecraftForge.EVENT_BUS.register( this.data.regionMap);
-    	}
+    public void playerLoggedOn( PlayerLoggedInEvent event) {
+    	this.regions.playerMap.put( event.player ,""); //TODO change access
+    	//this.regions.addPlayer( event.player ,"");
     }
     
     
     
+    @SubscribeEvent
+    //Appears to be server-side only
+    public void onPlayerBlockPlace( BlockEvent.PlaceEvent event) {
+    	BlockPos pos = event.getPos();
+    	event.getPlayer();
+    	System.out.println( pos.toString());
+    	System.out.println( event.getWorld().isRemote);
+    }
+    
+    
+    
+    @EventHandler
+    // Happens after dimension loading
+    public void onServerLoad(FMLServerStartingEvent event)
+    {
+    	event.registerServerCommand( new CommandDarkenSky());
+    	event.registerServerCommand( new CommandTeleportWW());
+    	
+    	WorldServer world = DimensionManager.getWorld(0); 
+    	if( this.savedata == null) {
+    		this.regions = new RegionManager( this.savedata);
+    		this.regions.setWorld( world); //TODO: is this necessary?
+    		
+    		NBTSaveFormat[] objectsToSave = { this.regions};
+    		this.savedata = TeinteWorldSavedData.getInstance( world ,objectsToSave);
+    		
+    		MinecraftForge.EVENT_BUS.register( this.regions);
+    		//if config data is saved, use that in place of current config data?
+    	}
+    }
+    
+    
+    @SubscribeEvent
+    //client & server-side
+    //ticks are phased, start/end
+    public void onServerTick( TickEvent.ServerTickEvent event) {
+    	
+    	
+    	WorldServer world = DimensionManager.getWorld(0);    	
+		if( world.isRemote || event.phase == Phase.START) { return;} //if logical client or tick.start phase, return
+		
+		//System.out.println( world.getWorldType().getName());
+    	
+    	tickcount += 1;
+    	
 
-    public void removeRegion( BlockPos pos) { this.data.regionMap.removeRegion(pos);}
-    public void setRegionName( String name ,BlockPos pos) { this.data.regionMap.updateRegionName(name, pos);}
+    	if( tickcount % 2 == 0) { //every other tick we run
+    		
+//    		System.out.println( event.phase);
+
+    	
+
+        	
+        	
+        	//this.factions.tick(world);
+        	
+        	
+    		if( config.allowRegionOverlay) {
+    			this.regions.tick( tickcount ,world); //TODO going to change when regionMap is removed from savedata
+    		}
+        	
+	    			
+    	}
+    }
+  
+	//@SubscribeEvent
+	//triggers twice per tick, for 'start' and 'end'
+	//triggers independently for each dimension
+    //TODO: Move all server-only code into onServerTick
+	public void onWorldTick( TickEvent.WorldTickEvent event){
+		
+		if( event.world.isRemote) { return;} //if logical client, return
+		
+
+	}
+
+	
+ //------------------------------  PassThrough Functions ------------------------------------------------------------//   
+	/* I chose this structure to allow Teinte full access to the various Managers/Handlers, while shielding their public
+	 * methods from other classes, rather than just 
+	 */
+	
+    public void removeRegion( BlockPos pos) {
+    	this.regions.removeRegion(pos);
+    }
+    
+    public void setRegionName( String name ,BlockPos pos) { 
+    	this.regions.updateRegionName( name ,pos);
+    }
+    
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer player) {
 		if( config.allowRegionOverlay) {
-			this.data.regionMap.guidestoneActivated( world ,pos, player);
+			this.regions.guidestoneActivated( world ,pos, player);
 		}
 	}
 	
-
-  
-	@SubscribeEvent
-	public void onWorldTick( TickEvent.WorldTickEvent event){
-		if( event.world.isRemote) { return;} //if logical client, return
-		tickcount += 1;
-		
-		if( tickcount == TICKSASECOND / 2 ){
-			tickcount = 0;
-			
-			if( config.allowRegionOverlay) {
-				this.data.regionMap.tick( tickcount ,event.world);
-			}
-			
-//			if( this.aleph == null) {
-//				this.aleph = new FactionAleph( event.world);
-//			}
-			
-
-			//aleph.update( event.world);
-
-/**			int rand = new Random().nextInt(120);
- * 			int rand = event.world.rand.nextInt(120);
-			if( rand > 1) {
-				
-				WorldInfo wi = world.getWorldInfo();
-				wi.setCleanWeatherTime( 0);
-				wi.setThunderTime( TICKSASECOND * 60);
-				wi.setRainTime( TICKSASECOND * 60);
-				wi.setRaining( true);
-				wi.setThundering( true);				
-				
-				if( rand > 1 ) {
-					//placeSerpent();
-				}
-
-			}**/
-		}
-
-	}
-
 	
 /**	
 	private void birthTerralith() {
@@ -202,35 +291,31 @@ public class TEinTE
 	
 	@Config( modid=MODID ,name="This Needs To Be Set" ,category="General")
 	public static class config {
-		@Comment( value={ "When true, allows the Aleph to appear in your world" ,"and slowly sculpt your world into a monument-city."})
-		@Name( value = "Enable Aleph Faction")
-		public static boolean allowAleph = true;
 		
-		@Comment( value={ "When true, allows your world to be consumed by Rot," ,"slowly sinking parts of your world into the quiet void."})
-		@Name( value = "Enable Void Rot")
-		public static boolean allowRot = true;
+		@Comment( value= {"The settings below will only affect *new* worlds."," Saved worlds are locked into their configuration."})
+		@Name( value="README?")
+		public static boolean thisDoesNothing = true;
 		
-		@Comment( value={ "When true, allows villages of other races to spawn."})
-		@Name( value = "Enable TaF Villages")
-		public static boolean allowMyVillages = true;
+		@Comment( value= { "When true, allows blocks placed by players to degrade over time."})
+		@Name( value="Enable Player Block Degradation")
+		public static boolean allowDegradation = true;
 		
-		@Comment( value={ "When true, allows players to craft portals" ,"and travel to pocket dimensions."})
-		@Name( value = "An Option Name")
-		public static boolean allowPDimensions = true;
+//		@Comment( value={ "When true, allows the Aleph to appear in your world" ,"and slowly sculpt your world into a monument-city."})
+//		@Name( value = "Enable Aleph Faction")
+//		public static boolean allowAleph = true;
+//		
+//		@Comment( value={ "When true, allows your world to be consumed by Rot," ,"slowly sinking parts of your world into the quiet void."})
+//		@Name( value = "Enable Void Rot")
+//		public static boolean allowRot = true;
+
 		
 		@Comment( value= {"When true, allows Guidestones to project the current Region name","onto the player's screen."})
 		@Name( value="Enable Region Overlay")
 		public static boolean allowRegionOverlay = true;
 		
-		@Config( modid=MODID ,name="Terralith Config" ,category="TConfig")
-		public static class terralithConfig{
-			
-			@Comment( value= { "When true, allows the Cataromotus to spawn."})
-			@Name( value = "Cataromotus can spawn")
-			public static boolean allowCatar = true;
-			
-			
-		}
+		@Comment( value= {"Rate of invasions when playing with Invasion turned on."})
+		@Name( value="Invasion Intensity")
+		public static int invasionIntensity = 5;
 	}
 	
 

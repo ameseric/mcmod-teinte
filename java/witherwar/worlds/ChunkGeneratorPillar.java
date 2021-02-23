@@ -128,7 +128,10 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	    {
 	        this.biomesForGeneration = this.world.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, x * 4 - 2, z * 4 - 2, 10, 10);
 	        this.generateHeightmap(x * 4, 0, z * 4);
-
+	        
+	        int sx = x<<4;
+	        int sz = z<<4;
+	        
 	        for (int i = 0; i < 4; ++i)
 	        {
 	            int j = i * 5;
@@ -167,17 +170,25 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	                            double d16 = (d11 - d10) * 0.25D;
 	                            double lvt_45_1_ = d10 - d16;
 
-	                            for (int l2 = 0; l2 < 4; ++l2)
-	                            {
-	                                if ((lvt_45_1_ += d16) > 0.0D)
-	                                {
-//	                                    primer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2, STONE);
-	                                    primer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2, LOG);
-	                                }
-	                                else if (i2 * 8 + j2 < this.settings.seaLevel)
-	                                {
-	                                    primer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2, this.oceanBlock);
-	                                }
+	                            for (int l2 = 0; l2 < 4; ++l2){
+	                            	
+	                            	int bcx = i*4+k2;
+	                            	int bcy = i2*8+j2;
+	                            	int bcz = l*4+l2;
+	                            	
+	                            	int bx = bcx + (x<<4);
+	                            	int bz = bcz + (z<<4);
+	                            	
+	                            	
+	                            	if( blocksInBoundary( bx ,bz)) {
+		                                if ((lvt_45_1_ += d16) > 0.0D) {
+		                                	primer.setBlockState( bcx ,bcy ,bcz, STONE);
+	//	                                    primer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2, LOG);
+		                                }
+		                                else if (i2 * 8 + j2 < this.settings.seaLevel) {
+		                                    primer.setBlockState( bcx ,bcy ,bcz, this.oceanBlock);
+		                                }
+	                            	}
 	                            }
 
 	                            d10 += d12;
@@ -193,6 +204,15 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	            }
 	        }
 	    }
+	    
+	    
+	    private boolean blocksInBoundary( int x ,int z) {
+	    	int ax = Math.abs(x);
+	    	int az = Math.abs(z);
+	    	
+	    	return (ax < 129 && az < 129 && (ax+az) < ( 128 + 128*0.34)) ;
+	    }
+
 
 	    public void replaceBiomeBlocks(int x, int z, ChunkPrimer primer, Biome[] biomesIn)
 	    {
@@ -302,14 +322,14 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	                    for (int k1 = -2; k1 <= 2; ++k1)
 	                    {
 	                        Biome biome1 = this.biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
-	                        float f5 = this.settings.biomeDepthOffSet + biome1.getBaseHeight() * this.settings.biomeDepthWeight;
+//	                        float f5 = this.settings.biomeDepthOffSet + biome1.getBaseHeight() * this.settings.biomeDepthWeight;
+	                        float f5 = this.settings.biomeDepthOffSet + 1.5F * this.settings.biomeDepthWeight;
 	                        float f6 = this.settings.biomeScaleOffset + biome1.getHeightVariation() * this.settings.biomeScaleWeight;
 
-	                        if (this.terrainType == WorldType.AMPLIFIED && f5 > 0.0F)
-	                        {
-	                            f5 = 1.0F + f5 * 2.0F;
+//	                        if (this.terrainType == WorldType.AMPLIFIED && f5 > 0.0F){
+	                            f5 = 1.0F + f5 * 3.0F; //2.0F
 	                            f6 = 1.0F + f6 * 4.0F;
-	                        }
+//	                        }
 
 	                        float f7 = this.biomeWeights[j1 + 2 + (k1 + 2) * 5] / (f5 + 2.0F);
 

@@ -43,10 +43,10 @@ public class BlockSerpentmind extends Block{
 		return true;
 	}
 	
-	@Override
-	public TileEntity createTileEntity( World world ,IBlockState state) {
-		return new TileEntitySerpentmind();
-	}
+//	@Override
+//	public TileEntity createTileEntity( World world ,IBlockState state) {
+//		return new TileEntitySerpentmind();
+//	}
 
 
 }

@@ -14,8 +14,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
 import witherwar.TEinTE;
+import witherwar.system.SystemLindenmayer;
 import witherwar.util.HashBlockFilter;
-import witherwar.util.LSystem;
+import witherwar.util.SearchBlock;
 import witherwar.util.SearchBlock.FilterBlock;
 import witherwar.util.Symbol;
 import witherwar.util.WeightedChoice;
@@ -25,12 +26,13 @@ import witherwar.util.WeightedChoice;
 public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	
 	private int ticks = 0;
-	private LSystem pattern;
+	private SystemLindenmayer pattern;
 	private Symbol[][] branches;  //convert to String[][] and back for writing/reading
 	private int[] lastBlockPosition;
 	private int numOfBranches = 0;
 	private int fullCycleCount = 0;
 	private HashBlockFilter nativeBlocks;
+	private SearchBlock seeker;
 	private Block terraformBlock;
 	private int blocksPlaced = 0;
 	private boolean isFullCycle() {
@@ -144,7 +146,7 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		
-		super.writeToNBT(compound);
+		compound = super.writeToNBT(compound);
 		if( this.spawnerLogic != null){
 			this.spawnerLogic.writeToNBT( compound);
 		}
@@ -251,22 +253,15 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 		//Layer.FLESH.setBlockStateType( WitherWar.newBlocks.get("flesh").block);
 		//Layer.BONE.setBlockStateType( Blocks.BONE_BLOCK);
 		
-		this.nativeBlocks = new HashBlockFilter();
-		this.nativeBlocks.add( Blocks.OBSIDIAN);
-		this.nativeBlocks.add( Blocks.BONE_BLOCK);
-		this.nativeBlocks.add( ObjectCatalog.FLESH);
-		this.nativeBlocks.add( this.getBlockType());
+		Block[] list = {
+				 Blocks.OBSIDIAN
+				,Blocks.BONE_BLOCK
+				,ObjectCatalog.FLESH
+				,this.getBlockType()};
+		this.nativeBlocks = new HashBlockFilter( list);
+
 		
 		this.terraformBlock = ObjectCatalog.DEAD_ASH;
-		
-		//for( int i=0; i<numOfBranches; i++) {
-//			branches[ i] = this.pattern.grow();
-		//}
-		
-	}
-	
-	
-	private void terraform() {
 		
 		FilterBlock filterReturnBlock = ( b) -> {
 			//return !isOfBlockSet( b ,this.nativeBlocks) && b != this.terraformBlock && b != Blocks.BEDROCK;
@@ -277,8 +272,22 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 			return b != Blocks.AIR && this.nativeBlocks.allows(b) && b != Blocks.BEDROCK;
 		};
 		
+		this.seeker = new SearchBlock( this.world ,filterReturnBlock ,filterTraversableBlock ,1000);
+		
+		//for( int i=0; i<numOfBranches; i++) {
+//			branches[ i] = this.pattern.grow();
+		//}
+		
+	}
+	
+	
+	private void terraform() {
+		
+
+		
 //TODO
-		//		BlockPos pos = searchForTouchingBlock( this.pos ,filterReturnBlock ,filterTraversableBlock ,10000 ,true);
+		//BlockPos pos = searchForTouchingBlock( this.pos ,filterReturnBlock ,filterTraversableBlock ,10000 ,true);
+		BlockPos pos = this.seeker.search( this.pos ,true);
 		if( !pos.equals( new BlockPos(0,0,0))) {
 			++blocksPlaced;
 			System.out.println( "Blocks placed: " + blocksPlaced);

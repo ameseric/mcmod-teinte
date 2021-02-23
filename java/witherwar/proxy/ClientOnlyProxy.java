@@ -10,6 +10,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import witherwar.ObjectCatalog;
@@ -33,8 +34,8 @@ public class ClientOnlyProxy implements IProxy{
 	public void preInit() {		
 		
 		for( NewBlock nb : ObjectCatalog.getNewBlocks()) {
-			System.out.println( nb.item);
-			System.out.println( nb.resourceLocation);
+			//System.out.println( nb.item);
+			//System.out.println( nb.resourceLocation);
 			this.setModelResourceLocation( nb.item ,nb.resourceLocation);
 		}
 
@@ -101,6 +102,16 @@ public class ClientOnlyProxy implements IProxy{
 		final int DEFAULT_ITEM_SUBTYPE = 0;
 		ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation( rl ,"inventory");
 		ModelLoader.setCustomModelResourceLocation( item ,DEFAULT_ITEM_SUBTYPE ,itemModelResourceLocation);
+	}
+
+
+
+
+
+	@Override
+	public void onWorldLoad(Load event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

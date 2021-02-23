@@ -17,14 +17,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.IClientCommand;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import witherwar.worlds.WorldProviderPillar;
 
-public class CommandFauxView extends CommandBase implements IClientCommand{
+public class CommandDarkenSky extends CommandBase implements IClientCommand{
 	
 	private final List<String> aliases;
 	
-	public CommandFauxView() {
+	public CommandDarkenSky() {
 		this.aliases = new ArrayList<>();
-		this.aliases.add( "fauxrender");
+		this.aliases.add( "darkensky");
 	}
 
 	@Override
@@ -34,12 +35,12 @@ public class CommandFauxView extends CommandBase implements IClientCommand{
 
 	@Override
 	public String getName() {
-		return "fauxrender";
+		return "darkensky";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "fauxrender <integer>";
+		return "darkensky <integer 1-100>";
 	}
 
 	@Override
@@ -50,6 +51,15 @@ public class CommandFauxView extends CommandBase implements IClientCommand{
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         System.out.println( "--------------> Executing");
+        
+        if (args.length == 1) {
+        	System.out.println( "Command arg length correct...");
+        	int i = parseInt( args[1] ,0 ,10);
+        	System.out.print( i);
+        	//WorldProviderPillar pillar = server.worlds[3].provider;
+        }else {
+        	System.out.println( "Nope");
+        }
         
 	}
 

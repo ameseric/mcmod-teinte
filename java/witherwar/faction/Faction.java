@@ -57,14 +57,14 @@ public abstract class Faction {
 	
 	
 	
-	public Faction( World world ,Block coreBlockType) {
+	public Faction( Block coreBlockType) {
 		//I think I've decided: The weights will be independent of unit assignments.
 		this.coreBlock = coreBlockType;
 		this.setupMaterialJobs();		
 	}
 	
 	
-	public void update( World world) {		
+	public void tick( World world) {		
 		
 		if( this.corePos == null) {
 			boolean success = this.tryToPlaceCore( world);

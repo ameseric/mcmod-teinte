@@ -88,7 +88,7 @@ public class RegionBiome extends Region{
     }
     
     
-    private class SearchNode {
+    private static class SearchNode {
     	public ChunkPos pos;
     	public Symbol facing;
     	public Biome parentBiome;

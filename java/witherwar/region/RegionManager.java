@@ -1,5 +1,6 @@
 package witherwar.region;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,19 +21,26 @@ import witherwar.TEinTE;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.region.SuperChunk.SCPos;
+import witherwar.util.NBTSaveFormat;
 
-public class RegionMap {
+/*
+ * Creates, deletes, saves, and loads regions as needed.
+ * Also informs players when entering a region.
+ * 
+ */
+public class RegionManager implements NBTSaveFormat{
 	private WorldSavedData data;
-	private World world;
+	private World world;  //TODO: Investigate why we need this field
 	private HashMap<SCPos ,SuperChunk> map; //for allowing O(1) player region lookup
 	private HashSet<RegionBiome> regionSet = new HashSet<RegionBiome>(); //for tracking Regions
+	private ArrayList<HashSet<RegionBiome>> dimensionSet = new ArrayList<>(); //TODO: finish
 	private NBTTagCompound nbt;
 	public HashMap<EntityPlayer ,String> playerMap;
-	public static ExecutorService saveExecutor = Executors.newFixedThreadPool(1);
+	//public static ExecutorService saveExecutor = Executors.newFixedThreadPool(1);
 	
 
 	
-	public RegionMap( WorldSavedData data) {
+	public RegionManager( WorldSavedData data) {
 		this.data = data;
 		this.initDataStructs();
 	}	
@@ -50,7 +58,10 @@ public class RegionMap {
 	
 	
 	public void tick( int tickcount ,World world) {
-		if( world.provider.getDimension() != 0 || this.map.isEmpty()) { return;}
+		
+		if( (tickcount % 10) != 0 || this.map.isEmpty()) { return;}
+		System.out.println( "Ticking...");
+		//TODO: RegionMap needs updating for multiple Dimensions
 		
 		List<EntityPlayer> players = world.playerEntities;
 		
@@ -59,6 +70,7 @@ public class RegionMap {
 				ChunkPos cpos = new ChunkPos( player.getPosition());
 				//String playerRegion = this.getPlayerRegionName( player);
 				String regionName = this.getRegionName( cpos);
+				System.out.println( "REGION NAME: " + regionName);
 				
 				if( !regionName.equals( this.getPlayerRegionName( player) ) ) {
 					this.setPlayerRegionName( player ,regionName);
@@ -73,15 +85,17 @@ public class RegionMap {
 	
 	
 	
-    @SubscribeEvent
-    public void playerLoggedOn( PlayerLoggedInEvent event) {
-    	this.playerMap.put( event.player ,"");
-    }
+//    @SubscribeEvent
+//    //can have TEinTE main handle this if needed
+//    public void playerLoggedOn( PlayerLoggedInEvent event) {
+//    	this.playerMap.put( event.player ,"");
+//    }
     
     
     
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer playerIn) {
 		String regionName = this.getRegionName( new ChunkPos(pos));
+		System.out.println( regionName);
 		TEinTE.networkwrapper.sendTo( new MessageEditGuidestone( pos.getX() ,pos.getZ() ,regionName) ,(EntityPlayerMP)playerIn);
 		
 
@@ -167,14 +181,14 @@ public class RegionMap {
 	public void setPlayerRegionName( EntityPlayer player ,String name) {this.playerMap.put( player ,name);	}
 	
 
-	
+	//TODO: modify
 	public void save() {
 		this.data.markDirty();
 	}
 	
 	
 	
-	
+	@Override
 	public NBTTagCompound writeToNBT( NBTTagCompound compound) {
 		if( this.nbt == null) {
 			this.nbt = new NBTTagCompound();
@@ -203,7 +217,7 @@ public class RegionMap {
 	}
 	
 	
-	
+	@Override
 	public void readFromNBT(NBTTagCompound compound) {		
 		this.nbt = compound.getCompoundTag( "TeinteRegionMap");
 		

@@ -1,6 +1,7 @@
 package witherwar.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
@@ -13,6 +14,8 @@ public interface IProxy {
 	void init();
 	
 	void postInit();	
+	
+	void onWorldLoad( WorldEvent.Load event);
 	
     /**
      * Returns a side-appropriate EntityPlayer for use during message handling.

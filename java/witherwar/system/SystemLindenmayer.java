@@ -1,11 +1,13 @@
-package witherwar.util;
+package witherwar.system;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import witherwar.util.LSystem.Rule;
+import witherwar.system.SystemLindenmayer.Rule;
+import witherwar.util.Symbol;
+import witherwar.util.WeightedChoice;
 
 
 
@@ -17,7 +19,7 @@ class RuleSet{
 
 
 
-public class LSystem{
+public class SystemLindenmayer{
 		
 	protected ArrayList<Symbol> axiom;
 	protected HashMap<Symbol ,Rule> alphabet;
@@ -40,7 +42,7 @@ public class LSystem{
 
 	
 
-	public LSystem( RuleSet ruleset ,int recursionDepth) {
+	public SystemLindenmayer( RuleSet ruleset ,int recursionDepth) {
 		setRules( ruleset.rules);
 		axiom = ruleset.axiom;		
 	}
@@ -89,44 +91,45 @@ class Weeping extends RuleSet{
 
 	public Weeping() {		
 		
-		WeightedChoice c = new WeightedChoice( 
+		WeightedChoice<?> c = new WeightedChoice<Object>( 
 				new Symbol[]{ Symbol.XP ,Symbol.XN ,Symbol.ZP ,Symbol.ZN} 
 				,new int[]{ 1 ,1 ,1 ,1});
 		this.axiom = new ArrayList<Symbol>( Arrays.asList( Symbol.YP ,Symbol.YP ,(Symbol)c.pick() ,Symbol.YN ,Symbol.YN));
 		
 		
 		Rule yp = () -> {
-			WeightedChoice a = new WeightedChoice( 
+			WeightedChoice<?> a = new WeightedChoice<Object>( 
 					new Symbol[]{ Symbol.YP ,Symbol.XP ,Symbol.XN ,Symbol.ZP ,Symbol.ZN ,Symbol.NU} 
 					,new int[]{ 12 ,2 ,2 ,2 ,2 ,1});
 			return new ArrayList<Symbol>( Arrays.asList( Symbol.YP ,Symbol.YP ,(Symbol)a.pick() ));};
 			
 		Rule yn = () -> {
-			WeightedChoice a = new WeightedChoice( 
+			WeightedChoice<?> a = new WeightedChoice<Object>( 
 					new Symbol[]{ Symbol.YN ,Symbol.XP ,Symbol.XN ,Symbol.ZP ,Symbol.ZN ,Symbol.NU} 
 					,new int[]{ 12 ,2 ,2 ,2 ,2 ,1});
 			return new ArrayList<Symbol>( Arrays.asList( Symbol.YN ,(Symbol)a.pick() ,Symbol.YN));};
 			
 		Rule xp = () -> {
-			WeightedChoice a = new WeightedChoice( 
+			WeightedChoice<?> a = new WeightedChoice<Object>( 
 					new Symbol[]{ Symbol.XP ,Symbol.YP ,Symbol.YN ,Symbol.NU} 
 					,new int[]{ 5 ,1 ,1 ,1});
 			return new ArrayList<Symbol>( Arrays.asList( Symbol.XP ,(Symbol)a.pick() ,Symbol.XP ));};	
 			
 		Rule xn = () -> {
-			WeightedChoice a = new WeightedChoice( 
+			WeightedChoice<?> a = new WeightedChoice<Object>( 
 					new Symbol[]{ Symbol.XN ,Symbol.YP ,Symbol.YN ,Symbol.NU} 
 					,new int[]{ 5 ,1 ,1 ,1});
 			return new ArrayList<Symbol>( Arrays.asList( Symbol.XN ,(Symbol)a.pick() ,Symbol.XN ));};
 			
 		Rule zp = () -> {
-			WeightedChoice a = new WeightedChoice( 
+			WeightedChoice<?> a = new WeightedChoice<Object>( 
 					new Symbol[]{ Symbol.ZP ,Symbol.YP ,Symbol.YN ,Symbol.NU} 
 					,new int[]{ 5 ,1 ,1 ,1});
 			return new ArrayList<Symbol>( Arrays.asList( Symbol.ZP ,(Symbol)a.pick() ,Symbol.ZP ));};
 			
+			
 		Rule zn = () -> {
-			WeightedChoice a = new WeightedChoice( 
+			WeightedChoice<?> a = new WeightedChoice<Object>( 
 					new Symbol[]{ Symbol.ZN ,Symbol.YP ,Symbol.YN ,Symbol.NU} 
 					,new int[]{ 5 ,1 ,1 ,1});
 			return new ArrayList<Symbol>( Arrays.asList( Symbol.ZN ,(Symbol)a.pick() ,Symbol.ZN ));};

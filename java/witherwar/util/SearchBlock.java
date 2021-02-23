@@ -1,5 +1,14 @@
 package witherwar.util;
 
+
+/**
+ * 
+ * @author Guiltygate
+ * 
+ * General block searching class
+ * 
+ */
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,7 +39,7 @@ public class SearchBlock {
 	
 	
 	
-	public BlockPos search( BlockPos currentPos ,boolean random) {
+	public BlockPos search( BlockPos currentPos ,boolean random ) {
 		
 		ArrayList<BlockPos> positions = new ArrayList<BlockPos>();
 		positions.add( currentPos);
