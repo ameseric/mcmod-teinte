@@ -1,22 +1,19 @@
 package witherwar.block;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import witherwar.TEinTE;
 import witherwar.alchemy.Fluid;
 import witherwar.alchemy.FluidContainer;
-import witherwar.util.BlockUtil;
+import witherwar.tileentity.BlockEntity;
+import witherwar.tileentity.BlockEntityContainer;
 
-public abstract class FluidContainerBlock extends Block implements FluidContainer{
 
-	private Fluid contents;
+public abstract class FluidContainerBlock extends Block implements FluidContainer ,BlockEntityContainer{
 
-	
 	
 	
 	
@@ -26,32 +23,19 @@ public abstract class FluidContainerBlock extends Block implements FluidContaine
 
 	
 	
-	public Fluid pullFluid( FluidContainer requester ,BlockPos pos ,World world) {
-		HashMap<BlockPos ,Block> neighbors = BlockUtil.getNeighborBlocks( pos ,world);
-		
-		Fluid input = new Fluid();
-		for( BlockPos neighborPos : neighbors.keySet()) {
-			Block neighbor = neighbors.get( neighborPos);
-			if( neighbor instanceof FluidContainer && neighbor != requester) {
-				input.add( ((FluidContainer) neighbor).pullFluid( this ,neighborPos ,world));
-			}
-		}
-		
-		return this.cycleFluid( input);
+	public Fluid pullFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
+		return ((FluidContainer) this.getBlockEntity(myPos)).pullFluid( requesterPos ,myPos ,world);
 	}
+
+
 	
-	
-	
-	public Fluid cycleFluid( Fluid input) {
-		Fluid output = this.contents;
-		this.contents = input;
-		return output;
+	public BlockEntity getBlockEntity(BlockPos pos) {
+		return TEinTE.instance.getBlockEntity( pos);
 	}
+
 	
 	
-	public boolean hasFluid() {
-		return this.contents != null && !this.contents.isEmpty();
-	}
+
 	
 	
 }

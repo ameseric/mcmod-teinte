@@ -13,7 +13,7 @@ public class SerpentmindBlockEntity extends BlockEntity{
 	
 	
 	public SerpentmindBlockEntity(BlockPos pos) {
-		super(pos ,ObjectCatalog.TERRA_KALI ,0);
+		super(pos ,ObjectCatalog.TERRA_KALI ,0 ,true);
 		//this.homeBlock = ObjectCatalog.TERRA_KALI;
 
 	}

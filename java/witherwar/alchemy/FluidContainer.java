@@ -5,9 +5,7 @@ import net.minecraft.world.World;
 
 public interface FluidContainer {
 	
-	public Fluid pullFluid( FluidContainer requester ,BlockPos pos ,World world);
-	
-	public boolean hasFluid();
+	public Fluid pullFluid( BlockPos requesterPos ,BlockPos requesteePos ,World world);
 	
 	
 }

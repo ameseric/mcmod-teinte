@@ -289,6 +289,11 @@ public class TEinTE
 	}
 	
 	
+	public BlockEntity getBlockEntity( BlockPos pos) {
+		return this.blockEntities.get(pos);
+	}
+	
+	
 /**	
 	private void birthTerralith() {
 		World world = DimensionManager.getWorld(0);

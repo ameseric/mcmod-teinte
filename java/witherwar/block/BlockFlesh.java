@@ -52,10 +52,7 @@ public class BlockFlesh extends DirectionalBlock{
 		return false;
 	}
 	
-	@Override
-	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new RitualBlockEntity( pos ,world));
-	}
+
 	
 
 

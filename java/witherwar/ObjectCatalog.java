@@ -14,11 +14,13 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import witherwar.block.BlockSerpentmind;
 import witherwar.block.ConduitBlock;
+import witherwar.block.RitualBlock;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
 import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
+import witherwar.block.AlchemyGeyserBlock;
 import witherwar.block.BlockAsh;
 import witherwar.block.BlockCatarCortex;
 import witherwar.block.BlockCatarMaw;
@@ -43,6 +45,8 @@ public class ObjectCatalog {
 	public final static Block TERRA_CATAR;
 	public final static Block GUIDESTONE;
 	public final static Block CONDUIT;
+	public final static Block GEYSER;
+	public final static Block RITUALBLOCK;
 	
 	
 	static {
@@ -63,6 +67,8 @@ public class ObjectCatalog {
 		DEAD_ASH =	 	new BlockAsh();
 		GUIDESTONE = 	new BlockGuidestone();
 		CONDUIT =		new ConduitBlock();
+		GEYSER =		new AlchemyGeyserBlock();
+		RITUALBLOCK =	new RitualBlock();
 		
 		
 		blocksToRegister.add( 		new NewBlock( "terra_kali"		,TERRA_KALI 	,"witherwar:terra_kali"));
@@ -72,6 +78,8 @@ public class ObjectCatalog {
 		blocksToRegister.add( 		new NewBlock( "dead_ash"		,DEAD_ASH 		,"witherwar:dead_ash"));
 		blocksToRegister.add( 		new NewBlock( "guidestone"		,GUIDESTONE 	,"witherwar:guidestone"));
 		blocksToRegister.add( 		new NewBlock( "conduit" 		,CONDUIT	 	,"witherwar:conduit"));
+		blocksToRegister.add(		new NewBlock( "geyser"			,GEYSER			,"witherwar:geyser"));
+		blocksToRegister.add(		new NewBlock( "ritualblock"		,RITUALBLOCK	,"witherwar:ritualblock"));
 		
 		
 	}

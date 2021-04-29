@@ -41,7 +41,8 @@ public class BlockUtil {
 
 	
 	public static HashMap<BlockPos,Block> getNeighborBlocks( BlockPos pos ,World world){
-		return getNeighborBlocks( pos ,Symbol.values() ,world);
+		
+		return getNeighborBlocks( pos ,Symbol.nonNullValues() ,world);
 	}
 	
 	public static HashMap<BlockPos,Block> getNeighborBlocks( BlockPos pos ,Symbol[] array ,World world){

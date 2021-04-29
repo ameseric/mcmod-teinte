@@ -41,10 +41,10 @@ public class BlockEntityManager extends NBTSaveObject{
 		ArrayList<BlockPos> toRemove = new ArrayList<>();
 		
 		for( Map.Entry<BlockPos ,BlockEntity> be : this.blockEntities.entrySet()) {
-			if( !be.getValue().isDead()) {
-				be.getValue().tick( tickcount ,world);
+			if( be.getValue().isDead()) {
+				toRemove.add( be.getKey());				
 			}else {
-				toRemove.add( be.getKey());
+				be.getValue().tick( tickcount ,world);				
 			}
 		}
 		
@@ -70,6 +70,12 @@ public class BlockEntityManager extends NBTSaveObject{
 	public void remove( BlockPos pos) {
 		this.blockEntities.remove( pos);
 		this.markDirty();
+	}
+	
+	
+	
+	public BlockEntity get( BlockPos pos) {
+		return this.blockEntities.get( pos);
 	}
 	
 	

@@ -53,6 +53,12 @@ public class BlockSerpentmind extends Block implements BlockEntityContainer{
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
 		TEinTE.instance.registerBlockEntity( new SerpentmindBlockEntity( pos));
 	}
+
+
+	@Override
+	public BlockEntity getBlockEntity( BlockPos pos) {
+		return TEinTE.instance.getBlockEntity( pos);
+	}
 	
 //	@Override //TODO: superfulous? BEManager already removes dead entities.
 //	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {

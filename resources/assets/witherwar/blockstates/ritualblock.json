@@ -1,0 +1,8 @@
+{
+	"variants": {
+		"facing=south": { "model": "witherwar:ritualblock_model" ,"y":90}
+		,"facing=west": { "model": "witherwar:ritualblock_model" ,"y":180}
+		,"facing=north": { "model": "witherwar:ritualblock_model" ,"y":270}
+		,"facing=east": { "model": "witherwar:ritualblock_model"}
+	}
+}
