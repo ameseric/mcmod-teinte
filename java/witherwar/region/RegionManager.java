@@ -222,6 +222,7 @@ public class RegionManager extends NBTSaveObject{
 		}		
 		
 		//compound.setTag( "TeinteRegionMap" ,this.nbt);
+		this.setDirty( false);
 		return this.localnbt;
 	}
 	

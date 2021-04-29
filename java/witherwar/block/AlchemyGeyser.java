@@ -1,7 +1,5 @@
 package witherwar.block;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -10,6 +8,9 @@ import net.minecraft.world.World;
 import witherwar.alchemy.Element;
 import witherwar.alchemy.Fluid;
 import witherwar.alchemy.FluidContainer;
+
+
+
 
 public class AlchemyGeyser extends Block implements FluidContainer{
 	private Fluid contents = new Fluid( new Element[]{Element.A} );

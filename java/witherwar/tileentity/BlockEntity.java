@@ -16,7 +16,7 @@ public abstract class BlockEntity implements NBTSaveFormat{
 	private BlockPos pos;
 	private boolean amIDead = false;
 	
-	private boolean isDirty = false;
+	private boolean dirty = false;
 	
 	private int id = -1;
 	
@@ -76,6 +76,7 @@ public abstract class BlockEntity implements NBTSaveFormat{
 		compound.setInteger( "y" ,this.pos.getY());
 		compound.setInteger( "z" ,this.pos.getZ());
 		compound.setInteger( "id" ,this.id);
+		this.dirty = false;
 		return compound;
 	}
 	@Override
@@ -83,7 +84,7 @@ public abstract class BlockEntity implements NBTSaveFormat{
 		
 	}
 	public void markDirty() {
-		this.isDirty = true;
+		this.dirty = true;
 	}
 //	public String getDataName() {
 //		return java.util.UUID.randomUUID().toString(); //TODO: give data name based on hashCode for obj

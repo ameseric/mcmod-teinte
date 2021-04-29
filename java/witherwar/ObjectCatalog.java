@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import witherwar.block.BlockSerpentmind;
+import witherwar.block.ConduitBlock;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
 import witherwar.tileentity.TileEntityCataromotus;
@@ -41,6 +42,7 @@ public class ObjectCatalog {
 	public final static Block DEAD_ASH;
 	public final static Block TERRA_CATAR;
 	public final static Block GUIDESTONE;
+	public final static Block CONDUIT;
 	
 	
 	static {
@@ -60,6 +62,7 @@ public class ObjectCatalog {
 		MAW = 			new BlockCatarMaw();
 		DEAD_ASH =	 	new BlockAsh();
 		GUIDESTONE = 	new BlockGuidestone();
+		CONDUIT =		new ConduitBlock();
 		
 		
 		blocksToRegister.add( 		new NewBlock( "terra_kali"		,TERRA_KALI 	,"witherwar:terra_kali"));
@@ -67,7 +70,8 @@ public class ObjectCatalog {
 		blocksToRegister.add( 		new NewBlock( "flesh"			,FLESH			,"witherwar:flesh"));
 		blocksToRegister.add( 		new NewBlock( "terra_catar_maw"	,MAW 			,"minecraft:nether_wart_block"));
 		blocksToRegister.add( 		new NewBlock( "dead_ash"		,DEAD_ASH 		,"witherwar:dead_ash"));
-		blocksToRegister.add( 		new NewBlock( "guidestone"		,GUIDESTONE 	,"minecraft:glowstone"));
+		blocksToRegister.add( 		new NewBlock( "guidestone"		,GUIDESTONE 	,"witherwar:guidestone"));
+		blocksToRegister.add( 		new NewBlock( "conduit" 		,CONDUIT	 	,"witherwar:conduit"));
 		
 		
 	}

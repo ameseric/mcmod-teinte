@@ -1,0 +1,6 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "all": "blocks/quartz_block_chiseled"
+    }
+}

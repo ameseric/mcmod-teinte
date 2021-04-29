@@ -49,7 +49,6 @@ public class BlockFlesh extends DirectionalBlock{
 	
 	@Override
 	public boolean hasTileEntity( IBlockState state) {
-		BlockStateContainer a;
 		return false;
 	}
 	

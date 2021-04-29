@@ -49,7 +49,7 @@ public class BlockEntityManager extends NBTSaveObject{
 		}
 		
 		for( BlockPos pos : toRemove) {
-			this.blockEntities.remove( pos);
+			this.remove( pos);
 		}
 	}
 	
