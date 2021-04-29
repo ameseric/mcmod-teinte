@@ -6,7 +6,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import witherwar.util.NBTSaveFormat;
+import witherwar.disk.NBTSaveFormat;
 
 public class SystemPower implements NBTSaveFormat{
 
@@ -39,9 +39,17 @@ public class SystemPower implements NBTSaveFormat{
 	
 	
 	@Override
-	public void save() {
+	public void markDirty() {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+
+	@Override
+	public String getDataName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

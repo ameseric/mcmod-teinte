@@ -2,8 +2,8 @@ package witherwar.system;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import witherwar.util.NBTSaveFormat;
-import witherwar.util.TeinteWorldSavedData;
+import witherwar.disk.NBTSaveFormat;
+import witherwar.disk.TeinteWorldSavedData;
 
 public class SystemBlockDegrade implements NBTSaveFormat{
 
@@ -41,8 +41,15 @@ public class SystemBlockDegrade implements NBTSaveFormat{
 	
 	
 	@Override
-	public void save() {
+	public void markDirty() {
 		this.savedata.markDirty();
+	}
+
+
+	@Override
+	public String getDataName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

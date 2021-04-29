@@ -64,7 +64,7 @@ public class ObjectCatalog {
 		
 		blocksToRegister.add( 		new NewBlock( "terra_kali"		,TERRA_KALI 	,"witherwar:terra_kali"));
 		blocksToRegister.add( 		new NewBlock( "terra_catar"		,TERRA_CATAR 	,"witherwar:terra_kali"));
-		blocksToRegister.add( 		new NewBlock( "flesh"			,FLESH			,"minecraft:nether_wart_block"));
+		blocksToRegister.add( 		new NewBlock( "flesh"			,FLESH			,"witherwar:flesh"));
 		blocksToRegister.add( 		new NewBlock( "terra_catar_maw"	,MAW 			,"minecraft:nether_wart_block"));
 		blocksToRegister.add( 		new NewBlock( "dead_ash"		,DEAD_ASH 		,"witherwar:dead_ash"));
 		blocksToRegister.add( 		new NewBlock( "guidestone"		,GUIDESTONE 	,"minecraft:glowstone"));

@@ -1,0 +1,11 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "up": "blocks/nether_wart_block"
+        ,"down": "blocks/nether_wart_block"
+        ,"north": "blocks/nether_wart_block"
+        ,"south": "blocks/nether_wart_block"
+        ,"east": "blocks/nether_wart_block"
+        ,"west": "blocks/obsidian"
+    }
+}

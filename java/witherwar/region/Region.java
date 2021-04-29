@@ -8,6 +8,7 @@ import net.minecraft.util.math.ChunkPos;
 
 /**
  * 
+ * 
  * @author Guiltygate
  * 
  * A consecutive series of ChunkPos that share an identifier (name).
@@ -23,7 +24,7 @@ public class Region {
 	protected boolean dirty = false;
 	public String id;
 	protected HashSet<ChunkPos> chunks = new HashSet<ChunkPos>();	
-
+	private boolean remove = false;
 
 	
 	public Region( String name) {
@@ -56,7 +57,7 @@ public class Region {
 		}
 		RegionBiome r = (RegionBiome) o;
 		
-		return this.chunks == r.chunks;
+		return this.chunks.equals( r.chunks);
 	}
 	
 	@Override
@@ -65,36 +66,46 @@ public class Region {
 	}
 	
 	
-	public boolean isEmpty() {
-		return this.chunks.isEmpty();
+	public boolean wasRemoved() {
+		return this.remove;
+	}
+	
+	public String getID() {
+		return this.id;
 	}
 	
 	
 	public void prepareForRemoval() {
-		this.chunks.clear();
+		this.remove = true;
 		this.dirty = true;
 	}
 	
-	public void writeToNBT( NBTTagCompound nbt) {
-		if( this.isEmpty()) {
-			nbt.removeTag( this.id);
-			return;
+	
+	public NBTTagCompound getNBT() {
+		return this.writeToNBT( new NBTTagCompound());
+	}
+	
+	
+	public NBTTagCompound writeToNBT( NBTTagCompound rnbt) {
+		if( this.wasRemoved()) {
+			return rnbt;
 		}
 		
-		NBTTagCompound rnbt = nbt.getCompoundTag( this.id);
+		//NBTTagCompound rnbt = nbt.getCompoundTag( this.id);
 		
-		rnbt.setString( "id" ,this.id);
-		rnbt.setString( "name" ,this.name);
-		rnbt.setInteger( "numOfChunks" ,this.chunks.size());
+		rnbt.setString( "--==||id||==--" ,this.id);
+		rnbt.setString( "--==||name||==--" ,this.name);
+		rnbt.setInteger( "--==||numOfChunks||==--" ,this.chunks.size());
 		
 		int j = 0;
 		for( ChunkPos pos : this.chunks) {
 			rnbt.setIntArray( "Chunk"+j ,new int[]{ pos.x ,pos.z});
 			j++;
 		}
-		nbt.setTag( this.id ,rnbt);
+		//rnbt.setTag( this.id ,rnbt);
 		
 		this.dirty = false;
+		return rnbt;
 	}
 	
 }

@@ -21,7 +21,7 @@ import witherwar.util.SearchBlock.FilterBlock;
  * @author Guiltygate
  *
  *
- * Basic block utilities, but poorly structures (and implemented?).
+ * Basic block utilities, but poorly structured (and implemented?).
  *
  * Probably going to be removed in the future.
  */
@@ -53,7 +53,7 @@ public class BlockUtil {
 		}
 		return map;
 	}
-
+	
 	public static HashSet<ChunkPos> getNeighborChunks( BlockPos pos){
 		return getNeighborChunks( new ChunkPos(pos));
 	}

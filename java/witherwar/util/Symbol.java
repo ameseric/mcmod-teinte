@@ -10,7 +10,9 @@ import net.minecraft.util.math.BlockPos;
 
 //could use ordinal instead of hardcoding tx, but would still need to hardcode conversion back
 
-public enum Symbol{ //not a generic Symbol class, which bothers me, but I think it's cleaner in the long-run.
+//TODO: This enum is redundant, and I am a fool. Remove this and utilize Veci3 or something similar.
+
+public enum Symbol{
 	 YP( new BlockPos(0,1,0) ,0)
 	,YN( new BlockPos(0,-1,0) ,1)
 	,XP( new BlockPos(1,0,0) ,2)

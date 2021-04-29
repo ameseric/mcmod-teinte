@@ -1,5 +1,13 @@
 {
     "variants": {
-        "normal": { "model": "minecraft:nether_wart_block" }
+        //"normal": { "model": "witherwar:flesh_model" }
+	"facing=south": { "model": "witherwar:flesh_model" ,"y":90}
+	,"facing=west": { "model": "witherwar:flesh_model" ,"y":180}
+	,"facing=north": { "model": "witherwar:flesh_model" ,"y":270}
+	,"facing=east": { "model": "witherwar:flesh_model"}
+	//"facing=south": { "model": "minecraft:nether_wart_block"}
+	//,"facing=north": { "model": "minecraft:nether_wart_block"}
+	//,"facing=west": { "model": "minecraft:nether_wart_block"}
+	//,"facing=east": { "model": "minecraft:nether_wart_block"}
     }
 }

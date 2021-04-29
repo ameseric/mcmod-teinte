@@ -18,30 +18,31 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import witherwar.TEinTE;
+import witherwar.disk.NBTSaveFormat;
+import witherwar.disk.NBTSaveObject;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.region.SuperChunk.SCPos;
-import witherwar.util.NBTSaveFormat;
 
 /*
  * Creates, deletes, saves, and loads regions as needed.
  * Also informs players when entering a region.
  * 
  */
-public class RegionManager implements NBTSaveFormat{
-	private WorldSavedData data;
+public class RegionManager extends NBTSaveObject{
 	private World world;  //TODO: Investigate why we need this field
 	private HashMap<SCPos ,SuperChunk> map; //for allowing O(1) player region lookup
 	private HashSet<RegionBiome> regionSet = new HashSet<RegionBiome>(); //for tracking Regions
-	private ArrayList<HashSet<RegionBiome>> dimensionSet = new ArrayList<>(); //TODO: finish
-	private NBTTagCompound nbt;
+	//private ArrayList<HashSet<RegionBiome>> dimensionSet = new ArrayList<>(); //TODO: finish
+	private NBTTagCompound localnbt;
 	public HashMap<EntityPlayer ,String> playerMap;
 	//public static ExecutorService saveExecutor = Executors.newFixedThreadPool(1);
 	
 
 	
-	public RegionManager( WorldSavedData data) {
-		this.data = data;
+	public RegionManager( WorldSavedData data ,World world) {
+		super( data);
+		this.world = world; //Only used because of MessageHandler lacking reference?
 		this.initDataStructs();
 	}	
 	
@@ -53,6 +54,11 @@ public class RegionManager implements NBTSaveFormat{
 	private void initDataStructs() {
 		this.map = new HashMap<>();
 		this.playerMap = new HashMap<>();
+	}
+	
+	
+	public String getDataName() {
+		return "RegionManagerSaveData"; //TODO
 	}
 	
 	
@@ -72,7 +78,7 @@ public class RegionManager implements NBTSaveFormat{
 				String regionName = this.getRegionName( cpos);
 				System.out.println( "REGION NAME: " + regionName);
 				
-				if( !regionName.equals( this.getPlayerRegionName( player) ) ) {
+				if( !regionName.equals( this.getPlayerRegionName( player))) {
 					this.setPlayerRegionName( player ,regionName);
 					if( !regionName.equals("")) {
 						TEinTE.networkwrapper.sendTo( new MessageRegionOverlayOn( regionName) ,(EntityPlayerMP)player);
@@ -122,7 +128,7 @@ public class RegionManager implements NBTSaveFormat{
 		}else {
 			r.name = name;
 			r.dirty = true;  //perform internal to object
-			this.save();
+			this.markDirty();
 		}
 	}
 	
@@ -145,7 +151,7 @@ public class RegionManager implements NBTSaveFormat{
 			this.getSuperChunk(pos).add(pos, r);
 		}
 		if( !skipSave) {
-			this.save();
+			this.markDirty();
 		}
 	}
 	
@@ -158,7 +164,7 @@ public class RegionManager implements NBTSaveFormat{
 				this.getSuperChunk( pos).remove( pos);
 			}
 			r.prepareForRemoval();
-			this.save();
+			this.markDirty();
 		}
     }
 	
@@ -177,57 +183,65 @@ public class RegionManager implements NBTSaveFormat{
 	}
 
 	
-	public String getPlayerRegionName( EntityPlayer player) { return this.playerMap.get( player);	}	
+	public String getPlayerRegionName( EntityPlayer player) { return this.playerMap.get( player);	}
 	public void setPlayerRegionName( EntityPlayer player ,String name) {this.playerMap.put( player ,name);	}
 	
 
-	//TODO: modify
-	public void save() {
-		this.data.markDirty();
-	}
 	
 	
 	
 	@Override
 	public NBTTagCompound writeToNBT( NBTTagCompound compound) {
-		if( this.nbt == null) {
-			this.nbt = new NBTTagCompound();
+		if( this.localnbt == null) {
+			this.localnbt = new NBTTagCompound();
 		}
 		
-		Iterator<RegionBiome> iter = this.regionSet.iterator();
+		Iterator<RegionBiome> iter = this.regionSet.iterator(); //should this be done in write?
+		System.out.println("Size of regionset before removal =======================:" + this.regionSet.size());
 		while( iter.hasNext()) {
 			RegionBiome r = iter.next();
-			if( r.dirty) {
-				r.writeToNBT( this.nbt);
-				if( r.isEmpty()) {
-					iter.remove();
+			//if( r.dirty) {
+				if( r.wasRemoved()) {
+					iter.remove(); //deletes from collection
+					this.localnbt.removeTag( r.id);
+					System.out.println("REmoving empty...=====================");
 				}
-			}
+				//NBTTagCompound newRNBT = r.writeToNBT( this.localnbt.getCompoundTag( r.getID())); //???
+
+			//}
 		}
+		System.out.println("Size of regionset after removal=======================:" + this.regionSet.size());
 		
-		this.nbt.setInteger( "numOfRegions" ,this.regionSet.size());
-		int i = 0;
+		//this.localnbt.setInteger( "numOfRegions" ,this.regionSet.size());
+//		int i = 0;
 		for( RegionBiome r : this.regionSet) {
-			this.nbt.setString( "Region"+i ,r.id);
-			i++;
+			if( r.dirty) {
+				this.localnbt.setTag( r.id ,r.getNBT());
+			}
+	//		i++;
 		}		
 		
-		compound.setTag( "TeinteRegionMap" ,this.nbt);
-		return compound;
+		//compound.setTag( "TeinteRegionMap" ,this.nbt);
+		return this.localnbt;
 	}
 	
 	
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {		
-		this.nbt = compound.getCompoundTag( "TeinteRegionMap");
+		this.localnbt = compound;
 		
-		int numOfRegions = this.nbt.getInteger( "numOfRegions");
-		for( int i=0; i<numOfRegions; i++) {
-			String id = this.nbt.getString( "Region"+i);
-			NBTTagCompound regionNBT = this.nbt.getCompoundTag( id);
-			RegionBiome r = new RegionBiome( regionNBT);
-			this.addRegion( r ,true);
+		for( String key : compound.getKeySet()) {
+			RegionBiome r = new RegionBiome( compound.getCompoundTag( key));
+			this.addRegion(r ,true);
 		}
+		
+//		int numOfRegions = this.localnbt.getInteger( "numOfRegions");
+//		for( int i=0; i<numOfRegions; i++) {
+//			String uuid = this.localnbt.getString( "Region"+i);
+//			NBTTagCompound regionNBT = this.localnbt.getCompoundTag( uuid);
+//			RegionBiome r = new RegionBiome( regionNBT);
+//			this.addRegion( r ,true);
+//		}
 	}
 	
 	

@@ -1,20 +1,27 @@
 package witherwar.block;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
+import witherwar.tileentity.RitualBlockEntity;
 
-public class BlockFlesh extends Block{
+
+public class BlockFlesh extends DirectionalBlock{
 	
 	public static final MaterialFlesh matFlesh = new MaterialFlesh( MapColor.TNT);
+	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 	
 	public BlockFlesh() {
         super( matFlesh);
@@ -22,7 +29,7 @@ public class BlockFlesh extends Block{
 		setUnlocalizedName( "flesh");
 		setSoundType( SoundType.SLIME);
 		setRegistryName( "flesh");
-        this.setDefaultState( this.blockState.getBaseState());
+//        this.setDefaultState( this.blockState.getBaseState());
         this.setHarvestLevel("axe" ,1);
 		//setCreativeTab( CreativeTabs.BUILDING_BLOCKS);
 		setCreativeTab( TEinTE.teinteTab);
@@ -42,9 +49,16 @@ public class BlockFlesh extends Block{
 	
 	@Override
 	public boolean hasTileEntity( IBlockState state) {
+		BlockStateContainer a;
 		return false;
 	}
 	
+	@Override
+	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
+		TEinTE.instance.registerBlockEntity( new RitualBlockEntity( pos ,world));
+	}
+	
+
 
 
 }

@@ -1,9 +1,12 @@
 package witherwar;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -33,6 +36,9 @@ import witherwar.network.MessageRegionOverlayOn;
 import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
 import witherwar.command.CommandDarkenSky;
 import witherwar.command.CommandTeleportWW;
+import witherwar.disk.NBTSaveFormat;
+import witherwar.disk.NBTSaveObject;
+import witherwar.disk.TeinteWorldSavedData;
 import witherwar.faction.FactionManager;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
@@ -40,8 +46,9 @@ import witherwar.proxy.IProxy;
 import witherwar.region.RegionManager;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
-import witherwar.util.NBTSaveFormat;
-import witherwar.util.TeinteWorldSavedData;
+import witherwar.tileentity.BlockEntity;
+import witherwar.tileentity.BlockEntityContainer;
+import witherwar.tileentity.BlockEntityManager;
 import witherwar.worlds.WorldCatalog;
 import witherwar.worlds.WorldTypeTeinte;
 
@@ -61,9 +68,10 @@ public class TEinTE
     public FactionManager factions = new FactionManager();
 	
 	private TeinteWorldSavedData savedata;
-	private RegionManager regions;  //TODO regionMap is going to leave savedata for clarity
+	private RegionManager regions;
 	private SystemBlockDegrade sysBlockDegrade;  
 	private SystemPower sysPower;
+	private BlockEntityManager blockEntities;
 	private int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
@@ -166,10 +174,13 @@ public class TEinTE
     @SubscribeEvent
     //Appears to be server-side only
     public void onPlayerBlockPlace( BlockEvent.PlaceEvent event) {
-    	BlockPos pos = event.getPos();
-    	event.getPlayer();
-    	System.out.println( pos.toString());
-    	System.out.println( event.getWorld().isRemote);
+    	//BlockPos pos = event.getPos();
+    	//event.getPlayer();
+    	
+    	//Doesn't appear to work, client-side issue?
+    	//event.getWorld().spawnParticle( EnumParticleTypes.SPELL_WITCH, pos.getX() ,pos.getY(),pos.getZ() ,1 ,1 ,1);
+    	
+    	
     }
     
     
@@ -181,17 +192,23 @@ public class TEinTE
     	event.registerServerCommand( new CommandDarkenSky());
     	event.registerServerCommand( new CommandTeleportWW());
     	
-    	WorldServer world = DimensionManager.getWorld(0); 
-    	if( this.savedata == null) {
-    		this.regions = new RegionManager( this.savedata);
-    		this.regions.setWorld( world); //TODO: is this necessary?
-    		
-    		NBTSaveFormat[] objectsToSave = { this.regions};
-    		this.savedata = TeinteWorldSavedData.getInstance( world ,objectsToSave);
-    		
-    		MinecraftForge.EVENT_BUS.register( this.regions);
+    	WorldServer world = DimensionManager.getWorld(0);
+    	
+
+		this.savedata = TeinteWorldSavedData.getInstance( world);    	
+    	
+		
+		this.regions = new RegionManager( this.savedata ,world);
+		//this.regions.setWorld( world); //TODO: is this necessary?		
+		this.blockEntities = new BlockEntityManager( this.savedata ,world);
+		
+		NBTSaveObject[] objectsToSave = { this.blockEntities ,this.regions};		
+		this.savedata.setObjectsToSave( objectsToSave);
+		this.savedata.forceReadFromNBT();
+		
+		MinecraftForge.EVENT_BUS.register( this.regions);
     		//if config data is saved, use that in place of current config data?
-    	}
+
     }
     
     
@@ -209,15 +226,15 @@ public class TEinTE
     	tickcount += 1;
     	
 
-    	if( tickcount % 2 == 0) { //every other tick we run
+    	if( tickcount % 10 == 0) { //TODO: going to stop throttling update speed at toplevel
     		
 //    		System.out.println( event.phase);
 
     	
-
-        	
         	
         	//this.factions.tick(world);
+
+    		this.blockEntities.tick( tickcount ,world);
         	
         	
     		if( config.allowRegionOverlay) {
@@ -240,7 +257,7 @@ public class TEinTE
 	}
 
 	
- //------------------------------  PassThrough Functions ------------------------------------------------------------//   
+ //------------------------------  API Calls ------------------------------------------------------------//   
 	/* I chose this structure to allow Teinte full access to the various Managers/Handlers, while shielding their public
 	 * methods from other classes, rather than just 
 	 */
@@ -249,14 +266,26 @@ public class TEinTE
     	this.regions.removeRegion(pos);
     }
     
+    
     public void setRegionName( String name ,BlockPos pos) { 
     	this.regions.updateRegionName( name ,pos);
     }
+    
     
 	public void guidestoneActivated( World world ,BlockPos pos ,EntityPlayer player) {
 		if( config.allowRegionOverlay) {
 			this.regions.guidestoneActivated( world ,pos, player);
 		}
+	}
+	
+	
+	public void registerBlockEntity( BlockEntity be) {
+		this.blockEntities.add( be);
+	}
+	
+	
+	public void removeBlockEntity( BlockPos pos) {
+		this.blockEntities.remove( pos);
 	}
 	
 	
