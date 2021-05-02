@@ -1,11 +1,11 @@
 {
     "parent": "block/cube",
     "textures": {
-        "up": "blocks/quartz_block_chiseled"
-        ,"down": "blocks/quartz_block_chiseled"
-        ,"north": "blocks/obsidian"
+        "up": "blocks/obsidian"
+        ,"down": "blocks/obsidian"
+        ,"north": "blocks/quartz_block_chiseled"
         ,"south": "blocks/obsidian"
         ,"east": "blocks/obsidian"
-        ,"west": "blocks/quartz_block_chiseled"
+        ,"west": "blocks/obsidian"
     }
 }

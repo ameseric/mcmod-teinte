@@ -12,12 +12,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
-import witherwar.tileentity.BlockEntity;
-import witherwar.tileentity.BlockEntityContainer;
-import witherwar.tileentity.SerpentmindBlockEntity;
+import witherwar.tileentity.TileLogic;
+import witherwar.tileentity.TileLogicContainer;
+import witherwar.tileentity.SerpentmindTile;
 import witherwar.tileentity.TileEntitySerpentmind;
 
-public class BlockSerpentmind extends Block implements BlockEntityContainer{
+public class BlockSerpentmind extends Block implements TileLogicContainer{
 	
 	
 	public BlockSerpentmind() {
@@ -51,13 +51,13 @@ public class BlockSerpentmind extends Block implements BlockEntityContainer{
 
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new SerpentmindBlockEntity( pos));
+		TEinTE.instance.registerBlockEntity( new SerpentmindTile( pos));
 	}
 
 
 	@Override
-	public BlockEntity getBlockEntity( BlockPos pos) {
-		return TEinTE.instance.getBlockEntity( pos);
+	public TileLogic getBlockEntity( BlockPos pos) {
+		return TEinTE.instance.getTileLogic( pos);
 	}
 	
 //	@Override //TODO: superfulous? BEManager already removes dead entities.

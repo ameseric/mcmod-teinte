@@ -15,15 +15,15 @@ import witherwar.disk.TeinteWorldSavedData;
 
 
 
-public class BlockEntityManager extends NBTSaveObject{
+public class TileManager extends NBTSaveObject{
 
-	private HashMap<BlockPos ,BlockEntity> blockEntities;
+	private HashMap<BlockPos ,TileLogic> tiles;
 	private World world; //TODO: Storing world locally for access during readNBT, will change if it's a problem
 	
 	
-	public BlockEntityManager( TeinteWorldSavedData savedata ,World world) {
+	public TileManager( TeinteWorldSavedData savedata ,World world) {
 		super( savedata);
-		this.blockEntities = new HashMap<>();
+		this.tiles = new HashMap<>();
 		this.world = world;
 	}
 
@@ -40,7 +40,7 @@ public class BlockEntityManager extends NBTSaveObject{
 	public void tick( int tickcount ,World world) {
 		ArrayList<BlockPos> toRemove = new ArrayList<>();
 		
-		for( Map.Entry<BlockPos ,BlockEntity> be : this.blockEntities.entrySet()) {
+		for( Map.Entry<BlockPos ,TileLogic> be : this.tiles.entrySet()) {
 			if( be.getValue().isDead()) {
 				toRemove.add( be.getKey());				
 			}else {
@@ -57,8 +57,8 @@ public class BlockEntityManager extends NBTSaveObject{
 	
 	
 	
-	public void add( BlockEntity be) {
-		this.blockEntities.put( be.getPos() ,be);
+	public void add( TileLogic be) {
+		this.tiles.put( be.getPos() ,be);
 		this.markDirty();
 	}
 	
@@ -68,14 +68,14 @@ public class BlockEntityManager extends NBTSaveObject{
 	 * @param pos
 	 */
 	public void remove( BlockPos pos) {
-		this.blockEntities.remove( pos);
+		this.tiles.remove( pos);
 		this.markDirty();
 	}
 	
 	
-	
-	public BlockEntity get( BlockPos pos) {
-		return this.blockEntities.get( pos);
+	//Returns null if no TileLogic at that position
+	public TileLogic get( BlockPos pos) {		
+		return this.tiles.get( pos);
 	}
 	
 	
@@ -87,9 +87,9 @@ public class BlockEntityManager extends NBTSaveObject{
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		System.out.println( "Saving block entities...");
 		compound = new NBTTagCompound(); //TODO?: if this becomes intensive, save local copy for comparison
-		compound.setInteger( "numOfBEs" ,this.blockEntities.size());
+		compound.setInteger( "numOfBEs" ,this.tiles.size());
 		Integer i = 0;
-		for( Map.Entry< BlockPos ,BlockEntity> be : this.blockEntities.entrySet()) {
+		for( Map.Entry< BlockPos ,TileLogic> be : this.tiles.entrySet()) {
 			String generatedName = "blockentity" + i.toString(); 
 			compound.setTag( generatedName ,be.getValue().writeToNBT( new NBTTagCompound()));
 			i++;
@@ -107,8 +107,8 @@ public class BlockEntityManager extends NBTSaveObject{
 			System.out.println( "========== Reading NBT for BEs");
 			NBTTagCompound beTag = compound.getCompoundTag( "blockentity" + i.toString());
 			BlockPos pos = new BlockPos( beTag.getInteger( "x") ,beTag.getInteger( "y") ,beTag.getInteger( "z") );
-			this.blockEntities.put( pos ,BlockEntity.createBlockEntityFromID( beTag.getInteger( "id") ,pos ,this.world));
-			this.blockEntities.get(pos).readFromNBT( beTag);			
+			this.tiles.put( pos ,TileLogic.createBlockEntityFromID( beTag.getInteger( "id") ,pos ,this.world));
+			this.tiles.get(pos).readFromNBT( beTag);			
 		}
 		
 	}

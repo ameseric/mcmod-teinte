@@ -46,9 +46,9 @@ import witherwar.proxy.IProxy;
 import witherwar.region.RegionManager;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
-import witherwar.tileentity.BlockEntity;
-import witherwar.tileentity.BlockEntityContainer;
-import witherwar.tileentity.BlockEntityManager;
+import witherwar.tileentity.TileLogic;
+import witherwar.tileentity.TileLogicContainer;
+import witherwar.tileentity.TileManager;
 import witherwar.worlds.WorldCatalog;
 import witherwar.worlds.WorldTypeTeinte;
 
@@ -71,7 +71,7 @@ public class TEinTE
 	private RegionManager regions;
 	private SystemBlockDegrade sysBlockDegrade;  
 	private SystemPower sysPower;
-	private BlockEntityManager blockEntities;
+	private TileManager blockEntities;
 	private int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
@@ -200,7 +200,7 @@ public class TEinTE
 		
 		this.regions = new RegionManager( this.savedata ,world);
 		//this.regions.setWorld( world); //TODO: is this necessary?		
-		this.blockEntities = new BlockEntityManager( this.savedata ,world);
+		this.blockEntities = new TileManager( this.savedata ,world);
 		
 		NBTSaveObject[] objectsToSave = { this.blockEntities ,this.regions};		
 		this.savedata.setObjectsToSave( objectsToSave);
@@ -279,7 +279,7 @@ public class TEinTE
 	}
 	
 	
-	public void registerBlockEntity( BlockEntity be) {
+	public void registerBlockEntity( TileLogic be) {
 		this.blockEntities.add( be);
 	}
 	
@@ -289,7 +289,7 @@ public class TEinTE
 	}
 	
 	
-	public BlockEntity getBlockEntity( BlockPos pos) {
+	public TileLogic getTileLogic( BlockPos pos) {
 		return this.blockEntities.get(pos);
 	}
 	

@@ -8,11 +8,11 @@ import witherwar.ObjectCatalog;
 
 
 
-public class SerpentmindBlockEntity extends BlockEntity{
+public class SerpentmindTile extends TileLogic{
 
 	
 	
-	public SerpentmindBlockEntity(BlockPos pos) {
+	public SerpentmindTile(BlockPos pos) {
 		super(pos ,ObjectCatalog.TERRA_KALI ,0 ,true);
 		//this.homeBlock = ObjectCatalog.TERRA_KALI;
 

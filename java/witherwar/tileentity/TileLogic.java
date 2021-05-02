@@ -11,7 +11,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.disk.NBTSaveFormat;
 
-public abstract class BlockEntity implements NBTSaveFormat{
+
+
+
+/**
+ * 
+ * @author Guiltygate
+ *
+ * Custom version of minecraft's TileEntities.
+ * Was formerly BlockEntity, but made class names difficult to parse due to similarity with Block class.
+ * Under this, a "tile" is really just a position in the world, analogous to a BlockPos.
+ * A BlockPos will correspond to a BlockState, a Block, and possibly a TileEntity or a TileLogic.
+ * This is cumbersome, but I have to work with what's given. And Blocks are stateless, so...
+ *
+ */
+public abstract class TileLogic implements NBTSaveFormat{
 	
 	public static final int SERPENTMIND_ID = 0;
 	public static final int RITUALBLOCK_ID = 1;
@@ -25,18 +39,18 @@ public abstract class BlockEntity implements NBTSaveFormat{
 	
 	private boolean dirty = false;
 	
-	private boolean active = false;
+	private boolean updatedOnTick = false;
 	
 	private int id = -1;
 	
 	
 	
 	
-	public BlockEntity( BlockPos pos ,Block homeblock ,int id ,boolean active){
+	public TileLogic( BlockPos pos ,Block homeblock ,int id ,boolean active){
 		this.pos = pos;
 		this.homeBlock = homeblock;
 		this.id = id;
-		this.active = active;
+		this.updatedOnTick = active;
 	}
 	
 	
@@ -46,7 +60,7 @@ public abstract class BlockEntity implements NBTSaveFormat{
 			this.amIDead = true;
 		}
 		
-		if( !this.amIDead && this.active) {
+		if( !this.amIDead && this.updatedOnTick) {
 			ticklogic( world);
 		}
 	}
@@ -76,7 +90,7 @@ public abstract class BlockEntity implements NBTSaveFormat{
 		return this.id;
 	}
 	public boolean isActive() {
-		return this.active;
+		return this.updatedOnTick;
 	}
 	
 	
@@ -106,12 +120,12 @@ public abstract class BlockEntity implements NBTSaveFormat{
 	
 	
 
-	public static BlockEntity createBlockEntityFromID(int id ,BlockPos pos ,World world) {
+	public static TileLogic createBlockEntityFromID(int id ,BlockPos pos ,World world) {
 		switch(id) {
-			case SERPENTMIND_ID: return new SerpentmindBlockEntity( pos);
-			case RITUALBLOCK_ID: return new RitualBlockEntity( pos ,world);
-			case CONDUIT_ID: return new ConduitBlockEntity( pos);
-			case GEYSER_ID: return new AlchemyGeyserBlockEntity( pos);
+			case SERPENTMIND_ID: return new SerpentmindTile( pos);
+			case RITUALBLOCK_ID: return new RitualBlockTile( pos ,world);
+			case CONDUIT_ID: return new ConduitTile( pos);
+			case GEYSER_ID: return new AlchemyGeyserTile( pos);
 		}
 		throw new UnsupportedOperationException();
 	}

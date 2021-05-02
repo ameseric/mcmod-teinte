@@ -5,8 +5,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
-import witherwar.tileentity.ConduitBlockEntity;
-import witherwar.tileentity.RitualBlockEntity;
+import witherwar.tileentity.ConduitTile;
+import witherwar.tileentity.RitualBlockTile;
 
 public class ConduitBlock extends FluidContainerBlock{
 
@@ -20,7 +20,7 @@ public class ConduitBlock extends FluidContainerBlock{
 	
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new ConduitBlockEntity( pos));
+		TEinTE.instance.registerBlockEntity( new ConduitTile( pos));
 	}
 
 }

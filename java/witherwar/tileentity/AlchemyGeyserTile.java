@@ -7,11 +7,13 @@ import witherwar.ObjectCatalog;
 import witherwar.alchemy.Element;
 import witherwar.alchemy.Fluid;
 
-public class AlchemyGeyserBlockEntity extends FluidContainerBlockEntity{
+public class AlchemyGeyserTile extends FluidContainerTile{
 
-	public AlchemyGeyserBlockEntity(BlockPos pos) {
-		super(pos ,ObjectCatalog.GEYSER ,BlockEntity.GEYSER_ID ,false);
-		this.setContents( new Fluid( new Element[] {Element.A}));
+	public AlchemyGeyserTile(BlockPos pos) {
+		super(pos ,ObjectCatalog.GEYSER ,TileLogic.GEYSER_ID ,false);
+		this.setContents( Fluid.random() );
+		System.out.println( this.getContents());
+		System.out.println( );
 	}
 
 	@Override
@@ -25,7 +27,6 @@ public class AlchemyGeyserBlockEntity extends FluidContainerBlockEntity{
 	
 	@Override
 	public Fluid pullFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
-		System.out.println("Calling Geyser...");
 		return this.getContents();
 	}
 

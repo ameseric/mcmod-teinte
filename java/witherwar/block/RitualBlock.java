@@ -7,12 +7,12 @@ import net.minecraft.world.World;
 import witherwar.TEinTE;
 import witherwar.alchemy.Fluid;
 import witherwar.alchemy.FluidContainer;
-import witherwar.tileentity.BlockEntity;
-import witherwar.tileentity.BlockEntityContainer;
-import witherwar.tileentity.RitualBlockEntity;
+import witherwar.tileentity.TileLogic;
+import witherwar.tileentity.TileLogicContainer;
+import witherwar.tileentity.RitualBlockTile;
 
 
-public class RitualBlock extends DirectionalBlock implements FluidContainer ,BlockEntityContainer{
+public class RitualBlock extends DirectionalBlock implements FluidContainer ,TileLogicContainer{
 
 	
 	
@@ -25,15 +25,15 @@ public class RitualBlock extends DirectionalBlock implements FluidContainer ,Blo
 	}
 
 	
-	public BlockEntity getBlockEntity(BlockPos pos) {
-		return TEinTE.instance.getBlockEntity( pos);
+	public TileLogic getBlockEntity(BlockPos pos) {
+		return TEinTE.instance.getTileLogic( pos);
 	}
 	
 	
 	
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new RitualBlockEntity( pos ,world));
+		TEinTE.instance.registerBlockEntity( new RitualBlockTile( pos ,world));
 	}
 
 

@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
-import witherwar.tileentity.RitualBlockEntity;
+import witherwar.tileentity.RitualBlockTile;
 
 
 public class BlockFlesh extends DirectionalBlock{

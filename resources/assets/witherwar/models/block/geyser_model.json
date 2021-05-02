@@ -1,0 +1,11 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "up": "blocks/glowstone"
+        ,"down": "blocks/glowstone"
+        ,"north": "blocks/glowstone"
+        ,"south": "blocks/glowstone"
+        ,"east": "blocks/glowstone"
+        ,"west": "blocks/glowstone"
+    }
+}

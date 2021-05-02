@@ -8,11 +8,11 @@ import net.minecraft.world.World;
 import witherwar.TEinTE;
 import witherwar.alchemy.Fluid;
 import witherwar.alchemy.FluidContainer;
-import witherwar.tileentity.BlockEntity;
-import witherwar.tileentity.BlockEntityContainer;
+import witherwar.tileentity.TileLogic;
+import witherwar.tileentity.TileLogicContainer;
 
 
-public abstract class FluidContainerBlock extends Block implements FluidContainer ,BlockEntityContainer{
+public abstract class FluidContainerBlock extends Block implements FluidContainer ,TileLogicContainer{
 
 	
 	
@@ -29,8 +29,8 @@ public abstract class FluidContainerBlock extends Block implements FluidContaine
 
 
 	
-	public BlockEntity getBlockEntity(BlockPos pos) {
-		return TEinTE.instance.getBlockEntity( pos);
+	public TileLogic getBlockEntity(BlockPos pos) {
+		return TEinTE.instance.getTileLogic( pos);
 	}
 
 	
