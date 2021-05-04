@@ -59,13 +59,7 @@ public class TeinteWorldSavedData extends WorldSavedData {
 	
 	
 	
-	//TODO: Not currently used, if we don't change impl then remove
-	public void setDirty( boolean isDirty ,String field) {
-		System.out.println("Marking WORLDOBJ dirty...");
-		System.out.println( this.isDirty());
-		super.setDirty(isDirty);
-    }
-	
+
 	
 	
 	

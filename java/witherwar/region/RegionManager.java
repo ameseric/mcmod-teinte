@@ -66,8 +66,7 @@ public class RegionManager extends NBTSaveObject{
 	public void tick( int tickcount ,World world) {
 		
 		if( (tickcount % 10) != 0 || this.map.isEmpty()) { return;}
-		System.out.println( "Ticking...");
-		//TODO: RegionMap needs updating for multiple Dimensions
+		//TODO: RegionMap needs updating for multiple Dimensions if desired
 		
 		List<EntityPlayer> players = world.playerEntities;
 		

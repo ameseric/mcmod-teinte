@@ -13,7 +13,7 @@ public class SerpentmindTile extends TileLogic{
 	
 	
 	public SerpentmindTile(BlockPos pos) {
-		super(pos ,ObjectCatalog.TERRA_KALI ,0 ,true);
+		super(pos ,ObjectCatalog.TERRA_KALI ,0 ,true ,1);
 		//this.homeBlock = ObjectCatalog.TERRA_KALI;
 
 	}

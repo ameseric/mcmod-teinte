@@ -15,7 +15,7 @@ import witherwar.util.BlockUtil;
 public class ConduitTile extends FluidContainerTile {
 
 	public ConduitTile(BlockPos pos) {
-		super( pos ,ObjectCatalog.CONDUIT ,TileLogic.CONDUIT_ID ,false);
+		super( pos ,ObjectCatalog.CONDUIT ,TileLogic.CONDUIT_ID ,false ,1);
 	}
 
 

@@ -48,7 +48,7 @@ import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLogicContainer;
-import witherwar.tileentity.TileManager;
+import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
 import witherwar.worlds.WorldTypeTeinte;
 
@@ -71,7 +71,7 @@ public class TEinTE
 	private RegionManager regions;
 	private SystemBlockDegrade sysBlockDegrade;  
 	private SystemPower sysPower;
-	private TileManager blockEntities;
+	private TileLoadManager blockEntities;
 	private int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
@@ -152,13 +152,13 @@ public class TEinTE
 //    	proxy.onWorldLoad( event);
     	
     	
-//    	World world = event.getWorld();
-//    	if( world.provider.getDimension() == 0 && !world.isRemote) {
-//    		if( world.getWorldType() == WorldCatalog.worldTypePillar) {
-//    			System.out.println( "Got'em Chief.-----------------------------");
-//    		}
-//
-//    	}
+    	World world = event.getWorld();
+    	if( world.provider.getDimension() == 0 && !world.isRemote) {
+    		if( world.getWorldType() == WorldCatalog.worldTypePillar) {
+    			world.setSpawnPoint( new BlockPos(0,0,0));
+    		}
+
+    	}
     	
     }
     
@@ -200,7 +200,7 @@ public class TEinTE
 		
 		this.regions = new RegionManager( this.savedata ,world);
 		//this.regions.setWorld( world); //TODO: is this necessary?		
-		this.blockEntities = new TileManager( this.savedata ,world);
+		this.blockEntities = new TileLoadManager( this.savedata ,world);
 		
 		NBTSaveObject[] objectsToSave = { this.blockEntities ,this.regions};		
 		this.savedata.setObjectsToSave( objectsToSave);
@@ -226,7 +226,6 @@ public class TEinTE
     	tickcount += 1;
     	
 
-    	if( tickcount % 10 == 0) { //TODO: going to stop throttling update speed at toplevel
     		
 //    		System.out.println( event.phase);
 
@@ -242,7 +241,6 @@ public class TEinTE
     		}
         	
 	    			
-    	}
     }
   
 	//@SubscribeEvent

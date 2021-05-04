@@ -10,7 +10,7 @@ import witherwar.alchemy.Fluid;
 public class AlchemyGeyserTile extends FluidContainerTile{
 
 	public AlchemyGeyserTile(BlockPos pos) {
-		super(pos ,ObjectCatalog.GEYSER ,TileLogic.GEYSER_ID ,false);
+		super(pos ,ObjectCatalog.GEYSER ,TileLogic.GEYSER_ID ,false ,1);
 		this.setContents( Fluid.random() );
 		System.out.println( this.getContents());
 		System.out.println( );

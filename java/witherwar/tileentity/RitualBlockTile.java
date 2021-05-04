@@ -32,7 +32,7 @@ public class RitualBlockTile extends FluidContainerTile {
 	
 	
 	public RitualBlockTile(BlockPos pos ,World world) {
-		super(pos, ObjectCatalog.RITUALBLOCK ,TileLogic.RITUALBLOCK_ID ,true); 
+		super(pos, ObjectCatalog.RITUALBLOCK ,TileLogic.RITUALBLOCK_ID ,true ,1); 
 		this.facing = world.getBlockState( this.getPos()).getValue( DirectionalBlock.FACING);
 		this.outputPos = new BlockPos( this.facing.rotateY().getDirectionVec()).add( this.getPos());
 		this.inputPos = new BlockPos( this.facing.rotateYCCW().getDirectionVec()).add( this.getPos());

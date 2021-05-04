@@ -24,6 +24,8 @@ import witherwar.util.SearchBlock.FilterBlock;
  * Basic block utilities, but poorly structured (and implemented?).
  *
  * Probably going to be removed in the future.
+ * 
+ * TODO: if we're keeping this, utilize EnumFacing rather than Symbol.
  */
 public class BlockUtil {	
 	
@@ -43,6 +45,17 @@ public class BlockUtil {
 	public static HashMap<BlockPos,Block> getNeighborBlocks( BlockPos pos ,World world){
 		
 		return getNeighborBlocks( pos ,Symbol.nonNullValues() ,world);
+	}
+	
+	public static HashMap<BlockPos,Block> getNeighborBlocks( BlockPos pos ,World world ,boolean random){
+		Symbol[] symbols;
+		if( random) {
+			symbols = Symbol.randomValues();
+		}else {
+			symbols = Symbol.nonNullValues();
+		}
+		
+		return getNeighborBlocks( pos ,symbols ,world);
 	}
 	
 	public static HashMap<BlockPos,Block> getNeighborBlocks( BlockPos pos ,Symbol[] array ,World world){

@@ -31,6 +31,7 @@ public abstract class TileLogic implements NBTSaveFormat{
 	public static final int RITUALBLOCK_ID = 1;
 	public static final int CONDUIT_ID = 2;
 	public static final int GEYSER_ID = 3;
+	public static final int REPLICATE_ID = 4;
 	
 	
 	private Block homeBlock;
@@ -41,16 +42,19 @@ public abstract class TileLogic implements NBTSaveFormat{
 	
 	private boolean updatedOnTick = false;
 	
+	private int ticksPerCycle = 1;
+	
 	private int id = -1;
 	
 	
 	
 	
-	public TileLogic( BlockPos pos ,Block homeblock ,int id ,boolean active){
+	public TileLogic( BlockPos pos ,Block homeblock ,int id ,boolean active ,int ticksPerCycle){
 		this.pos = pos;
 		this.homeBlock = homeblock;
 		this.id = id;
 		this.updatedOnTick = active;
+		this.ticksPerCycle = ticksPerCycle;
 	}
 	
 	
@@ -60,7 +64,7 @@ public abstract class TileLogic implements NBTSaveFormat{
 			this.amIDead = true;
 		}
 		
-		if( !this.amIDead && this.updatedOnTick) {
+		if( !this.amIDead && this.updatedOnTick && (tickcount % this.ticksPerCycle == 0) ) {
 			ticklogic( world);
 		}
 	}
@@ -92,6 +96,9 @@ public abstract class TileLogic implements NBTSaveFormat{
 	public boolean isActive() {
 		return this.updatedOnTick;
 	}
+	protected void iAmDead() {
+		this.amIDead = true;
+	}
 	
 	
 	
@@ -120,12 +127,13 @@ public abstract class TileLogic implements NBTSaveFormat{
 	
 	
 
-	public static TileLogic createBlockEntityFromID(int id ,BlockPos pos ,World world) {
+	public static TileLogic createTileLogicFromID(int id ,BlockPos pos ,World world) {
 		switch(id) {
 			case SERPENTMIND_ID: return new SerpentmindTile( pos);
 			case RITUALBLOCK_ID: return new RitualBlockTile( pos ,world);
 			case CONDUIT_ID: return new ConduitTile( pos);
 			case GEYSER_ID: return new AlchemyGeyserTile( pos);
+			case REPLICATE_ID: return new ReplicatingTile( pos);
 		}
 		throw new UnsupportedOperationException();
 	}

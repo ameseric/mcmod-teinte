@@ -31,7 +31,6 @@ public abstract class NBTSaveObject implements NBTSaveFormat{
      * Marks this MapDataBase dirty, to be saved to disk when the level next saves.
      */
     public void markDirty(){
-    	System.out.println("Marking saveobj dirty,....");
         this.setDirty(true);
         this.savedata.markDirty();
     }

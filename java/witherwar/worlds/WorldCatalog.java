@@ -17,7 +17,7 @@ public class WorldCatalog {
 	}	
 	
 	//WorldType instance is not directly used - the object creation triggers necessary registration in the super class
-	public static final WorldType worldTypePillar = new WorldType( "pillar");
+	public static final WorldType worldTypePillar = new WorldTypeTeinte( "pillar");
 
 	
 	

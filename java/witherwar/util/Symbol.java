@@ -10,8 +10,9 @@ import net.minecraft.util.math.BlockPos;
 
 //could use ordinal instead of hardcoding tx, but would still need to hardcode conversion back
 
-//TODO: This enum is redundant, and I am a fool. Remove this and utilize Veci3 or something similar.
+//TODO: This enum is redundant, and I am a fool. Remove this and utilize EnumFacing or some Vec3 derivation.
 
+@Deprecated
 public enum Symbol{
 	 YP( new BlockPos(0,1,0) ,0)
 	,YN( new BlockPos(0,-1,0) ,1)
@@ -58,7 +59,7 @@ public enum Symbol{
 	}
 	
 	public static Symbol[] randomValues( int numOfValues) {
-		if( numOfValues > 6) { numOfValues = 6; } //silent error, need to throw exception
+		if( numOfValues > 6) { numOfValues = 6; } //TODO: silent error, need to throw exception
 		
 		Symbol[] choices = Symbol.nonNullValues();
 		int[] weights = new int[] { 1 ,1 ,1 ,1 ,1 ,1};

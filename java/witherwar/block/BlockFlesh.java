@@ -15,10 +15,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
+import witherwar.tileentity.AlchemyGeyserTile;
+import witherwar.tileentity.ReplicatingTile;
 import witherwar.tileentity.RitualBlockTile;
+import witherwar.tileentity.TileLogic;
+import witherwar.tileentity.TileLogicContainer;
 
 
-public class BlockFlesh extends DirectionalBlock{
+public class BlockFlesh extends DirectionalBlock implements TileLogicContainer{
 	
 	public static final MaterialFlesh matFlesh = new MaterialFlesh( MapColor.TNT);
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
@@ -50,6 +54,19 @@ public class BlockFlesh extends DirectionalBlock{
 	@Override
 	public boolean hasTileEntity( IBlockState state) {
 		return false;
+	}
+
+
+	@Override
+	public TileLogic getBlockEntity(BlockPos pos) {
+		return null;
+	}
+	
+	
+
+	@Override
+	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
+		TEinTE.instance.registerBlockEntity( new ReplicatingTile( pos)); //TODO consider comparing classes for TileLogic
 	}
 	
 

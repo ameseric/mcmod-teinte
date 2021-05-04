@@ -15,8 +15,8 @@ public abstract class FluidContainerTile extends TileLogic implements FluidConta
 	private Fluid contents = new Fluid();
 	
 	
-	public FluidContainerTile(BlockPos pos, Block homeblock, int id, boolean active) {
-		super(pos, homeblock, id, active);
+	public FluidContainerTile(BlockPos pos, Block homeblock, int id, boolean active ,int ticksPerCycle) {
+		super(pos, homeblock, id, active ,ticksPerCycle);
 	}
 	
 	

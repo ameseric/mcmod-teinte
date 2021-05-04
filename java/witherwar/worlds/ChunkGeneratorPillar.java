@@ -179,16 +179,14 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	                            	int bx = bcx + (x<<4);
 	                            	int bz = bcz + (z<<4);
 	                            	
-	                            	
-	                            	if( blocksInBoundary( bx ,bz)) {
-		                                if ((lvt_45_1_ += d16) > 0.0D) {
-		                                	primer.setBlockState( bcx ,bcy ,bcz, STONE);
-	//	                                    primer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2, LOG);
-		                                }
-		                                else if (i2 * 8 + j2 < this.settings.seaLevel) {
-		                                    primer.setBlockState( bcx ,bcy ,bcz, this.oceanBlock);
-		                                }
-	                            	}
+
+	                                if ((lvt_45_1_ += d16) > 0.0D && blocksInBoundary( bx ,bz)) {
+	                                	primer.setBlockState( bcx ,bcy ,bcz, STONE);
+	                                	//primer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2, LOG);
+	                                }
+	                                else if (i2 * 8 + j2 < this.settings.seaLevel) {
+	                                    primer.setBlockState( bcx ,bcy ,bcz, this.oceanBlock);
+	                                }
 	                            }
 
 	                            d10 += d12;
@@ -206,11 +204,14 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	    }
 	    
 	    
+	    //Used to calculate circular world shape
 	    private boolean blocksInBoundary( int x ,int z) {
+	    	int r = 1024;
+	    	
 	    	int ax = Math.abs(x);
 	    	int az = Math.abs(z);
 	    	
-	    	return (ax < 129 && az < 129 && (ax+az) < ( 128 + 128*0.34)) ;
+	    	return ( Math.pow( ax ,2.0) + Math.pow( az ,2.0) <= Math.pow( r ,2.0) ) ;
 	    }
 
 
@@ -326,10 +327,10 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	                        float f5 = this.settings.biomeDepthOffSet + 1.5F * this.settings.biomeDepthWeight;
 	                        float f6 = this.settings.biomeScaleOffset + biome1.getHeightVariation() * this.settings.biomeScaleWeight;
 
-//	                        if (this.terrainType == WorldType.AMPLIFIED && f5 > 0.0F){
+	                        if (this.terrainType == WorldType.AMPLIFIED && f5 > 0.0F){
 	                            f5 = 1.0F + f5 * 3.0F; //2.0F
 	                            f6 = 1.0F + f6 * 4.0F;
-//	                        }
+	                        }
 
 	                        float f7 = this.biomeWeights[j1 + 2 + (k1 + 2) * 5] / (f5 + 2.0F);
 
