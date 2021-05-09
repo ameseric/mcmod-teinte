@@ -26,7 +26,7 @@ public class TileLoadManager extends NBTSaveObject{
 	//private ArrayList<HashMap<BlockPos,TileLogic>> tilebuckets;
 	private World world; //TODO: Storing world locally for access during readNBT, will change if it's a problem
 	
-	private final double LIMIT = 20.0;
+	private final double LIMIT = 10.0;
 	
 	private int tilesPerTick = -1;
 	private int tickNumber = 1;
@@ -85,16 +85,26 @@ public class TileLoadManager extends NBTSaveObject{
 	
 	
 	private void resetCycle() {
-		double callsPerCycle = Math.ceil(this.tiles.size() / LIMIT);
-		this.tilesPerTick = (int) Math.floor( this.tiles.size() / callsPerCycle);
-		this.tickNumber = 1;
+//		int activeTileCount = 0;
+//		for( TileLogic tl : this.tiles.values()) { //TODO: check this segment is performing appropriately
+//			if( tl.isActive()) {
+//				activeTileCount++;
+//			}
+//		}
+		
+		int activeTileCount = this.tiles.size();
+
+		double callsPerCycle = Math.ceil( activeTileCount / LIMIT);
+		this.tilesPerTick = (int) Math.round( activeTileCount / callsPerCycle);
+		this.tickNumber = 0;
 		this.ticksPerCycle = (int) callsPerCycle;
 		this.tileclone = (HashMap<BlockPos, TileLogic>) this.tiles.clone();
 		this.performReset = false;
-		
-//		System.out.println( "Ticks per Cycle: " + callsPerCycle);
-//		System.out.println( "Tiles per Tick: " + this.tilesPerTick);
-//		System.out.println( "" + 0);
+
+		System.out.println( "Active Tile Count: " + activeTileCount + "  |Total Tile Count: " + this.tiles.size());
+		System.out.println( "Ticks per Cycle: " + callsPerCycle);
+		System.out.println( "Tiles per Tick: " + this.tilesPerTick);
+
 	}
 	
 
@@ -120,7 +130,7 @@ public class TileLoadManager extends NBTSaveObject{
 		//Set<Map.Entry<BlockPos ,TileLogic>> tilecloneSet = this.tileclone.entrySet();
 		Iterator< Map.Entry<BlockPos ,TileLogic>> iter;
 		
-		for( iter = this.tileclone.entrySet().iterator(); iter.hasNext();) { //TODO this should support deletion, try it			
+		for( iter = this.tileclone.entrySet().iterator(); iter.hasNext();) {			
 			Map.Entry< BlockPos ,TileLogic> tl = iter.next();
 			if( !(this.tickNumber == this.ticksPerCycle)) {
 				if( tilesThisTick == this.tilesPerTick) {
@@ -136,11 +146,12 @@ public class TileLoadManager extends NBTSaveObject{
 			
 
 			iter.remove();
-//			tilecloneSet.remove( tl);
-//			this.tileclone.remove( tl.getKey()); //removal from clone
-			tilesThisTick++;
+			if( tl.getValue().isActive()) { //duplicate check, but allows us to not count inactive tiles
+				tilesThisTick++;
+			}
 		}
 		
+		System.out.println( tilesThisTick);
 		
 		for( BlockPos pos : toRemove) {
 			this.remove( pos);

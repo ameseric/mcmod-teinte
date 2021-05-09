@@ -58,7 +58,7 @@ public class BlockFlesh extends DirectionalBlock implements TileLogicContainer{
 
 
 	@Override
-	public TileLogic getBlockEntity(BlockPos pos) {
+	public TileLogic getTileLogic(BlockPos pos) {
 		return null;
 	}
 	

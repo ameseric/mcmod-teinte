@@ -180,7 +180,7 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	                            	int bz = bcz + (z<<4);
 	                            	
 
-	                                if ((lvt_45_1_ += d16) > 0.0D && blocksInBoundary( bx ,bz)) {
+	                                if ((lvt_45_1_ += d16) > 0.0D && blockInBoundary( bx ,bz)) {
 	                                	primer.setBlockState( bcx ,bcy ,bcz, STONE);
 	                                	//primer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2, LOG);
 	                                }
@@ -205,7 +205,7 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	    
 	    
 	    //Used to calculate circular world shape
-	    private boolean blocksInBoundary( int x ,int z) {
+	    private boolean blockInBoundary( int x ,int z) {
 	    	int r = 1024;
 	    	
 	    	int ax = Math.abs(x);
@@ -225,8 +225,12 @@ public class ChunkGeneratorPillar implements IChunkGenerator
 	        {
 	            for (int j = 0; j < 16; ++j)
 	            {
+	            	int bx = x * 16 + i;
+	            	int bz = z * 16 + j;
+	            	
+	            	//TODO: would be better off changing the actual biome selection algorithm
 	                Biome biome = biomesIn[j + i * 16];
-	                biome.genTerrainBlocks(this.world, this.rand, primer, x * 16 + i, z * 16 + j, this.depthBuffer[j + i * 16]);
+	                biome.genTerrainBlocks(this.world, this.rand, primer, bx, bz, this.depthBuffer[j + i * 16]);
 	            }
 	        }
 	    }

@@ -24,12 +24,12 @@ public abstract class FluidContainerBlock extends Block implements FluidContaine
 	
 	
 	public Fluid pullFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
-		return ((FluidContainer) this.getBlockEntity(myPos)).pullFluid( requesterPos ,myPos ,world);
+		return ((FluidContainer) this.getTileLogic(myPos)).pullFluid( requesterPos ,myPos ,world);
 	}
 
 
 	
-	public TileLogic getBlockEntity(BlockPos pos) {
+	public TileLogic getTileLogic(BlockPos pos) {
 		return TEinTE.instance.getTileLogic( pos);
 	}
 

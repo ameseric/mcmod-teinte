@@ -12,15 +12,17 @@ import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import witherwar.block.BlockSerpentmind;
+import witherwar.block.KaliCoreBlock;
 import witherwar.block.ConduitBlock;
 import witherwar.block.RitualBlock;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
+import witherwar.entity.BlobFlyingTestEntity;
 import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.block.AlchemyGeyserBlock;
+import witherwar.block.AshReplicatingBlock;
 import witherwar.block.BlockAsh;
 import witherwar.block.BlockCatarCortex;
 import witherwar.block.BlockCatarMaw;
@@ -29,6 +31,7 @@ import witherwar.block.BlockGuidestone;
 
 
 // stateless singleton
+// necessary due to Minecraft's structure, not desired choice
 public class ObjectCatalog {
 
 	
@@ -47,12 +50,15 @@ public class ObjectCatalog {
 	public final static Block CONDUIT;
 	public final static Block GEYSER;
 	public final static Block RITUALBLOCK;
+	public final static Block ASH_REPL_BLOCK;
+
 	
 	
 	static {
 		
 		entitiesToRegister.add( 	new NewEntity( 		EntitySerpentWither.class 		,"serpent_wither_skeleton" 	,2));
 		entitiesToRegister.add( 	new NewEntity( 		EntityMotusGhast.class 			,"motus_ghast" 				,3));
+		entitiesToRegister.add( 	new NewEntity( 		BlobFlyingTestEntity.class		,"test_blob" 				,4));
 		
 		
 		tileEntitesToRegister.add( 	new NewTileEntity( 	TileEntitySerpentmind.class 	,"witherwar:tile_entity_serpentmind"));
@@ -60,7 +66,7 @@ public class ObjectCatalog {
 		tileEntitesToRegister.add( 	new NewTileEntity( 	TileEntityMaw.class 			,"witherwar:tile_entity_maw"));
 		
 		
-		TERRA_KALI = 	new BlockSerpentmind();
+		TERRA_KALI = 	new KaliCoreBlock();
 		TERRA_CATAR = 	new BlockCatarCortex();
 		FLESH = 		new BlockFlesh();
 		MAW = 			new BlockCatarMaw();
@@ -69,6 +75,8 @@ public class ObjectCatalog {
 		CONDUIT =		new ConduitBlock();
 		GEYSER =		new AlchemyGeyserBlock();
 		RITUALBLOCK =	new RitualBlock();
+		ASH_REPL_BLOCK =new AshReplicatingBlock();
+
 		
 		
 		blocksToRegister.add( 		new NewBlock( "terra_kali"		,TERRA_KALI 	,"witherwar:terra_kali"));
@@ -80,7 +88,8 @@ public class ObjectCatalog {
 		blocksToRegister.add( 		new NewBlock( "conduit" 		,CONDUIT	 	,"witherwar:conduit"));
 		blocksToRegister.add(		new NewBlock( "geyser"			,GEYSER			,"witherwar:geyser"));
 		blocksToRegister.add(		new NewBlock( "ritualblock"		,RITUALBLOCK	,"witherwar:ritualblock"));
-		
+		blocksToRegister.add(		new NewBlock( "ash_repl"		,ASH_REPL_BLOCK	,"witherwar:dead_ash"));
+
 		
 	}
 	

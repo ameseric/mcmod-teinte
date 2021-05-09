@@ -15,10 +15,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import witherwar.ObjectCatalog;
 import witherwar.ObjectCatalog.NewBlock;
+import witherwar.entity.BlobFlyingTestEntity;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
 import witherwar.gui.GuiEditGuidestone;
 import witherwar.gui.TeinteGUI;
+import witherwar.models.BlobTestRender;
 
 public class ClientOnlyProxy implements IProxy{
 	public static TeinteGUI teinteGUI;
@@ -53,6 +55,7 @@ public class ClientOnlyProxy implements IProxy{
 		
         mc.getRenderManager().entityRenderMap.put( EntitySerpentWither.class, new RenderWitherSkeleton( mc.getRenderManager()));
         mc.getRenderManager().entityRenderMap.put( EntityMotusGhast.class, new RenderGhast( mc.getRenderManager()));
+        mc.getRenderManager().entityRenderMap.put( BlobFlyingTestEntity.class, new BlobTestRender( mc.getRenderManager()));
 		
 	}
 	

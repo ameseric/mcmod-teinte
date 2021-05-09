@@ -1,9 +1,14 @@
 package witherwar.tileentity;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public interface TileLogicContainer {
 
-	public TileLogic getBlockEntity( BlockPos pos);
+	public TileLogic getTileLogic( BlockPos pos);
+	
+	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state);
+
 	
 }

@@ -165,8 +165,8 @@ public class TEinTE
     
     @SubscribeEvent
     public void playerLoggedOn( PlayerLoggedInEvent event) {
-    	this.regions.playerMap.put( event.player ,""); //TODO change access
-    	//this.regions.addPlayer( event.player ,"");
+//    	this.regions.playerMap.put( event.player ,""); //changed access, good?
+    	this.regions.addPlayer( event.player);
     }
     
     
@@ -174,11 +174,13 @@ public class TEinTE
     @SubscribeEvent
     //Appears to be server-side only
     public void onPlayerBlockPlace( BlockEvent.PlaceEvent event) {
-    	//BlockPos pos = event.getPos();
-    	//event.getPlayer();
+    	BlockPos pos = event.getPos();
+    	event.getPlayer();
     	
-    	//Doesn't appear to work, client-side issue?
-    	//event.getWorld().spawnParticle( EnumParticleTypes.SPELL_WITCH, pos.getX() ,pos.getY(),pos.getZ() ,1 ,1 ,1);
+    	//got another particle to work, some particles need specific arguments, also
+    	//need to call through the proper channels
+    	WorldServer world = (WorldServer) event.getWorld();
+    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY(),pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
     	
     	
     }
@@ -195,11 +197,10 @@ public class TEinTE
     	WorldServer world = DimensionManager.getWorld(0);
     	
 
-		this.savedata = TeinteWorldSavedData.getInstance( world);    	
+		this.savedata = TeinteWorldSavedData.getInstance( world);
     	
 		
 		this.regions = new RegionManager( this.savedata ,world);
-		//this.regions.setWorld( world); //TODO: is this necessary?		
 		this.blockEntities = new TileLoadManager( this.savedata ,world);
 		
 		NBTSaveObject[] objectsToSave = { this.blockEntities ,this.regions};		
@@ -225,20 +226,17 @@ public class TEinTE
     	
     	tickcount += 1;
     	
-
     		
-//    		System.out.println( event.phase);
+    		
+        	
+    	//this.factions.tick(world);
 
+		this.blockEntities.tick( tickcount ,world);
     	
-        	
-        	//this.factions.tick(world);
-
-    		this.blockEntities.tick( tickcount ,world);
-        	
-        	
-    		if( config.allowRegionOverlay) {
-    			this.regions.tick( tickcount ,world); //TODO going to change when regionMap is removed from savedata
-    		}
+    	
+		if( config.allowRegionOverlay) {
+			this.regions.tick( tickcount ,world); //TODO going to change when regionMap is removed from savedata
+		}
         	
 	    			
     }
@@ -257,7 +255,7 @@ public class TEinTE
 	
  //------------------------------  API Calls ------------------------------------------------------------//   
 	/* I chose this structure to allow Teinte full access to the various Managers/Handlers, while shielding their public
-	 * methods from other classes, rather than just 
+	 * methods from other classes.
 	 */
 	
     public void removeRegion( BlockPos pos) {
@@ -336,9 +334,9 @@ public class TEinTE
 //		@Name( value = "Enable Aleph Faction")
 //		public static boolean allowAleph = true;
 //		
-//		@Comment( value={ "When true, allows your world to be consumed by Rot," ,"slowly sinking parts of your world into the quiet void."})
-//		@Name( value = "Enable Void Rot")
-//		public static boolean allowRot = true;
+		@Comment( value={ "Controls radius of Pillar World Type. Does not affect worlds already generated."})
+		@Name( value = "Pillar World Size")
+		public static int pillarWorldSize = 1;
 
 		
 		@Comment( value= {"When true, allows Guidestones to project the current Region name","onto the player's screen."})

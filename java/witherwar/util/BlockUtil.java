@@ -12,7 +12,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import witherwar.faction.ResourceMap;
-import witherwar.util.SearchBlock.FilterBlock;
 
 
 
@@ -29,11 +28,11 @@ import witherwar.util.SearchBlock.FilterBlock;
  */
 public class BlockUtil {	
 	
-	public static boolean onlyTouchingBlockTypes( BlockPos currentPos ,FilterBlock acceptedBlocks ,World world) {
+	public static boolean onlyTouchingBlockTypes( BlockPos currentPos ,BlockTypeCollection acceptedBlocks ,World world) {
 		HashMap<BlockPos,Block> map = getNeighborBlocks( currentPos ,world);
 		
 		for( Block b : map.values()) {
-			if( !acceptedBlocks.allows( b)) {
+			if( !acceptedBlocks.includes( b)) {
 				return false;
 			}
 		}

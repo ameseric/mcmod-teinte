@@ -21,16 +21,14 @@ import net.minecraft.world.World;
 public class SearchBlock {
 	
 	private World world;
-	private FilterBlock returnBlockTypes;
-	private FilterBlock traversableBlockTypes;
+	private BlockTypeCollection returnBlockTypes;
+	private BlockTypeCollection traversableBlockTypes;
 	private final int MAX_DEPTH;
 
-	public interface FilterBlock{
-		boolean allows( Block bs);
-	}
+
 	
 	
-	public SearchBlock( World world ,FilterBlock returnBlockTypes ,FilterBlock traversableBlockTypes ,int searchDepth) {
+	public SearchBlock( World world ,BlockTypeCollection returnBlockTypes ,BlockTypeCollection traversableBlockTypes ,int searchDepth) {
 		this.world = world;
 		this.returnBlockTypes = returnBlockTypes;
 		this.traversableBlockTypes = traversableBlockTypes;
@@ -64,8 +62,8 @@ public class SearchBlock {
 		
 		for( BlockPos pos : map.keySet()) {
 			Block b = map.get(pos);
-			if( this.traversableBlockTypes.allows(b)) {
-				if( this.returnBlockTypes.allows( b)) {
+			if( this.traversableBlockTypes.includes(b)) {
+				if( this.returnBlockTypes.includes( b)) {
 					return pos;
 				}else if( !positions.contains( pos)) { //inefficient, think about using HashSet?
 					positions.add( pos);
@@ -78,11 +76,11 @@ public class SearchBlock {
 	
 	
 	
-	public boolean onlyTouchingBlockTypes( BlockPos currentPos ,FilterBlock acceptedBlocks) {
+	public boolean onlyTouchingBlockTypes( BlockPos currentPos ,BlockTypeCollection acceptedBlocks) {
 		HashMap<BlockPos,Block> map = getNeighborBlocks( currentPos);
 		
 		for( Block b : map.values()) {
-			if( !acceptedBlocks.allows( b)) {
+			if( !acceptedBlocks.includes( b)) {
 				return false;
 			}
 		}

@@ -14,13 +14,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLogicContainer;
-import witherwar.tileentity.SerpentmindTile;
+import witherwar.tileentity.KaliCoreTile;
 import witherwar.tileentity.TileEntitySerpentmind;
 
-public class BlockSerpentmind extends Block implements TileLogicContainer{
+public class KaliCoreBlock extends Block implements TileLogicContainer{
 	
 	
-	public BlockSerpentmind() {
+	public KaliCoreBlock() {
 		super( Material.ROCK);
 	    setHardness(30F);
 		setUnlocalizedName( "terra_kali");  // unlocalized name ties block to resources.lang file, I.e. "Serpentmind" or what have you
@@ -51,12 +51,12 @@ public class BlockSerpentmind extends Block implements TileLogicContainer{
 
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new SerpentmindTile( pos));
+		TEinTE.instance.registerBlockEntity( new KaliCoreTile( pos));
 	}
 
 
 	@Override
-	public TileLogic getBlockEntity( BlockPos pos) {
+	public TileLogic getTileLogic( BlockPos pos) {
 		return TEinTE.instance.getTileLogic( pos);
 	}
 	

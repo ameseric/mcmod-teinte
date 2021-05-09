@@ -25,7 +25,7 @@ public class RitualBlock extends DirectionalBlock implements FluidContainer ,Til
 	}
 
 	
-	public TileLogic getBlockEntity(BlockPos pos) {
+	public TileLogic getTileLogic(BlockPos pos) {
 		return TEinTE.instance.getTileLogic( pos);
 	}
 	
@@ -39,7 +39,7 @@ public class RitualBlock extends DirectionalBlock implements FluidContainer ,Til
 
 	@Override
 	public Fluid pullFluid(BlockPos requesterPos, BlockPos myPos, World world) {
-		return ((FluidContainer) this.getBlockEntity(myPos)).pullFluid( requesterPos ,myPos ,world);
+		return ((FluidContainer) this.getTileLogic(myPos)).pullFluid( requesterPos ,myPos ,world);
 	}
 
 

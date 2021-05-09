@@ -42,29 +42,39 @@ public abstract class TileLogic implements NBTSaveFormat{
 	
 	private boolean updatedOnTick = false;
 	
-	private int ticksPerCycle = 1;
+	private int ticksUntilUpdate = 1;
+	private int tickcountAtLastUpdate = 0;
 	
 	private int id = -1;
 	
 	
 	
 	
-	public TileLogic( BlockPos pos ,Block homeblock ,int id ,boolean active ,int ticksPerCycle){
+	public TileLogic( BlockPos pos ,Block homeblock ,int id ,boolean active ,int ticksUntilUpdate){
 		this.pos = pos;
 		this.homeBlock = homeblock;
 		this.id = id;
 		this.updatedOnTick = active;
-		this.ticksPerCycle = ticksPerCycle;
+		this.ticksUntilUpdate = ticksUntilUpdate;
 	}
 	
 	
 	
 	public void tick( int tickcount ,World world) {
+		
 		if( homeBlockRemoved( world)) {
 			this.amIDead = true;
 		}
 		
-		if( !this.amIDead && this.updatedOnTick && (tickcount % this.ticksPerCycle == 0) ) {
+		if(this.tickcountAtLastUpdate == 0) {
+			this.tickcountAtLastUpdate = tickcount;
+		}
+		
+		int tickDiff = tickcount - this.tickcountAtLastUpdate;
+		System.out.println( tickDiff + " | " + this.ticksUntilUpdate + " | " + this.tickcountAtLastUpdate);
+
+		if( !this.amIDead && this.updatedOnTick && tickDiff >= this.ticksUntilUpdate ) {
+			this.tickcountAtLastUpdate = tickcount;
 			ticklogic( world);
 		}
 	}
@@ -99,6 +109,9 @@ public abstract class TileLogic implements NBTSaveFormat{
 	protected void iAmDead() {
 		this.amIDead = true;
 	}
+	protected void setActive( boolean isActive) {
+		this.updatedOnTick = isActive;
+	}
 	
 	
 	
@@ -129,7 +142,7 @@ public abstract class TileLogic implements NBTSaveFormat{
 
 	public static TileLogic createTileLogicFromID(int id ,BlockPos pos ,World world) {
 		switch(id) {
-			case SERPENTMIND_ID: return new SerpentmindTile( pos);
+			case SERPENTMIND_ID: return new KaliCoreTile( pos);
 			case RITUALBLOCK_ID: return new RitualBlockTile( pos ,world);
 			case CONDUIT_ID: return new ConduitTile( pos);
 			case GEYSER_ID: return new AlchemyGeyserTile( pos);

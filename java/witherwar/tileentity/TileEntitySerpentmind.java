@@ -15,9 +15,9 @@ import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
 import witherwar.TEinTE;
 import witherwar.system.SystemLindenmayer;
-import witherwar.util.HashBlockFilter;
+import witherwar.util.BlockTypeCollection;
+import witherwar.util.HashBlockCollection;
 import witherwar.util.SearchBlock;
-import witherwar.util.SearchBlock.FilterBlock;
 import witherwar.util.Symbol;
 import witherwar.util.WeightedChoice;
 
@@ -31,7 +31,7 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 	private int[] lastBlockPosition;
 	private int numOfBranches = 0;
 	private int fullCycleCount = 0;
-	private HashBlockFilter nativeBlocks;
+	private HashBlockCollection nativeBlocks;
 	private SearchBlock seeker;
 	private Block terraformBlock;
 	private int blocksPlaced = 0;
@@ -258,21 +258,21 @@ public class TileEntitySerpentmind extends TileEntityCustomTickingBase{
 				,Blocks.BONE_BLOCK
 				,ObjectCatalog.FLESH
 				,this.getBlockType()};
-		this.nativeBlocks = new HashBlockFilter( list);
+		this.nativeBlocks = new HashBlockCollection( list);
 
 		
 		this.terraformBlock = ObjectCatalog.DEAD_ASH;
 		
-		FilterBlock filterReturnBlock = ( b) -> {
-			//return !isOfBlockSet( b ,this.nativeBlocks) && b != this.terraformBlock && b != Blocks.BEDROCK;
-			return b != this.terraformBlock;
-		};
-		
-		FilterBlock filterTraversableBlock = ( b) -> {
-			return b != Blocks.AIR && this.nativeBlocks.allows(b) && b != Blocks.BEDROCK;
-		};
-		
-		this.seeker = new SearchBlock( this.world ,filterReturnBlock ,filterTraversableBlock ,1000);
+//		BlockTypeCollection filterReturnBlock = ( b) -> {
+//			//return !isOfBlockSet( b ,this.nativeBlocks) && b != this.terraformBlock && b != Blocks.BEDROCK;
+//			return b != this.terraformBlock;
+//		};
+//		
+//		BlockTypeCollection filterTraversableBlock = ( b) -> {
+//			return b != Blocks.AIR && this.nativeBlocks.includes(b) && b != Blocks.BEDROCK;
+//		};
+//		
+//		this.seeker = new SearchBlock( this.world ,filterReturnBlock ,filterTraversableBlock ,1000);
 		
 		//for( int i=0; i<numOfBranches; i++) {
 //			branches[ i] = this.pattern.grow();

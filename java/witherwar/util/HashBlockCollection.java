@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import witherwar.util.SearchBlock.FilterBlock;
 
 /**
  * 
@@ -15,40 +14,40 @@ import witherwar.util.SearchBlock.FilterBlock;
  *
  */
 
-public class HashBlockFilter implements FilterBlock{
+public class HashBlockCollection implements BlockTypeCollection{
 	private HashSet<Block> blocks;
 	
-	public HashBlockFilter() {
+	public HashBlockCollection() {
 		this.blocks = new HashSet<Block>();
 	};
 	
 	
-	public HashBlockFilter( Block[] blocks) {
+	public HashBlockCollection( Block[] blocks) {
 		for( Block b : blocks) {
 			this.blocks.add( b);
 		}
 	}	
 	
 	
-	public HashBlockFilter( HashSet<Block> blocks) {
+	public HashBlockCollection( HashSet<Block> blocks) {
 		this.blocks = blocks;
 	}
 	
 	
-	public HashBlockFilter( ArrayList<Block> blocks) {
+	public HashBlockCollection( ArrayList<Block> blocks) {
 		this.blocks = new HashSet<Block>( blocks);
 	}
 	
 	
 	public void add( Block b) {
 		this.blocks.add(b);
-	}
-	
+	}	
+
 
 	@Override
-	public boolean allows(Block bs) {
+	public boolean includes(Block b) {
 		if( this.blocks == null) return false;
-		return this.blocks.contains(bs);
+		return this.blocks.contains(b);
 	}		
 }
 

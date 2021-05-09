@@ -46,10 +46,6 @@ public class RegionManager extends NBTSaveObject{
 		this.initDataStructs();
 	}	
 	
-	// Bad idea? Used for delaying findRegion call until after Guidestone activation.
-	public void setWorld( World world) {
-		this.world = world;
-	}	
 	
 	private void initDataStructs() {
 		this.map = new HashMap<>();
@@ -59,6 +55,11 @@ public class RegionManager extends NBTSaveObject{
 	
 	public String getDataName() {
 		return "RegionManagerSaveData"; //TODO
+	}
+	
+	
+	public void addPlayer( EntityPlayer player) {
+		this.playerMap.put( player ,"");
 	}
 	
 	

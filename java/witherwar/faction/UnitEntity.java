@@ -11,9 +11,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import witherwar.faction.ResourceMap.RMChunk;
+import witherwar.util.BlockTypeCollection;
 import witherwar.util.BlockUtil;
 import witherwar.util.SearchBlock;
-import witherwar.util.SearchBlock.FilterBlock;
 
 public class UnitEntity {
 	private static int count = 0;
@@ -29,8 +29,8 @@ public class UnitEntity {
 	private SearchBlock findWood;
 	private PuppetMovement move;
 	
-	private static FilterBlock woodTraversable;
-	private static FilterBlock woodReturn;	
+	private static BlockTypeCollection woodTraversable;
+	private static BlockTypeCollection woodReturn;	
 	
 	
 	public enum UnitType{
@@ -48,11 +48,11 @@ public class UnitEntity {
 		,MINE //5-15, with slight variation.
 	}	
 	
-	static{ //Block searching and filters setup
-		woodTraversable = (b) -> { 
-			return (b == Blocks.AIR) || (b == Blocks.LEAVES); };
-		woodReturn = (b) -> { return b == Blocks.LOG;};
-	}
+//	static{ //Block searching and filters setup
+//		woodTraversable = (b) -> { 
+//			return (b == Blocks.AIR) || (b == Blocks.LEAVES); };
+//		woodReturn = (b) -> { return b == Blocks.LOG;};
+//	}
 	
 	
 	
