@@ -26,29 +26,43 @@ public class TileLoadManager extends NBTSaveObject{
 	//private ArrayList<HashMap<BlockPos,TileLogic>> tilebuckets;
 	private World world; //TODO: Storing world locally for access during readNBT, will change if it's a problem
 	
-	private final double LIMIT = 10.0;
+	//private NBTTagCompound localnbt; //TODO for now not tracking NBT changes, reconsider later
 	
+	private double tilePerTickLimit = 10.0;	
 	private int tilesPerTick = -1;
 	private int tickNumber = 1;
 	private int ticksPerCycle = 1;
 	private boolean performReset = false;
 	
+	private String dataname = "THISISANAME";
+	
 	
 	
 	public TileLoadManager( TeinteWorldSavedData savedata ,World world) {
+		this( savedata ,world ,10);
+	}
+	
+	
+//	public TileLoadManager( TeinteWorldSavedData savedata ,World world ,String id) {
+//		this( savedata ,world ,10);
+//	}
+	
+	
+	public TileLoadManager( TeinteWorldSavedData savedata ,World world ,int tilePerTickLimit) {
 		super( savedata);
-//		this.tilebuckets = new ArrayList<>();
-//		this.tilebuckets.add( new HashMap<BlockPos ,TileLogic>());
+		this.world = world;
+		this.tilePerTickLimit = tilePerTickLimit;
 		this.tiles = new HashMap<>();
 		this.tileclone = (HashMap<BlockPos, TileLogic>) this.tiles.clone();
-		this.world = world;
-	}
+	}	
+	
 
 	
 	
 	
+	@Override
 	public String getDataName() {
-		return "TileLogicSaveData";
+		return this.dataname;
 	}
 	
 	
@@ -94,16 +108,16 @@ public class TileLoadManager extends NBTSaveObject{
 		
 		int activeTileCount = this.tiles.size();
 
-		double callsPerCycle = Math.ceil( activeTileCount / LIMIT);
+		double callsPerCycle = Math.ceil( activeTileCount / tilePerTickLimit);
 		this.tilesPerTick = (int) Math.round( activeTileCount / callsPerCycle);
 		this.tickNumber = 0;
 		this.ticksPerCycle = (int) callsPerCycle;
 		this.tileclone = (HashMap<BlockPos, TileLogic>) this.tiles.clone();
 		this.performReset = false;
 
-		System.out.println( "Active Tile Count: " + activeTileCount + "  |Total Tile Count: " + this.tiles.size());
-		System.out.println( "Ticks per Cycle: " + callsPerCycle);
-		System.out.println( "Tiles per Tick: " + this.tilesPerTick);
+//		System.out.println( "Active Tile Count: " + activeTileCount + "  |Total Tile Count: " + this.tiles.size());
+//		System.out.println( "Ticks per Cycle: " + callsPerCycle);
+//		System.out.println( "Tiles per Tick: " + this.tilesPerTick);
 
 	}
 	
@@ -151,7 +165,7 @@ public class TileLoadManager extends NBTSaveObject{
 			}
 		}
 		
-		System.out.println( tilesThisTick);
+//		System.out.println( tilesThisTick);
 		
 		for( BlockPos pos : toRemove) {
 			this.remove( pos);
@@ -219,6 +233,7 @@ public class TileLoadManager extends NBTSaveObject{
 
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
+//		this.localnbt = compound;
 		int tlCount = compound.getInteger( "numOfTLs");
 		
 //		HashMap<BlockPos,TileLogic> tiles = this.tilebuckets.get(0);

@@ -1,4 +1,4 @@
-package witherwar.util;
+package witherwar.utility;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +39,23 @@ public class BlockUtil {
 		return true;
 	}
 	
+	
+	public static boolean notTouchingBlockType( BlockPos pos ,BlockTypeCollection dontTouch ,World world) {
+		
+		HashMap<BlockPos,Block> neighbors = getNeighborBlocks( pos ,world);
+		for( Block b : neighbors.values()) {
+			if( dontTouch.includes(b)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	
+	public static boolean notTouchingAir( BlockPos pos ,World world) {
+		return notTouchingBlockType( pos ,new HashBlockCollection( Blocks.AIR) ,world );
+	}
 
 	
 	public static HashMap<BlockPos,Block> getNeighborBlocks( BlockPos pos ,World world){
@@ -49,7 +66,7 @@ public class BlockUtil {
 	public static HashMap<BlockPos,Block> getNeighborBlocks( BlockPos pos ,World world ,boolean random){
 		Symbol[] symbols;
 		if( random) {
-			symbols = Symbol.randomValues();
+			symbols = Symbol.randomValues(6);
 		}else {
 			symbols = Symbol.nonNullValues();
 		}

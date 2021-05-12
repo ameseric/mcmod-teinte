@@ -1,18 +1,21 @@
 package witherwar.tileentity;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
 import witherwar.TEinTE;
-import witherwar.util.BlockTypeCollection;
-import witherwar.util.BlockUtil;
-import witherwar.util.HashBlockCollection;
+import witherwar.system.GrowthSystem;
+import witherwar.utility.BlockTypeCollection;
+import witherwar.utility.BlockUtil;
+import witherwar.utility.HashBlockCollection;
 
 
 
@@ -23,13 +26,24 @@ public class KaliCoreTile extends TileLogic{
 	
 	private final BlockTypeCollection dontChange = new HashBlockCollection();
 	
+	private GrowthSystem growth = new GrowthSystem();
+	
 	
 	public KaliCoreTile(BlockPos pos) {
 		super(pos ,ObjectCatalog.TERRA_KALI ,0 ,true ,10);
+		
 		this.dontChange.add( Blocks.OBSIDIAN);
 		this.dontChange.add( Blocks.AIR);
 		this.dontChange.add( ObjectCatalog.TERRA_KALI);
 		this.dontChange.add( ObjectCatalog.ASH_REPL_BLOCK);
+		this.dontChange.add( Blocks.BEDROCK);
+		
+		this.growth.add( EnumFacing.UP);
+		this.growth.add( EnumFacing.UP);
+		ArrayList<EnumFacing> segment = new ArrayList<>();
+		segment.add(EnumFacing.EAST);
+		segment.add( EnumFacing.WEST);
+		this.growth.add( segment);
 	}
 
 

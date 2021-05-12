@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import witherwar.system.SystemLindenmayer.Rule;
-import witherwar.util.Symbol;
-import witherwar.util.WeightedChoice;
+import witherwar.utility.Symbol;
+import witherwar.utility.WeightedChoice;
 
 
 

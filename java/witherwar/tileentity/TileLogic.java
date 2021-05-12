@@ -42,7 +42,7 @@ public abstract class TileLogic implements NBTSaveFormat{
 	
 	private boolean updatedOnTick = false;
 	
-	private int ticksUntilUpdate = 1;
+	protected int ticksUntilUpdate = 1;
 	private int tickcountAtLastUpdate = 0;
 	
 	private int id = -1;
@@ -70,10 +70,10 @@ public abstract class TileLogic implements NBTSaveFormat{
 			this.tickcountAtLastUpdate = tickcount;
 		}
 		
-		int tickDiff = tickcount - this.tickcountAtLastUpdate;
-		System.out.println( tickDiff + " | " + this.ticksUntilUpdate + " | " + this.tickcountAtLastUpdate);
+		int delta = tickcount - this.tickcountAtLastUpdate;
+//		System.out.println( delta + " | " + this.ticksUntilUpdate + " | " + this.tickcountAtLastUpdate);
 
-		if( !this.amIDead && this.updatedOnTick && tickDiff >= this.ticksUntilUpdate ) {
+		if( !this.amIDead && this.updatedOnTick && delta >= this.ticksUntilUpdate ) {
 			this.tickcountAtLastUpdate = tickcount;
 			ticklogic( world);
 		}
@@ -96,7 +96,16 @@ public abstract class TileLogic implements NBTSaveFormat{
 	}	
 	public BlockPos getPos() {
 		return this.pos;
-	}	
+	}
+	public double getX() {
+		return this.pos.getX();
+	}
+	public double getY() {
+		return this.pos.getY();
+	}
+	public double getZ() {
+		return this.pos.getZ();
+	}
 	public Block getHomeBlock() {
 		return this.homeBlock;
 	}

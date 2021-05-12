@@ -9,7 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import witherwar.ObjectCatalog;
-import witherwar.util.Symbol;
+import witherwar.utility.Symbol;
 
 //Needs cleaning, too many flag variables.
 public class TileEntityMaw extends TileEntityCustomTickingBase{

@@ -21,7 +21,7 @@ import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
 import witherwar.TEinTE;
-import witherwar.util.Symbol;
+import witherwar.utility.Symbol;
 
 
 

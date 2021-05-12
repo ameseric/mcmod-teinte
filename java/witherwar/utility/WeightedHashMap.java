@@ -1,4 +1,4 @@
-package witherwar.util;
+package witherwar.utility;
 
 import java.util.HashMap;
 import java.util.Random;

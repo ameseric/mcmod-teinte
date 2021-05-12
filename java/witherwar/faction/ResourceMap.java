@@ -8,7 +8,7 @@ import java.util.List;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import witherwar.util.BlockUtil;
+import witherwar.utility.BlockUtil;
 
 public class ResourceMap {
 	

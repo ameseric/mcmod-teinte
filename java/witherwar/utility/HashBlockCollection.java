@@ -1,10 +1,11 @@
-package witherwar.util;
+package witherwar.utility;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 
 /**
  * 
@@ -15,10 +16,18 @@ import net.minecraft.block.Block;
  */
 
 public class HashBlockCollection implements BlockTypeCollection{
+	
+	
 	private HashSet<Block> blocks;
 	
 	public HashBlockCollection() {
 		this.blocks = new HashSet<Block>();
+	};
+	
+	
+	public HashBlockCollection( Block b) {
+		this.blocks = new HashSet<Block>();
+		this.blocks.add( b);
 	};
 	
 	

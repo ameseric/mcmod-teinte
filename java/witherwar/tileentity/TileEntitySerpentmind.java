@@ -15,11 +15,11 @@ import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
 import witherwar.TEinTE;
 import witherwar.system.SystemLindenmayer;
-import witherwar.util.BlockTypeCollection;
-import witherwar.util.HashBlockCollection;
-import witherwar.util.SearchBlock;
-import witherwar.util.Symbol;
-import witherwar.util.WeightedChoice;
+import witherwar.utility.BlockTypeCollection;
+import witherwar.utility.HashBlockCollection;
+import witherwar.utility.SearchBlock;
+import witherwar.utility.Symbol;
+import witherwar.utility.WeightedChoice;
 
 
 

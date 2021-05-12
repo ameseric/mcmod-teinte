@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 import witherwar.alchemy.Fluid;
 import witherwar.alchemy.FluidContainer;
 import witherwar.block.FluidContainerBlock;
-import witherwar.util.BlockUtil;
+import witherwar.utility.BlockUtil;
 
 public abstract class FluidContainerTile extends TileLogic implements FluidContainer{
 

@@ -1,4 +1,4 @@
-package witherwar.util;
+package witherwar.utility;
 
 import net.minecraft.block.Block;
 

@@ -1,4 +1,4 @@
-package witherwar.util;
+package witherwar.utility;
 
 
 /**
@@ -44,7 +44,7 @@ public class SearchBlock {
 		
 		Symbol[] values;
 		if( random) {
-			values = Symbol.randomValues();
+			values = Symbol.randomValues(3);
 		}else {
 			values = Symbol.values();
 		}

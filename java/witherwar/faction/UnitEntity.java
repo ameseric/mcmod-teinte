@@ -11,9 +11,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import witherwar.faction.ResourceMap.RMChunk;
-import witherwar.util.BlockTypeCollection;
-import witherwar.util.BlockUtil;
-import witherwar.util.SearchBlock;
+import witherwar.utility.BlockTypeCollection;
+import witherwar.utility.BlockUtil;
+import witherwar.utility.SearchBlock;
 
 public class UnitEntity {
 	private static int count = 0;

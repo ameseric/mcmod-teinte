@@ -12,8 +12,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import witherwar.faction.UnitEntity.Job;
 import witherwar.faction.UnitEntity.UnitType;
-import witherwar.util.BlockUtil;
-import witherwar.util.WeightedHashMap;
+import witherwar.utility.BlockUtil;
+import witherwar.utility.WeightedHashMap;
 
 /*
  * Note that, for this class, "materials" denote items collected from the world

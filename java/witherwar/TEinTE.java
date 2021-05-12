@@ -44,6 +44,7 @@ import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.IProxy;
 import witherwar.region.RegionManager;
+import witherwar.system.InvasionSystem;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
@@ -69,9 +70,10 @@ public class TEinTE
 	
 	private TeinteWorldSavedData savedata;
 	private RegionManager regions;
+	private InvasionSystem invader;
 	private SystemBlockDegrade sysBlockDegrade;  
 	private SystemPower sysPower;
-	private TileLoadManager blockEntities;
+	private TileLoadManager tiles;
 	private int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
@@ -201,9 +203,10 @@ public class TEinTE
     	
 		
 		this.regions = new RegionManager( this.savedata ,world);
-		this.blockEntities = new TileLoadManager( this.savedata ,world);
+		this.tiles = new TileLoadManager( this.savedata ,world);
+		this.invader = new InvasionSystem();
 		
-		NBTSaveObject[] objectsToSave = { this.blockEntities ,this.regions};		
+		NBTSaveObject[] objectsToSave = { this.tiles ,this.regions};		
 		this.savedata.setObjectsToSave( objectsToSave);
 		this.savedata.forceReadFromNBT();
 		
@@ -219,7 +222,7 @@ public class TEinTE
     public void onServerTick( TickEvent.ServerTickEvent event) {
     	
     	
-    	WorldServer world = DimensionManager.getWorld(0);    	
+    	WorldServer world = DimensionManager.getWorld(0);
 		if( world.isRemote || event.phase == Phase.START) { return;} //if logical client or tick.start phase, return
 		
 		//System.out.println( world.getWorldType().getName());
@@ -231,11 +234,13 @@ public class TEinTE
         	
     	//this.factions.tick(world);
 
-		this.blockEntities.tick( tickcount ,world);
+		this.tiles.tick( tickcount ,world);
+		
+		this.invader.tick( tickcount ,world);
     	
     	
 		if( config.allowRegionOverlay) {
-			this.regions.tick( tickcount ,world); //TODO going to change when regionMap is removed from savedata
+			this.regions.tick( tickcount ,world);
 		}
         	
 	    			
@@ -276,17 +281,17 @@ public class TEinTE
 	
 	
 	public void registerBlockEntity( TileLogic be) {
-		this.blockEntities.add( be);
+		this.tiles.add( be);
 	}
 	
 	
 	public void removeBlockEntity( BlockPos pos) {
-		this.blockEntities.remove( pos);
+		this.tiles.remove( pos);
 	}
 	
 	
 	public TileLogic getTileLogic( BlockPos pos) {
-		return this.blockEntities.get(pos);
+		return this.tiles.get(pos);
 	}
 	
 	

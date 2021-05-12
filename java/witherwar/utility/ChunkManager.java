@@ -1,4 +1,4 @@
-package witherwar.util;
+package witherwar.utility;
 
 import java.util.ArrayList;
 import java.util.List;

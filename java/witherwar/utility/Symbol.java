@@ -1,4 +1,4 @@
-package witherwar.util;
+package witherwar.utility;
 
 
 import java.util.ArrayList;
@@ -39,9 +39,9 @@ public enum Symbol{
 	public int getZ() {	return this.mod.getZ();	}
 	
 	
-	public static Symbol[] randomValues() {
-		return Symbol.randomValues( 3);
-	}
+//	public static Symbol[] randomValues() {
+//		return Symbol.randomValues( 3);
+//	}
 	
 	public static List<Symbol> shuffledValues() {
 		List<Symbol> list = Arrays.asList( Symbol.values());

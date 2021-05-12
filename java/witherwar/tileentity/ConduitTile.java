@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
 import witherwar.alchemy.Fluid;
 import witherwar.alchemy.FluidContainer;
-import witherwar.util.BlockUtil;
+import witherwar.utility.BlockUtil;
 
 
 
