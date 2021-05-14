@@ -1,21 +1,32 @@
 package witherwar;
 
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketEntityVelocity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.Config.Name;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -27,6 +38,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -34,6 +46,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.network.MessageRegionOverlayOn;
 import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
+import witherwar.network.PlayerDashMessage;
+import witherwar.network.PlayerDashMessage.HandlePlayerDashMessage;
 import witherwar.command.CommandDarkenSky;
 import witherwar.command.CommandTeleportWW;
 import witherwar.disk.NBTSaveFormat;
@@ -102,7 +116,8 @@ public class TEinTE
     	networkwrapper.registerMessage( HandleMessageRegionOverlayOn.class, MessageRegionOverlayOn.class, 0, Side.CLIENT);
     	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.CLIENT);
     	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.SERVER);
-    	
+    	networkwrapper.registerMessage( HandlePlayerDashMessage.class ,PlayerDashMessage.class, 2, Side.SERVER);
+
     	WorldCatalog.registerDimensions();
     	
 		proxy.preInit();
@@ -137,6 +152,40 @@ public class TEinTE
  
 
  //------------------------------  Non-Init Event Handlers ------------------------------------------------------------//
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onRenderBlockOverlay( RenderBlockOverlayEvent event) {
+//    	System.out.println( "OVERLAY TEST");
+    }
+    
+    
+    
+    @SubscribeEvent
+    public void onChunkLoad( ChunkEvent.Load event) {
+//    	System.out.println( "OVERLAY TEST");
+    }
+    
+    
+    
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void test( EntityViewRenderEvent.FogDensity event) {
+//	    event.setDensity(0.1F);
+//	    event.setCanceled(true);
+    }
+    
+    
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void test( EntityViewRenderEvent.FogColors event) {
+//	    event.setBlue(0.1F);
+//	    event.setGreen(0.1F);
+//	    event.setRed(0.1F);
+//
+//	    event.setCanceled(true);
+    }
+    
+    
     
     @SubscribeEvent
     //Triggers on client and server
@@ -171,18 +220,62 @@ public class TEinTE
     	this.regions.addPlayer( event.player);
     }
     
+
+
+    private static Field KEYBIND_ARRAY = null;    
+    static {
+    	try {
+			KEYBIND_ARRAY = KeyBinding.class.getDeclaredField("KEYBIND_ARRAY");
+			KEYBIND_ARRAY.setAccessible(true);
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		}
+    }
+
+	@SubscribeEvent
+    @SideOnly(Side.CLIENT)
+	public void onClientTick(TickEvent.ClientTickEvent event) throws Exception {
+
+		if(event.phase.equals(Phase.END)){
+			Map<String, KeyBinding> binds = (Map<String, KeyBinding>) KEYBIND_ARRAY.get(null);
+
+			
+	    	for (String bind : binds.keySet()) {
+				if(binds.get(bind).isPressed()){
+					System.out.println(bind + " - " + binds.get(bind).getDisplayName());
+					break;
+				}
+			}
+
+		}
+	}
+	
+	@SubscribeEvent
+    @SideOnly(Side.CLIENT) //Look over Jaeblar to make custom key binding... 
+	public void test( InputEvent.KeyInputEvent event) throws Exception{
+		Map<String, KeyBinding> binds = (Map<String, KeyBinding>) KEYBIND_ARRAY.get(null);
+		if( binds.get("key.sneak").isPressed()) {
+			TEinTE.networkwrapper.sendToServer( new PlayerDashMessage( ));
+		}
+		
+	}
+	
+    
+    
     
     
     @SubscribeEvent
     //Appears to be server-side only
     public void onPlayerBlockPlace( BlockEvent.PlaceEvent event) {
     	BlockPos pos = event.getPos();
-    	event.getPlayer();
-    	
-    	//got another particle to work, some particles need specific arguments, also
+        
+        //got another particle to work, some particles need specific arguments, also
     	//need to call through the proper channels
     	WorldServer world = (WorldServer) event.getWorld();
     	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY(),pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
+    	
     	
     	
     }
@@ -229,7 +322,11 @@ public class TEinTE
     	
     	tickcount += 1;
     	
-    		
+//    	List<EntityPlayer> players = world.playerEntities;
+//    	for( EntityPlayer player : players) {
+//    		System.out.println(player.lastTickPosX);
+//    		System.out.println(player.posX);
+//    	}
     		
         	
     	//this.factions.tick(world);
@@ -249,7 +346,6 @@ public class TEinTE
 	//@SubscribeEvent
 	//triggers twice per tick, for 'start' and 'end'
 	//triggers independently for each dimension
-    //TODO: Move all server-only code into onServerTick
 	public void onWorldTick( TickEvent.WorldTickEvent event){
 		
 		if( event.world.isRemote) { return;} //if logical client, return

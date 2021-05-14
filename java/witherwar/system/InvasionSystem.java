@@ -1,5 +1,8 @@
 package witherwar.system;
 
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import witherwar.ObjectCatalog;
@@ -11,7 +14,12 @@ public class InvasionSystem {
 	private double spawnChance = SPAWN_INC;
 	
 
-	
+/*
+ * 
+ *   ((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(MobEffects.WITHER, 200));
+ *    
+ * 
+ */
 	
 	
 	

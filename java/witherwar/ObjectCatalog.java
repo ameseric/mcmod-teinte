@@ -93,6 +93,8 @@ public class ObjectCatalog {
 		
 	}
 	
+	
+	
 	private ObjectCatalog() {}
 
 	
@@ -100,9 +102,11 @@ public class ObjectCatalog {
 		return blocksToRegister;
 	}
 	
+	
 	public static List<NewEntity> getNewEntities(){
 		return entitiesToRegister;
 	}
+	
 	
 	public static List<NewTileEntity> getNewTileEntities(){
 		return tileEntitesToRegister;

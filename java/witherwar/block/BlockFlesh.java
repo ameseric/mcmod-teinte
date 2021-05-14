@@ -1,16 +1,24 @@
 package witherwar.block;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialLiquid;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -22,13 +30,12 @@ import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLogicContainer;
 
 
-public class BlockFlesh extends DirectionalBlock implements TileLogicContainer{
+public class BlockFlesh extends DirectionalBlock{
 	
 	public static final MaterialFlesh matFlesh = new MaterialFlesh( MapColor.TNT);
-	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 	
 	public BlockFlesh() {
-        super( matFlesh);
+        super( matFlesh); //try making a block that can use Material.WATER ?
 	    setHardness(8F);
 		setUnlocalizedName( "flesh");
 		setSoundType( SoundType.SLIME);
@@ -51,23 +58,66 @@ public class BlockFlesh extends DirectionalBlock implements TileLogicContainer{
 		return BlockRenderLayer.SOLID;
 	}
 	
+    @Override
+	public Vec3d modifyAcceleration(World worldIn, BlockPos pos, Entity entityIn, Vec3d motion)
+    {
+        return motion.add(new Vec3d(1,0,0));
+    }
+	
+    @Nullable
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
+    {
+        return NULL_AABB;
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state)
+    {
+        return false;
+    }
+
+    
+    @Override
+    public boolean isCollidable()
+    {
+        return false;
+    }
+	
 	@Override
 	public boolean hasTileEntity( IBlockState state) {
 		return false;
 	}
-
-
-	@Override
-	public TileLogic getTileLogic(BlockPos pos) {
-		return null;
-	}
 	
-	
+    public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
+    {
+        return true;
+    }
 
-	@Override
-	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new ReplicatingTile( pos)); //TODO consider comparing classes for TileLogic
-	}
+
+    @Override
+    @SideOnly (Side.CLIENT)
+    public Vec3d getFogColor(World world, BlockPos pos, IBlockState state, Entity entity, Vec3d originalColor, float partialTicks)
+    {
+//        Vec3d viewport = net.minecraft.client.renderer.ActiveRenderInfo.projectViewFromEntity(entity, partialTicks);
+//
+//        if (state.getMaterial().isLiquid())
+//        {
+//            float height = 0.0F;
+//            if (state.getBlock() instanceof BlockLiquid)
+//            {
+//                height = getLiquidHeightPercent(5.0) - 0.11111111F;
+//            }
+//            float f1 = (float) (pos.getY() + 1) - height;
+//            if (viewport.y > (double)f1)
+//            {
+//                BlockPos upPos = pos.up();
+//                IBlockState upState = world.getBlockState(upPos);
+//                return upState.getBlock().getFogColor(world, upPos, upState, entity, originalColor, partialTicks);
+//            }
+//        }
+
+        return new Vec3d(0.6F, 0.8F, 0.6F); //RGB
+    }
 	
 
 	
@@ -78,12 +128,20 @@ public class BlockFlesh extends DirectionalBlock implements TileLogicContainer{
 
 
 
-
+//NOTE: Materials that block movement throw an overlay render when clipping.
+// Materials that don't block movement don't through an overlay, unless water or lava?
+//Must be hard-coded somewhere else...
 class MaterialFlesh extends Material{
 
 	public MaterialFlesh(MapColor color) {
 		super(color);
 		this.setRequiresTool();
 	}
+	
+	
+	@Override
+    public boolean blocksMovement(){
+        return false;
+    }
 	
 }
