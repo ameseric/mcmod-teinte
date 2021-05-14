@@ -20,9 +20,12 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.Config.Name;
+import net.minecraftforge.common.config.Config.RangeInt;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -222,7 +225,7 @@ public class TEinTE
 	public void onClientTick(TickEvent.ClientTickEvent event) throws Exception {
 
 		if(event.phase.equals(Phase.END)){			
-			if( proxy.isDashing()) {
+			if( config.allowPlayerDash && proxy.isDashing()) {
 				TEinTE.networkwrapper.sendToServer( new PlayerDashMessage( ));
 			}
 
@@ -322,6 +325,17 @@ public class TEinTE
         	
 	    			
     }
+    
+    
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onConfigChanged( ConfigChangedEvent.OnConfigChangedEvent event) {
+    	System.out.println("Triggering config change...");
+    	ConfigManager.sync( MODID ,Config.Type.INSTANCE);
+    }
+
+    
+    
   
 	//@SubscribeEvent
 	//triggers twice per tick, for 'start' and 'end'
@@ -446,6 +460,16 @@ public class TEinTE
 		@Comment( value= {"Rate of invasions when playing with Invasion turned on."})
 		@Name( value="Invasion Intensity")
 		public static int invasionIntensity = 5;
+		
+		@Comment( value= {"Amount of Food consumed when dashing."})
+		@Name( value="Hunger cost of Dash")
+		@RangeInt( min=0 ,max=40)
+		public static int dashHungerCost = 1;
+		
+		
+		@Comment( value= {"Allow Player Dash"})
+		@Name( value="Allow Player Dash")
+		public static boolean allowPlayerDash = true;
 	}
 	
 

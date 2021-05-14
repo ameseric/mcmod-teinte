@@ -57,13 +57,13 @@ public class PlayerDashMessage implements IMessage {
 		    	
 		    	if( traj.x == 0 && traj.z == 0) {
 			        Vec3d facing = player.getForward();
-			    	player.motionX = facing.x * 1.2;
-			    	player.motionZ = facing.z * 1.2;			        
+			    	player.motionX = facing.x;// * 1.2;
+			    	player.motionZ = facing.z;// * 1.2;			        
 		    	}else {
-			    	player.motionX = 1.2 * traj.x;
-			    	player.motionZ = 1.2 * traj.z;		    		
+			    	player.motionX = traj.x;//* 1.2;
+			    	player.motionZ = traj.z;//* 1.2;    		
 		    	}
-		    	player.getFoodStats().addExhaustion( 1F);
+		    	player.getFoodStats().addExhaustion( (float)TEinTE.config.dashHungerCost);
 	            player.connection.sendPacket(new SPacketEntityVelocity(player));
 		      });
 			
