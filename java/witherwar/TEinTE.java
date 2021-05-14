@@ -1,21 +1,16 @@
 package witherwar;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Queue;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketEntityVelocity;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -38,7 +33,6 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -50,22 +44,19 @@ import witherwar.network.PlayerDashMessage;
 import witherwar.network.PlayerDashMessage.HandlePlayerDashMessage;
 import witherwar.command.CommandDarkenSky;
 import witherwar.command.CommandTeleportWW;
-import witherwar.disk.NBTSaveFormat;
 import witherwar.disk.NBTSaveObject;
 import witherwar.disk.TeinteWorldSavedData;
 import witherwar.faction.FactionManager;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
-import witherwar.proxy.IProxy;
+import witherwar.proxy.Proxy;
 import witherwar.region.RegionManager;
 import witherwar.system.InvasionSystem;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
-import witherwar.tileentity.TileLogicContainer;
 import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
-import witherwar.worlds.WorldTypeTeinte;
 
 
 //TODO: Decide whether Manager classes can/should be discarded.
@@ -80,6 +71,8 @@ public class TEinTE
 	public static final SimpleNetworkWrapper networkwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
     public static CreativeTabs teinteTab;
     
+    public HashMap<EntityPlayer ,ArrayDeque<Vec3d>> lastPlayerPos = new HashMap<>(); //TODO see if better solution
+    
     public FactionManager factions = new FactionManager();
 	
 	private TeinteWorldSavedData savedata;
@@ -91,7 +84,7 @@ public class TEinTE
 	private int tickcount = 0;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
-	public static IProxy proxy;
+	public static Proxy proxy;
 	
 	@Mod.Instance("witherwar")
 	public static TEinTE instance;
@@ -110,8 +103,9 @@ public class TEinTE
 				return new ItemStack( Items.END_CRYSTAL);
 			}};
 			
-		ObjectCatalog.registerPreInitObjects();		
-   	
+		ObjectCatalog.registerPreInitObjects();
+		
+  	
     	
     	networkwrapper.registerMessage( HandleMessageRegionOverlayOn.class, MessageRegionOverlayOn.class, 0, Side.CLIENT);
     	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.CLIENT);
@@ -222,45 +216,28 @@ public class TEinTE
     
 
 
-    private static Field KEYBIND_ARRAY = null;    
-    static {
-    	try {
-			KEYBIND_ARRAY = KeyBinding.class.getDeclaredField("KEYBIND_ARRAY");
-			KEYBIND_ARRAY.setAccessible(true);
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		}
-    }
 
 	@SubscribeEvent
     @SideOnly(Side.CLIENT)
 	public void onClientTick(TickEvent.ClientTickEvent event) throws Exception {
 
-		if(event.phase.equals(Phase.END)){
-			Map<String, KeyBinding> binds = (Map<String, KeyBinding>) KEYBIND_ARRAY.get(null);
-
-			
-	    	for (String bind : binds.keySet()) {
-				if(binds.get(bind).isPressed()){
-					System.out.println(bind + " - " + binds.get(bind).getDisplayName());
-					break;
-				}
+		if(event.phase.equals(Phase.END)){			
+			if( proxy.isDashing()) {
+				TEinTE.networkwrapper.sendToServer( new PlayerDashMessage( ));
 			}
 
 		}
 	}
 	
-	@SubscribeEvent
-    @SideOnly(Side.CLIENT) //Look over Jaeblar to make custom key binding... 
-	public void test( InputEvent.KeyInputEvent event) throws Exception{
-		Map<String, KeyBinding> binds = (Map<String, KeyBinding>) KEYBIND_ARRAY.get(null);
-		if( binds.get("key.sneak").isPressed()) {
-			TEinTE.networkwrapper.sendToServer( new PlayerDashMessage( ));
-		}
-		
-	}
+//	@SubscribeEvent
+//    @SideOnly(Side.CLIENT)
+//	public void onKeyPress( InputEvent.KeyInputEvent event) throws Exception{
+//		Map<String, KeyBinding> binds = (Map<String, KeyBinding>) KEYBIND_ARRAY.get(null);
+//		if( dashKeybind.isPressed()) {
+//			TEinTE.networkwrapper.sendToServer( new PlayerDashMessage( ));
+//		}
+//		
+//	}
 	
     
     
@@ -316,28 +293,31 @@ public class TEinTE
     	
     	
     	WorldServer world = DimensionManager.getWorld(0);
-		if( world.isRemote || event.phase == Phase.START) { return;} //if logical client or tick.start phase, return
+		if( world.isRemote) { return;} //if logical client return
 		
-		//System.out.println( world.getWorldType().getName());
-    	
-    	tickcount += 1;
-    	
-//    	List<EntityPlayer> players = world.playerEntities;
-//    	for( EntityPlayer player : players) {
-//    		System.out.println(player.lastTickPosX);
-//    		System.out.println(player.posX);
-//    	}
-    		
-        	
-    	//this.factions.tick(world);
+		
+		if( event.phase == Phase.START) {
 
-		this.tiles.tick( tickcount ,world);
+		}
 		
-		this.invader.tick( tickcount ,world);
-    	
-    	
-		if( config.allowRegionOverlay) {
-			this.regions.tick( tickcount ,world);
+		
+		if( event.phase == Phase.END) {
+			
+	    	
+	    	this.logPlayerPosition( world);
+	    	
+			
+			this.tiles.tick( tickcount ,world);
+			
+			this.invader.tick( tickcount ,world);
+	    	
+	    	
+			if( config.allowRegionOverlay) {
+				this.regions.tick( tickcount ,world);
+			}
+			
+			
+			tickcount += 1;
 		}
         	
 	    			
@@ -417,6 +397,25 @@ public class TEinTE
 		}
 	}
 **/	
+
+	
+//------------------------------  Assist Methods ------------------------------------------------------------//  
+	
+	private void logPlayerPosition( WorldServer world) {
+    	for( EntityPlayer player : world.playerEntities) {
+    		if( !this.lastPlayerPos.containsKey(player)) {
+    			this.lastPlayerPos.put( player ,new ArrayDeque<>());
+    		}
+    		
+    		ArrayDeque<Vec3d> posQ = this.lastPlayerPos.get( player);
+    		
+    		if( posQ.size() > 1) {
+    			posQ.poll();
+    		}	    		
+    		Vec3d pos = new Vec3d( player.lastTickPosX ,player.lastTickPosY ,player.lastTickPosZ);
+    		posQ.add( pos);
+    	}
+	}
 
 	
 	

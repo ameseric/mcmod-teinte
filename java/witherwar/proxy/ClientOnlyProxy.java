@@ -1,16 +1,20 @@
 package witherwar.proxy;
 
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderGhast;
 import net.minecraft.client.renderer.entity.RenderWitherSkeleton;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent.Load;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import witherwar.ObjectCatalog;
@@ -22,8 +26,10 @@ import witherwar.gui.GuiEditGuidestone;
 import witherwar.gui.TeinteGUI;
 import witherwar.models.BlobTestRender;
 
-public class ClientOnlyProxy implements IProxy{
+public class ClientOnlyProxy implements Proxy{
 	public static TeinteGUI teinteGUI;
+	public static KeyBinding dashKeybind = new KeyBinding("key.dash.desc", Keyboard.KEY_P, "key.magicbeans.teinte");
+
 	
 //	private HashMap< Class<? extends Entity> ,Class<? extends Render>> entityRenderTable = new HashMap<>();
 //	{
@@ -65,6 +71,7 @@ public class ClientOnlyProxy implements IProxy{
 	public void postInit() {
     	teinteGUI = new TeinteGUI();
     	MinecraftForge.EVENT_BUS.register( teinteGUI.renderHandler);
+    	ClientRegistry.registerKeyBinding( dashKeybind);
 	}
 
 	
@@ -114,6 +121,15 @@ public class ClientOnlyProxy implements IProxy{
 	@Override
 	public void onWorldLoad(Load event) {
 		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	@Override
+	public boolean isDashing() {
+		return dashKeybind.isPressed();
 		
 	}
 

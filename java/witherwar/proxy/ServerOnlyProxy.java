@@ -5,7 +5,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class ServerOnlyProxy implements IProxy{
+public class ServerOnlyProxy implements Proxy{
 	
 	public void preInit() {
 	}
@@ -39,6 +39,12 @@ public class ServerOnlyProxy implements IProxy{
 	@Override
 	public void onWorldLoad( WorldEvent.Load event) {
 		
+	}
+
+	@Override
+	public boolean isDashing() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 

@@ -11,3 +11,5 @@ entity.serpent_wither_skeleton.name=SerpentWither
 itemGroup.witherwar_tab=The End Is Not the End
 generator.pillar=Pillar
 generator.pillar.info=A transient world of Ocean.
+key.dash.desc=Dash
+key.magicbeans.teinte=The End

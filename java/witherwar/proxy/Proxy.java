@@ -5,7 +5,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public interface IProxy {
+public interface Proxy {
 	
 	abstract public boolean isDedicatedServer();
 	
@@ -27,6 +27,9 @@ public interface IProxy {
     
     
     void openGui( int ID ,IMessage msg);
+    
+    
+    public boolean isDashing();
 	
 	
 }

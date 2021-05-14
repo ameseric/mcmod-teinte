@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.server.FMLServerHandler;
+import witherwar.TEinTE;
 import witherwar.proxy.ClientOnlyProxy;
 
 
@@ -43,20 +44,26 @@ public class PlayerDashMessage implements IMessage {
 			WorldServer world = player.getServerWorld();
 			
 		    world.addScheduledTask(() -> {
+		    	Vec3d lastPos = TEinTE.instance.lastPlayerPos.get( player).poll();
+		    	Vec3d currentPos = player.getPositionVector();
+		    	Vec3d traj = currentPos.subtract( lastPos);
+		    	traj = new Vec3d( traj.x ,0 ,traj.z).normalize();
+//		    	System.out.println( lastPos);
+//		    	System.out.println( currentPos);
+//		    	System.out.println( traj);
+//		    	System.out.println( player.getForward());
+//		    	traj = traj.normalize();
+//		    	System.out.println( traj);
 		    	
-		    	
-		    	System.out.println( player.prevPosX);
-		    	System.out.println( player.posX);
-		    	System.out.println( player.lastTickPosX);
-		    	
-		    	if( player.motionX == 0 && player.motionZ == 0.0) {
+		    	if( traj.x == 0 && traj.z == 0) {
 			        Vec3d facing = player.getForward();
-			    	player.motionX = facing.x * 1.5;
-			    	player.motionZ = facing.z * 1.5;			        
+			    	player.motionX = facing.x * 1.2;
+			    	player.motionZ = facing.z * 1.2;			        
 		    	}else {
-			    	player.motionX *= 1.5;
-			    	player.motionZ *= 1.5;		    		
+			    	player.motionX = 1.2 * traj.x;
+			    	player.motionZ = 1.2 * traj.z;		    		
 		    	}
+		    	player.getFoodStats().addExhaustion( 1F);
 	            player.connection.sendPacket(new SPacketEntityVelocity(player));
 		      });
 			
