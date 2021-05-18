@@ -17,7 +17,7 @@ import witherwar.block.ConduitBlock;
 import witherwar.block.RitualBlock;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
-import witherwar.entity.BlobFlyingTestEntity;
+import witherwar.entity.FactionDroneEntity;
 import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
@@ -58,7 +58,7 @@ public class ObjectCatalog {
 		
 		entitiesToRegister.add( 	new NewEntity( 		EntitySerpentWither.class 		,"serpent_wither_skeleton" 	,2));
 		entitiesToRegister.add( 	new NewEntity( 		EntityMotusGhast.class 			,"motus_ghast" 				,3));
-		entitiesToRegister.add( 	new NewEntity( 		BlobFlyingTestEntity.class		,"test_blob" 				,4));
+		entitiesToRegister.add( 	new NewEntity( 		FactionDroneEntity.class		,"test_blob" 				,4));
 		
 		
 		tileEntitesToRegister.add( 	new NewTileEntity( 	TileEntitySerpentmind.class 	,"witherwar:tile_entity_serpentmind"));

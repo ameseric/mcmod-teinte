@@ -4,11 +4,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
-import witherwar.entity.BlobFlyingTestEntity;
+import witherwar.entity.FactionDroneEntity;
 import witherwar.entity.EntityMotusGhast;
 
 
-public class BlobTestRender extends RenderLiving<BlobFlyingTestEntity>{
+public class BlobTestRender extends RenderLiving<FactionDroneEntity>{
 //    private static final ResourceLocation GHAST_TEXTURES = new ResourceLocation("textures/entity/ghast/ghast.png");
     private static final ResourceLocation GHAST_TEXTURES = new ResourceLocation("witherwar:textures/entity/test_blob/ghast_yellow.png");
     private static final ResourceLocation GHAST_SHOOTING_TEXTURES = new ResourceLocation("textures/entity/ghast/ghast_shooting.png");
@@ -19,7 +19,7 @@ public class BlobTestRender extends RenderLiving<BlobFlyingTestEntity>{
     }
 
 
-    protected ResourceLocation getEntityTexture(BlobFlyingTestEntity entity)
+    protected ResourceLocation getEntityTexture(FactionDroneEntity entity)
     {
         return GHAST_TEXTURES;
     }

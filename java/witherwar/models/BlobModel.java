@@ -102,7 +102,7 @@ public class BlobModel extends ModelBase{
 		}
 		
 
-		this.spinY( this.body);
+//		this.spinY( this.body);
 //		this.spinZ( this.body);
 		
 		

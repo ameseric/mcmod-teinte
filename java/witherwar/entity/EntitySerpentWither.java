@@ -13,6 +13,7 @@ import net.minecraft.entity.monster.EntityWitherSkeleton;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import witherwar.TEinTE;
 
 public class EntitySerpentWither extends EntityWitherSkeleton{
 
@@ -36,11 +37,11 @@ public class EntitySerpentWither extends EntityWitherSkeleton{
         this.targetTasks.addTask(3, new EntityAINearestAttackableTarget<EntityIronGolem>(this, EntityIronGolem.class, true));
     }
 	
-/**	@Override
-	public boolean isValidLightLevel() {
-		return true;
-		
-	}**/
+//	@Override
+//    protected void despawnEntity() {
+//		TEinTE.instance.gemtest.saveEntity( this);
+//		super.despawnEntity();
+//	}
 	
 	
 }

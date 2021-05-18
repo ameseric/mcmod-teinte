@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Queue;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.MoverType;
+import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -49,11 +51,13 @@ import witherwar.command.CommandDarkenSky;
 import witherwar.command.CommandTeleportWW;
 import witherwar.disk.NBTSaveObject;
 import witherwar.disk.TeinteWorldSavedData;
+import witherwar.entity.EntitySerpentWither;
 import witherwar.faction.FactionManager;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.Proxy;
 import witherwar.region.RegionManager;
+import witherwar.system.GlobalEntityManager;
 import witherwar.system.InvasionSystem;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
@@ -77,6 +81,8 @@ public class TEinTE
     public HashMap<EntityPlayer ,ArrayDeque<Vec3d>> lastPlayerPos = new HashMap<>(); //TODO see if better solution
     
     public FactionManager factions = new FactionManager();
+    
+    public GlobalEntityManager gemtest = new GlobalEntityManager();
 	
 	private TeinteWorldSavedData savedata;
 	private RegionManager regions;
@@ -166,7 +172,7 @@ public class TEinTE
     
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public void test( EntityViewRenderEvent.FogDensity event) {
+    public void onFogDensity( EntityViewRenderEvent.FogDensity event) {
 //	    event.setDensity(0.1F);
 //	    event.setCanceled(true);
     }
@@ -174,12 +180,17 @@ public class TEinTE
     
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public void test( EntityViewRenderEvent.FogColors event) {
+    public void onFogColor( EntityViewRenderEvent.FogColors event) {
 //	    event.setBlue(0.1F);
 //	    event.setGreen(0.1F);
 //	    event.setRed(0.1F);
 //
 //	    event.setCanceled(true);
+    }
+    
+    
+    
+    public void onChunkUnload( ChunkEvent.Unload event) {
     }
     
     
@@ -254,7 +265,25 @@ public class TEinTE
         //got another particle to work, some particles need specific arguments, also
     	//need to call through the proper channels
     	WorldServer world = (WorldServer) event.getWorld();
-    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY(),pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
+    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
+    	
+//    	EntitySerpentWither skele = new EntitySerpentWither(world);
+//    	skele.setPosition( pos.getX() ,pos.getY()+2 ,pos.getZ());
+    	 
+    	//works, but have to reload chunk.
+//    	world.getChunkFromBlockCoords( pos).addEntity( skele);
+    	
+    	//completely works
+//    	world.spawnEntity( skele);
+    	
+    	System.out.println( world.getChunkFromBlockCoords(pos).isLoaded());
+    	
+    	
+    	//for abrupt, mechanical movement
+//    	skele.moveToBlockPosAndAngles( new BlockPos(0 ,pos.getY() ,0), 0, 0);
+    	
+    	//also fairly mechanical, despite what it says, uses motion/velocity, not block position
+//    	skele.move(MoverType.SELF ,1 ,0 ,1);
     	
     	
     	
@@ -330,9 +359,12 @@ public class TEinTE
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void onConfigChanged( ConfigChangedEvent.OnConfigChangedEvent event) {
-    	System.out.println("Triggering config change...");
     	ConfigManager.sync( MODID ,Config.Type.INSTANCE);
     }
+    
+    
+    
+    
 
     
     

@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import witherwar.ObjectCatalog;
 import witherwar.ObjectCatalog.NewBlock;
-import witherwar.entity.BlobFlyingTestEntity;
+import witherwar.entity.FactionDroneEntity;
 import witherwar.entity.EntityMotusGhast;
 import witherwar.entity.EntitySerpentWither;
 import witherwar.gui.GuiEditGuidestone;
@@ -61,7 +61,7 @@ public class ClientOnlyProxy implements Proxy{
 		
         mc.getRenderManager().entityRenderMap.put( EntitySerpentWither.class, new RenderWitherSkeleton( mc.getRenderManager()));
         mc.getRenderManager().entityRenderMap.put( EntityMotusGhast.class, new RenderGhast( mc.getRenderManager()));
-        mc.getRenderManager().entityRenderMap.put( BlobFlyingTestEntity.class, new BlobTestRender( mc.getRenderManager()));
+        mc.getRenderManager().entityRenderMap.put( FactionDroneEntity.class, new BlobTestRender( mc.getRenderManager()));
 		
 	}
 	

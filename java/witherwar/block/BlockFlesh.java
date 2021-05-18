@@ -1,5 +1,7 @@
 package witherwar.block;
 
+import java.util.Random;
+
 import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
@@ -13,6 +15,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.projectile.EntityLargeFireball;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -23,6 +26,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
+import witherwar.entity.FactionDroneEntity;
 import witherwar.tileentity.AlchemyGeyserTile;
 import witherwar.tileentity.ReplicatingTile;
 import witherwar.tileentity.RitualBlockTile;
@@ -33,6 +37,9 @@ import witherwar.tileentity.TileLogicContainer;
 public class BlockFlesh extends DirectionalBlock{
 	
 	public static final MaterialFlesh matFlesh = new MaterialFlesh( MapColor.TNT);
+	public static boolean spawned = false;
+	public static boolean toggle = true;
+	public FactionDroneEntity e;
 	
 	public BlockFlesh() {
         super( matFlesh); //try making a block that can use Material.WATER ?
@@ -44,6 +51,7 @@ public class BlockFlesh extends DirectionalBlock{
         this.setHarvestLevel("axe" ,1);
 		//setCreativeTab( CreativeTabs.BUILDING_BLOCKS);
 		setCreativeTab( TEinTE.teinteTab);
+		setTickRandomly(true);
 //"nether_wart_block", (new Block(Material.GRASS, MapColor.RED)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS).setHardness(1.0F).setSoundType(SoundType.WOOD).setUnlocalizedName("netherWartBlock"));
 	}
 	
@@ -58,17 +66,33 @@ public class BlockFlesh extends DirectionalBlock{
 		return BlockRenderLayer.SOLID;
 	}
 	
-    @Override
-	public Vec3d modifyAcceleration(World worldIn, BlockPos pos, Entity entityIn, Vec3d motion)
-    {
-        return motion.add(new Vec3d(1,0,0));
-    }
 	
-    @Nullable
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
-    {
-        return NULL_AABB;
-    }
+	@Override
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+//		System.out.println("updating block...");
+//		
+//		if( !worldIn.isRemote) {
+////            EntityLargeFireball fireball = new EntityLargeFireball( worldIn ,pos.getX() 
+////            		,pos.getY()+2 ,pos.getZ() ,0.5 ,0.5 ,0.5);
+////            fireball.explosionPower = 1;
+//			
+//			if( spawned) {
+////				e.tasks.addTask( 1 ,???);
+//				e.setHarvestActive( toggle);
+//				toggle = !toggle;
+//				
+//			}else {
+//			
+//				e = new FactionDroneEntity( worldIn);
+//				e.setPosition( pos.getX() ,pos.getY()+1 ,pos.getZ());
+//				
+//	            worldIn.spawnEntity( e);
+//	            spawned = true;
+//			}
+//		}
+		
+	}
+
 
     @Override
     public boolean isOpaqueCube(IBlockState state)
@@ -80,7 +104,7 @@ public class BlockFlesh extends DirectionalBlock{
     @Override
     public boolean isCollidable()
     {
-        return false;
+        return true;
     }
 	
 	@Override
@@ -88,10 +112,7 @@ public class BlockFlesh extends DirectionalBlock{
 		return false;
 	}
 	
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
-    {
-        return true;
-    }
+
 
 
     @Override
@@ -141,7 +162,7 @@ class MaterialFlesh extends Material{
 	
 	@Override
     public boolean blocksMovement(){
-        return false;
+        return true;
     }
 	
 }
