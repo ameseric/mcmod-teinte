@@ -9,6 +9,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -22,15 +23,20 @@ public class FactionDroneEntity extends FactionEntityFlying{
 	
 //	private AIFactionHarvest harvestTask;
 	
+	public int innerRotation = 1;
 	
 
-	public FactionDroneEntity(WorldServer world ,Faction2 faction) {
+	public FactionDroneEntity(World world ,Faction2 faction) {
 		super(world ,faction);
         this.setSize(1.0F, 1.0F);
         this.isImmuneToFire = true;
         this.experienceValue = 5;
         this.enablePersistence();
         this.moveHelper = new MoveHelperBigFloat( this);
+	}
+	
+	public FactionDroneEntity(World world) { //for FORGE only!
+		this( world ,null);
 	}
 	
     protected void applyEntityAttributes()
@@ -43,10 +49,11 @@ public class FactionDroneEntity extends FactionEntityFlying{
     
     @Override
     protected void initEntityAI() {
-    	this.tasks.addTask( 7 ,new AIBigHeadLookIdle(this));
-        this.tasks.addTask(5, new AIRandomFly(this));
-//        this.harvestTask = new AIFactionHarvest(this);
-//        this.tasks.addTask( 1 ,this.harvestTask);
+//    	this.tasks.addTask( 7 ,new AIBigHeadLookIdle(this));
+//        this.tasks.addTask(5, new AIRandomFly(this));
+//        AIFactionHarvest harvestTask = new AIFactionHarvest( new BlockPos(0,0,0));
+//        harvestTask.setEntity(this);
+//        this.tasks.addTask( 1 ,harvestTask);
     }
     
     
@@ -55,9 +62,13 @@ public class FactionDroneEntity extends FactionEntityFlying{
 //    }
     
     
+    
+
+    
+    
     public float getEyeHeight()
     {
-        return 0.2F;
+        return 0.8F;
     }
     
     public SoundCategory getSoundCategory()

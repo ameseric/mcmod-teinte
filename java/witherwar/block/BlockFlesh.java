@@ -27,6 +27,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
 import witherwar.entity.FactionDroneEntity;
+import witherwar.faction2.Faction2;
 import witherwar.tileentity.AlchemyGeyserTile;
 import witherwar.tileentity.ReplicatingTile;
 import witherwar.tileentity.RitualBlockTile;
@@ -69,8 +70,7 @@ public class BlockFlesh extends DirectionalBlock{
 	
 	@Override
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-//		System.out.println("updating block...");
-//		
+		
 //		if( !worldIn.isRemote) {
 ////            EntityLargeFireball fireball = new EntityLargeFireball( worldIn ,pos.getX() 
 ////            		,pos.getY()+2 ,pos.getZ() ,0.5 ,0.5 ,0.5);
@@ -78,7 +78,7 @@ public class BlockFlesh extends DirectionalBlock{
 //			
 //			if( spawned) {
 ////				e.tasks.addTask( 1 ,???);
-//				e.setHarvestActive( toggle);
+////				e.setHarvestActive( toggle);
 //				toggle = !toggle;
 //				
 //			}else {
@@ -92,6 +92,13 @@ public class BlockFlesh extends DirectionalBlock{
 //		}
 		
 	}
+	
+	
+	@Override
+	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
+		TEinTE.instance.createNewFactionTest( pos);
+	}
+
 
 
     @Override

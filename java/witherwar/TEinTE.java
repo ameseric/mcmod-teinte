@@ -1,6 +1,7 @@
 package witherwar;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Queue;
 
@@ -53,6 +54,7 @@ import witherwar.disk.NBTSaveObject;
 import witherwar.disk.TeinteWorldSavedData;
 import witherwar.entity.EntitySerpentWither;
 import witherwar.faction.FactionManager;
+import witherwar.faction2.Faction2;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.Proxy;
@@ -80,7 +82,7 @@ public class TEinTE
     
     public HashMap<EntityPlayer ,ArrayDeque<Vec3d>> lastPlayerPos = new HashMap<>(); //TODO see if better solution
     
-    public FactionManager factions = new FactionManager();
+//    public FactionManager factions = new FactionManager();
     
     public GlobalEntityManager gemtest = new GlobalEntityManager();
 	
@@ -91,6 +93,11 @@ public class TEinTE
 	private SystemPower sysPower;
 	private TileLoadManager tiles;
 	private int tickcount = 0;
+	
+	
+	//temp
+	public ArrayList<Faction2> factions = new ArrayList<>();
+	
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static Proxy proxy;
@@ -341,7 +348,11 @@ public class TEinTE
 			
 			this.tiles.tick( tickcount ,world);
 			
-			this.invader.tick( tickcount ,world);
+//			this.invader.tick( tickcount ,world);
+			
+			for( Faction2 faction : this.factions) {
+				faction.tick(tickcount, world);
+			}
 	    	
 	    	
 			if( config.allowRegionOverlay) {
@@ -385,7 +396,12 @@ public class TEinTE
 	 * methods from other classes.
 	 */
 	
-    public void removeRegion( BlockPos pos) {
+    public void createNewFactionTest( BlockPos pos) {
+    	this.factions.add( new Faction2( pos));
+    }
+	
+	
+	public void removeRegion( BlockPos pos) {
     	this.regions.removeRegion(pos);
     }
     

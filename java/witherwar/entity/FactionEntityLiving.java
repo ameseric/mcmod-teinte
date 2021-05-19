@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -14,13 +16,21 @@ public class FactionEntityLiving extends EntityLiving{
 	private int cost = 10;
 	private ArrayList<Block> heldblocks = new ArrayList<>();
 	private Faction2 faction;
+
+	public boolean renderBeam = false;
+	public BlockPos beamTarget;
+
 	
 	
-	
-	public FactionEntityLiving(WorldServer world ,Faction2 faction) {
+	public FactionEntityLiving(World world ,Faction2 faction) {
 		super(world);
 		this.faction = faction;
 	}
+	
+	public FactionEntityLiving(World world) {
+		super(world);
+	}	
+	
 	
 	
 	
@@ -39,9 +49,32 @@ public class FactionEntityLiving extends EntityLiving{
 	
 	
 	
+    public BlockPos getBeamTarget() {
+    	return new BlockPos(0,70,0);
+    }
+    
+    
+    public void setBeamTarget( BlockPos pos) {
+    	this.beamTarget = pos;
+    }
+	
+	
+	
 	public void pickTask() {
 		
 	}
+	
+	
+	
+	public void addTask( AIFactionEntityBase task) {
+		task.setEntity( this);
+		this.tasks.addTask( 1 ,task);
+	}
+	
+//	public boolean hasTask( EntityAIBase task) {
+//		this.tasks
+//	}
+//	
 	
 	
 	
