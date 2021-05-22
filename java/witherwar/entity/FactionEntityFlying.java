@@ -17,7 +17,7 @@ import witherwar.faction2.Faction2;
  *
  */
 
-public class FactionEntityFlying extends FactionEntityLiving{
+public abstract class FactionEntityFlying extends FactionEntity{
 
 	public FactionEntityFlying(World world ,Faction2 faction) {
 		super( world ,faction);

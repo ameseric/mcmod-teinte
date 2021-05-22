@@ -4,7 +4,10 @@ import javax.annotation.Nullable;
 
 import net.minecraft.entity.EntityFlying;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.EntityFlyHelper;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigateFlying;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -19,31 +22,48 @@ import witherwar.faction2.Faction2;
 
 
 
-public class FactionDroneEntity extends FactionEntityFlying{
+public class DroneEntity extends FactionEntityFlying{
 	
 //	private AIFactionHarvest harvestTask;
 	
 	public int innerRotation = 1;
 	
 
-	public FactionDroneEntity(World world ,Faction2 faction) {
+	public DroneEntity(World world ,Faction2 faction) {
 		super(world ,faction);
         this.setSize(1.0F, 1.0F);
         this.isImmuneToFire = true;
         this.experienceValue = 5;
         this.enablePersistence();
-        this.moveHelper = new MoveHelperBigFloat( this);
+//        this.moveHelper = new MoveHelperBigFloat( this);
+        this.moveHelper = new EntityFlyHelper(this);
+
 	}
 	
-	public FactionDroneEntity(World world) { //for FORGE only!
+	public DroneEntity(World world) { //for FORGE only!
 		this( world ,null);
 	}
 	
     protected void applyEntityAttributes()
     {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
+        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(4.0D);
         this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(1.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(1.0D);
+
+    }
+    
+    
+    @Override
+    protected PathNavigate createNavigator(World worldIn)
+    {
+        PathNavigateFlying pathnavigateflying = new PathNavigateFlying(this, worldIn);
+        pathnavigateflying.setCanOpenDoors(false);
+        pathnavigateflying.setCanFloat(true);
+        pathnavigateflying.setCanEnterDoors(true);
+        return pathnavigateflying;
     }
     
     

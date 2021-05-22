@@ -52,7 +52,7 @@ import witherwar.command.CommandDarkenSky;
 import witherwar.command.CommandTeleportWW;
 import witherwar.disk.NBTSaveObject;
 import witherwar.disk.TeinteWorldSavedData;
-import witherwar.entity.EntitySerpentWither;
+import witherwar.entity.WitherSkeletonTestEntity;
 import witherwar.faction.FactionManager;
 import witherwar.faction2.Faction2;
 import witherwar.network.MessageEditGuidestone;

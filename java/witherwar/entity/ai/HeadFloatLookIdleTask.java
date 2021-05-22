@@ -1,16 +1,16 @@
-package witherwar.entity;
+package witherwar.entity.ai;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.util.math.MathHelper;
 
-public class AIBigHeadLookIdle extends EntityAIBase{
+public class HeadFloatLookIdleTask extends EntityAIBase{
 	
 	
     private final EntityLiving parentEntity;
 
-    public AIBigHeadLookIdle( EntityLiving e)
+    public HeadFloatLookIdleTask( EntityLiving e)
     {
         this.parentEntity = e;
         this.setMutexBits(2);

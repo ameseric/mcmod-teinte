@@ -1,11 +1,12 @@
-package witherwar.entity;
+package witherwar.entity.ai;
 
 import net.minecraft.entity.ai.EntityAIBase;
+import witherwar.entity.FactionEntity;
 import witherwar.faction2.FactionAITask;
 
-public abstract class AIFactionEntityBase extends EntityAIBase implements FactionAITask{
+public abstract class FactionEntityTask extends EntityAIBase implements FactionAITask{
 
-	protected FactionEntityLiving taskHolder;
+	protected FactionEntity taskHolder;
 	protected boolean active = true;
 	
 	
@@ -16,7 +17,7 @@ public abstract class AIFactionEntityBase extends EntityAIBase implements Factio
 	
 	
 	
-	public void setEntity( FactionEntityLiving e) {
+	public void setEntity( FactionEntity e) {
 		this.taskHolder = e;
 	}
 

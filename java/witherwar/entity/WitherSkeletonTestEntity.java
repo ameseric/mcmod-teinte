@@ -15,11 +15,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
 
-public class EntitySerpentWither extends EntityWitherSkeleton{
+public class WitherSkeletonTestEntity extends EntityWitherSkeleton{
 
 	
 	
-	public EntitySerpentWither(World worldIn) {
+	public WitherSkeletonTestEntity(World worldIn) {
 		super(worldIn);
 	}
 	

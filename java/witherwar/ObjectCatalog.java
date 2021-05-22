@@ -15,9 +15,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import witherwar.block.KaliCoreBlock;
 import witherwar.block.ConduitBlock;
 import witherwar.block.RitualBlock;
-import witherwar.entity.EntityMotusGhast;
-import witherwar.entity.EntitySerpentWither;
-import witherwar.entity.FactionDroneEntity;
+import witherwar.entity.GhastTestEntity;
+import witherwar.entity.WitherSkeletonTestEntity;
+import witherwar.entity.DroneEntity;
 import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
@@ -56,9 +56,9 @@ public class ObjectCatalog {
 	
 	static {
 		
-		entitiesToRegister.add( 	new NewEntity( 		EntitySerpentWither.class 		,"serpent_wither_skeleton" 	,2));
-		entitiesToRegister.add( 	new NewEntity( 		EntityMotusGhast.class 			,"motus_ghast" 				,3));
-		entitiesToRegister.add( 	new NewEntity( 		FactionDroneEntity.class		,"test_blob" 				,4));
+		entitiesToRegister.add( 	new NewEntity( 		WitherSkeletonTestEntity.class 		,"serpent_wither_skeleton" 	,2));
+		entitiesToRegister.add( 	new NewEntity( 		GhastTestEntity.class 			,"motus_ghast" 				,3));
+		entitiesToRegister.add( 	new NewEntity( 		DroneEntity.class		,"test_blob" 				,4));
 		
 		
 		tileEntitesToRegister.add( 	new NewTileEntity( 	TileEntitySerpentmind.class 	,"witherwar:tile_entity_serpentmind"));

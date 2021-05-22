@@ -3,11 +3,11 @@ package witherwar.entity;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.world.World;
 
-public class EntityMotusGhast extends EntityGhast{
+public class GhastTestEntity extends EntityGhast{
 	
 	private int explosionStrength = 3;
 
-	public EntityMotusGhast(World worldIn) {
+	public GhastTestEntity(World worldIn) {
 		super(worldIn);
 	}
 	

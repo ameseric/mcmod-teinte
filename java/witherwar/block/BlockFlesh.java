@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
-import witherwar.entity.FactionDroneEntity;
+import witherwar.entity.DroneEntity;
 import witherwar.faction2.Faction2;
 import witherwar.tileentity.AlchemyGeyserTile;
 import witherwar.tileentity.ReplicatingTile;
@@ -40,7 +40,7 @@ public class BlockFlesh extends DirectionalBlock{
 	public static final MaterialFlesh matFlesh = new MaterialFlesh( MapColor.TNT);
 	public static boolean spawned = false;
 	public static boolean toggle = true;
-	public FactionDroneEntity e;
+	public DroneEntity e;
 	
 	public BlockFlesh() {
         super( matFlesh); //try making a block that can use Material.WATER ?

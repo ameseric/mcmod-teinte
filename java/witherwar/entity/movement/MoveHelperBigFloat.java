@@ -1,9 +1,10 @@
-package witherwar.entity;
+package witherwar.entity.movement;
 
 import net.minecraft.entity.EntityFlying;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
+import witherwar.entity.FactionEntityFlying;
 
 public class MoveHelperBigFloat extends EntityMoveHelper{
 	

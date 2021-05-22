@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 
-public class BlobModel extends ModelBase{
+public class DroneModel extends ModelBase{
 
 	public ModelRenderer body;
 	public ModelRenderer fin;
@@ -33,7 +33,7 @@ public class BlobModel extends ModelBase{
 	
 	
 	
-	public BlobModel() {
+	public DroneModel() {
 		
 		this.body = new ModelRenderer( this ,0 ,0);
         this.body.addBox(-8 ,-8 ,-8 ,16, 16, 16);

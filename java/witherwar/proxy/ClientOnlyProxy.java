@@ -19,12 +19,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import witherwar.ObjectCatalog;
 import witherwar.ObjectCatalog.NewBlock;
-import witherwar.entity.FactionDroneEntity;
-import witherwar.entity.EntityMotusGhast;
-import witherwar.entity.EntitySerpentWither;
+import witherwar.entity.DroneEntity;
+import witherwar.entity.GhastTestEntity;
+import witherwar.entity.WitherSkeletonTestEntity;
 import witherwar.gui.GuiEditGuidestone;
 import witherwar.gui.TeinteGUI;
-import witherwar.models.BlobTestRender;
+import witherwar.models.DroneRender;
 
 public class ClientOnlyProxy implements Proxy{
 	public static TeinteGUI teinteGUI;
@@ -59,9 +59,9 @@ public class ClientOnlyProxy implements Proxy{
 //			mc.getRenderManager().entityRenderMap.put( ne.entityClass ,)
 //		}
 		
-        mc.getRenderManager().entityRenderMap.put( EntitySerpentWither.class, new RenderWitherSkeleton( mc.getRenderManager()));
-        mc.getRenderManager().entityRenderMap.put( EntityMotusGhast.class, new RenderGhast( mc.getRenderManager()));
-        mc.getRenderManager().entityRenderMap.put( FactionDroneEntity.class, new BlobTestRender( mc.getRenderManager()));
+        mc.getRenderManager().entityRenderMap.put( WitherSkeletonTestEntity.class, new RenderWitherSkeleton( mc.getRenderManager()));
+        mc.getRenderManager().entityRenderMap.put( GhastTestEntity.class, new RenderGhast( mc.getRenderManager()));
+        mc.getRenderManager().entityRenderMap.put( DroneEntity.class, new DroneRender( mc.getRenderManager()));
 		
 	}
 	

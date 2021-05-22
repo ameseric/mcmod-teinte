@@ -1,10 +1,11 @@
-package witherwar.entity;
+package witherwar.entity.ai;
 
 import java.util.Random;
 
 import net.minecraft.entity.EntityFlying;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityMoveHelper;
+import witherwar.entity.FactionEntityFlying;
 
 
 /**
@@ -14,14 +15,14 @@ import net.minecraft.entity.ai.EntityMoveHelper;
  * Taken from Ghast AIRandomFly
  *
  */
-public class AIRandomFly extends EntityAIBase{
+public class RandomGhastFlyTask extends EntityAIBase{
 	
     private final FactionEntityFlying parent;
     
     
     
 
-    public AIRandomFly( FactionEntityFlying e)
+    public RandomGhastFlyTask( FactionEntityFlying e)
     {
         this.parent = e;
         this.setMutexBits(1);

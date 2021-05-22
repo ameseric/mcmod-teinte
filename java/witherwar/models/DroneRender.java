@@ -13,22 +13,22 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import witherwar.entity.FactionDroneEntity;
-import witherwar.entity.EntityMotusGhast;
+import witherwar.entity.DroneEntity;
+import witherwar.entity.GhastTestEntity;
 
 
-public class BlobTestRender extends RenderLiving<FactionDroneEntity>{
+public class DroneRender extends RenderLiving<DroneEntity>{
 //    private static final ResourceLocation GHAST_TEXTURES = new ResourceLocation("textures/entity/ghast/ghast.png");
     private static final ResourceLocation GHAST_TEXTURES = new ResourceLocation("witherwar:textures/entity/test_blob/ghast_yellow.png");
     private static final ResourceLocation GHAST_SHOOTING_TEXTURES = new ResourceLocation("textures/entity/ghast/ghast_shooting.png");
 
-    public BlobTestRender(RenderManager renderManagerIn)
+    public DroneRender(RenderManager renderManagerIn)
     {
-        super(renderManagerIn, new BlobModel(), 0.5F);
+        super(renderManagerIn, new DroneModel(), 0.5F);
     }
 
 
-    protected ResourceLocation getEntityTexture(FactionDroneEntity entity)
+    protected ResourceLocation getEntityTexture(DroneEntity entity)
     {
         return GHAST_TEXTURES;
     }
@@ -36,8 +36,8 @@ public class BlobTestRender extends RenderLiving<FactionDroneEntity>{
     
     
     @Override
-    public void doRender(FactionDroneEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-    	if( true) {    	
+    public void doRender(DroneEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    	if( entity.shouldRenderBeam()) {    	
             float f = (float)entity.innerRotation + partialTicks;
             float f1 = MathHelper.sin(f * 0.2F) / 2.0F + 0.5F;
             f1 = f1 * f1 + f1;
@@ -50,7 +50,6 @@ public class BlobTestRender extends RenderLiving<FactionDroneEntity>{
             double d0 = (double)targetX - entity.posX;
             double d1 = (double)targetY - entity.posY;
             double d2 = (double)targetZ - entity.posZ;
-//    		this.renderCrystalBeams(relX, relY, relZ, partialTicks, targetX, targetY, targetZ, ???, entityX, entityY, entityZ);
     	    renderCrystalBeams(x + d0, y - 0.3D + (double)(f1 * 0.4F) + d1, z + d2, partialTicks, targetX, targetY, targetZ, entity.innerRotation, entity.posX, entity.posY-0.5, entity.posZ);
 
     	}
