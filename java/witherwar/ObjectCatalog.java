@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import witherwar.block.KaliCoreBlock;
 import witherwar.block.ConduitBlock;
+import witherwar.block.DebugBlock;
 import witherwar.block.RitualBlock;
 import witherwar.entity.GhastTestEntity;
 import witherwar.entity.WitherSkeletonTestEntity;
@@ -51,14 +52,15 @@ public class ObjectCatalog {
 	public final static Block GEYSER;
 	public final static Block RITUALBLOCK;
 	public final static Block ASH_REPL_BLOCK;
+	public final static Block DEBUG_BLOCK;
 
 	
 	
 	static {
 		
 		entitiesToRegister.add( 	new NewEntity( 		WitherSkeletonTestEntity.class 		,"serpent_wither_skeleton" 	,2));
-		entitiesToRegister.add( 	new NewEntity( 		GhastTestEntity.class 			,"motus_ghast" 				,3));
-		entitiesToRegister.add( 	new NewEntity( 		DroneEntity.class		,"test_blob" 				,4));
+		entitiesToRegister.add( 	new NewEntity( 		GhastTestEntity.class 				,"motus_ghast" 				,3));
+		entitiesToRegister.add( 	new NewEntity( 		DroneEntity.class					,"test_blob" 				,4));
 		
 		
 		tileEntitesToRegister.add( 	new NewTileEntity( 	TileEntitySerpentmind.class 	,"witherwar:tile_entity_serpentmind"));
@@ -76,6 +78,7 @@ public class ObjectCatalog {
 		GEYSER =		new AlchemyGeyserBlock();
 		RITUALBLOCK =	new RitualBlock();
 		ASH_REPL_BLOCK =new AshReplicatingBlock();
+		DEBUG_BLOCK =	new DebugBlock();
 
 		
 		
@@ -89,6 +92,7 @@ public class ObjectCatalog {
 		blocksToRegister.add(		new NewBlock( "geyser"			,GEYSER			,"witherwar:geyser"));
 		blocksToRegister.add(		new NewBlock( "ritualblock"		,RITUALBLOCK	,"witherwar:ritualblock"));
 		blocksToRegister.add(		new NewBlock( "ash_repl"		,ASH_REPL_BLOCK	,"witherwar:dead_ash"));
+		blocksToRegister.add(		new NewBlock( "debug_block"		,DEBUG_BLOCK	,"witherwar:debug_block"));
 
 		
 	}

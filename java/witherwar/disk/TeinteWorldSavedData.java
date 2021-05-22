@@ -80,6 +80,7 @@ public class TeinteWorldSavedData extends WorldSavedData {
 	}
 	
 	
+	
 	public void forceReadFromNBT() {
 		System.out.println( "Copy of nbt: " + this.nbtcopy);
 		for( NBTSaveObject systemToSave : this.objectsForReadWrite){

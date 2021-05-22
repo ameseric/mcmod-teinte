@@ -9,6 +9,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
@@ -61,6 +62,7 @@ import witherwar.proxy.Proxy;
 import witherwar.region.RegionManager;
 import witherwar.system.GlobalEntityManager;
 import witherwar.system.InvasionSystem;
+import witherwar.system.SegmentGenerationTest;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
@@ -325,6 +327,9 @@ public class TEinTE
     }
     
     
+    
+    private boolean haveRun = false;
+    
     @SubscribeEvent
     //client & server-side
     //ticks are phased, start/end
@@ -344,6 +349,31 @@ public class TEinTE
 			
 	    	
 	    	this.logPlayerPosition( world);
+	    	
+	    	if(!haveRun) {
+//	    		for( int x=-120; x<120; x++) {
+//	    			for( int z=-100; z<100; z++) { //actually z, switched it
+//	    				int y = SegmentGenerationTest.validShapeBlock(x, z);
+//	    				if( y > 0) {
+//	    					world.setBlockState( new BlockPos(x,y,z) ,Blocks.STONE.getDefaultState());
+//	    				}
+//	    			}	    		
+//	    		}
+	    		
+	    		for( int x=-120; x<120; x++) {
+	    			for( int z=-100; z<100; z++) {
+	    				for( int y=0; y<100; y++) {
+	    					BlockPos pos = new BlockPos( x ,y ,z);
+	    					if( SegmentGenerationTest.validBlock(pos)) {
+		    					world.setBlockState( pos ,Blocks.STONE.getDefaultState());
+	    					}
+	    				}	    		
+	    			}
+	    		}
+	    		
+	    		haveRun = true;
+	    	}
+
 	    	
 			
 			this.tiles.tick( tickcount ,world);

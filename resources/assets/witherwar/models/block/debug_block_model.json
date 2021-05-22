@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "down": "witherwar:no_asset_default",
+        "up": "witherwar:no_asset_default",
+        "north": "witherwar:no_asset_default",
+        "east": "witherwar:no_asset_default",
+        "south": "witherwar:no_asset_default",
+        "west": "witherwar:no_asset_default",
+        "particle": "blocks/obsidian"
+    }
+}

@@ -7,6 +7,7 @@ tile.terra_kali.name=Kalimmacinus Anocortex
 tile.conduit.name=Conduit
 tile.geyser.name=Geyser
 tile.ritualblock.name=Ritual Block
+tile.debug_bl.name=Debug Block
 entity.serpent_wither_skeleton.name=SerpentWither
 itemGroup.witherwar_tab=The End Is Not the End
 generator.pillar=Pillar
