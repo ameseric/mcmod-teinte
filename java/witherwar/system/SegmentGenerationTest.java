@@ -31,7 +31,7 @@ public class SegmentGenerationTest {
 	
 	//using toroid shape
 	public static boolean validShapeBlock( BlockPos pos) {
-		int a = 20; //radius of tube
+		int a = 30; //radius of tube
 		int c = 40; //dist from center to tube center
 		
 		double xzsq = Math.pow( pos.getX() ,2.0) + Math.pow( pos.getZ() ,2.0); 
