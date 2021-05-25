@@ -66,6 +66,10 @@ import witherwar.system.SegmentGenerationTest;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
+import witherwar.utility.DisplacementFractalNoise;
+import witherwar.utility.GreyScaleNoisePrinter;
+import witherwar.utility.MidpointDisplacementNoise;
+import witherwar.utility.MidpointNoiseMap;
 import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
 
@@ -351,6 +355,15 @@ public class TEinTE
 	    	this.logPlayerPosition( world);
 	    	
 	    	if(!haveRun) {
+	    		
+	    		float[][] map = new MidpointNoiseMap( 4 ,0.1f).getMap();
+	    		
+	    		GreyScaleNoisePrinter.greyWriteImage( map);
+	    		
+//	    		int[][] map = MidpointDisplacementNoise.genMap( 4 ,0.1);	    		
+//	    		MidpointDisplacementNoise.printAsCSV(map);
+	    		
+	    		
 //	    		for( int x=-120; x<120; x++) {
 //	    			for( int z=-100; z<100; z++) { //actually z, switched it
 //	    				int y = SegmentGenerationTest.validShapeBlock(x, z);
@@ -360,11 +373,14 @@ public class TEinTE
 //	    			}	    		
 //	    		}
 	    		
+	    		//generation sequence (where to start)
+	    		//usable pattern (harder to determine than shape, since has to house structures)
+	    		
 	    		for( int x=-120; x<120; x++) {
 	    			for( int z=-100; z<100; z++) {
 	    				for( int y=0; y<100; y++) {
 	    					BlockPos pos = new BlockPos( x ,y ,z);
-	    					if( SegmentGenerationTest.validBlock(pos)) {
+	    					if( SegmentGenerationTest.validBlock(pos) || SegmentGenerationTest.toroid(x, z) == y) {
 		    					world.setBlockState( pos ,Blocks.STONE.getDefaultState());
 	    					}
 	    				}	    		

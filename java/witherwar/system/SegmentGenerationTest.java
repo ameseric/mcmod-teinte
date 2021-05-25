@@ -29,18 +29,20 @@ public class SegmentGenerationTest {
 	
 	
 	
-	//using toroid shape
-	public static boolean validShapeBlock( BlockPos pos) {
-		int a = 30; //radius of tube
-		int c = 40; //dist from center to tube center
+	public static int toroid( int x ,int z) {
+		int a = 30;
+		int c = 40;
 		
-		double xzsq = Math.pow( pos.getX() ,2.0) + Math.pow( pos.getZ() ,2.0); 
-		
+		double xzsq = Math.pow( x ,2.0) + Math.pow( z ,2.0); 
 		double ysq = Math.pow( a ,2.0) - Math.pow(  c - Math.sqrt(xzsq), 2.0);		
-		
-		int y = (int) Math.round( Math.sqrt( ysq));
-		
-		
+		return (int) Math.round( Math.sqrt( ysq));		
+	}
+	
+	
+	
+
+	public static boolean validShapeBlock( BlockPos pos) {
+		int y = SegmentGenerationTest.toroid( pos.getX() ,pos.getZ());		
 		return pos.getY() <= y; 
 	}
 	
@@ -52,12 +54,6 @@ public class SegmentGenerationTest {
 	
 	
 	
-	public void thing() {
-		
-		
-		
-	}
-	
 	
 	
     private boolean blockInBoundary( int x ,int z) {
@@ -67,7 +63,7 @@ public class SegmentGenerationTest {
     	int az = Math.abs(z);
     	double axz = Math.pow( ax ,2.0) + Math.pow( az ,2.0);
     	
-    	return axz <= Math.pow( r ,2.0)  ;
+    	return axz <= Math.pow( r ,2.0);
     }
 	
 	
