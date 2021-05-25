@@ -18,6 +18,7 @@ public class MidpointNoiseMap {
 
 	private Random RNG;
 	private float roughness;
+	private float variance;
 	private float[][] map;
 	
 	
@@ -27,14 +28,13 @@ public class MidpointNoiseMap {
 		
 		int width = (int)Math.pow( size ,2) - 1;
 		int height = (int)Math.pow( size ,2) - 1;
-		this.roughness = roughness / width;
+		this.roughness = roughness;
+		this.variance = roughness / width;
 		
 		this.map = new float[width][height];
 		for( float[] v : this.map) {
 			Arrays.fill( v ,0);
-
-		}
-		
+		}	
 		
 		this.RNG = new Random();
 		
@@ -51,7 +51,7 @@ public class MidpointNoiseMap {
 	
 	private void generate() {
 		int xf = this.map.length - 1;
-		int yf = this.map[0].length - 1;
+		int yf = xf;
 		int xo = 0;
 		int yo = 0;
 		
@@ -60,8 +60,7 @@ public class MidpointNoiseMap {
 		this.map[xf][yo] = this.RNG.nextFloat();
 		this.map[xf][yf] = this.RNG.nextFloat();
 		
-		this.calculateMidpoints( xo ,yo ,xf ,yf);
-		
+		this.calculateMidpoints( xo ,yo ,xf ,yf);		
 	}
 	
 	
@@ -75,52 +74,63 @@ public class MidpointNoiseMap {
 	 * Calculate averaged & roughened midpoints for grid segment defined by xy boundary points
 	 * 
 	 */
-    private void calculateMidpoints(int xl, int yl, int xh, int yh) {
-        int xm = (xl + xh) / 2;
-        int ym = (yl + yh) / 2;
-        if ((xl == xm) && (yl == ym)) return;
-
-//        if( this.map[xm][yl] == 0) {
-        	this.map[xm][yl] = 0.5f * (this.map[xl][yl] + this.map[xh][yl]);
-        	this.map[xm][yl] = roughen(this.map[xm][yl], xl, xh);
-//        }
-//        if( this.map[xm][yh] == 0) {
-        	this.map[xm][yh] = 0.5f * (this.map[xl][yh] + this.map[xh][yh]);
-        	this.map[xm][yh] = roughen(this.map[xm][yh], xl, xh);
-//        }
-//        if( this.map[xl][ym] == 0) {
-        	this.map[xl][ym] = 0.5f * (this.map[xl][yl] + this.map[xl][yh]);
-        	this.map[xl][ym] = roughen(this.map[xl][ym], yl, yh);
-//        }
-//        if( this.map[xh][ym] == 0) {
-        	this.map[xh][ym] = 0.5f * (this.map[xh][yl] + this.map[xh][yh]);
-        	this.map[xh][ym] = roughen(this.map[xh][ym], yl, yh);
-//        }
-
-        float v = roughen(0.5f * (this.map[xm][yl] + this.map[xm][yh]), yh
-                + xh ,xl + yl);
-        
-        this.map[xm][ym] = v;
-//        this.map[xm][yl] = roughen(this.map[xm][yl], xl, xh);
-//        this.map[xm][yh] = roughen(this.map[xm][yh], xl, xh);
-//        this.map[xl][ym] = roughen(this.map[xl][ym], yl, yh);
-//        this.map[xh][ym] = roughen(this.map[xh][ym], yl, yh);
-
-        calculateMidpoints(xl, yl, xm, ym);
-        calculateMidpoints(xm, yl, xh, ym);
-        calculateMidpoints(xl, ym, xm, yh);
-        calculateMidpoints(xm, ym, xh, yh);
+    private void calculateMidpoints( int xo ,int yo ,int xf ,int yf) {
+    	
+    	int xm = (xf + xo) / 2;
+    	int ym = (yf + yo) / 2;
+    	int halfwidth = (xf - xo) / 2;
+    	if( xo==xm && yo==ym) return;
+    	
+    	
+//    	float midpoint = (this.map[xo][yo] + this.map[xo][yf] + this.map[xf][yo] + this.map[xf][yf]) * 0.25f;
+    	float midpoint = avg( new float[]{ this.map[xo][yo] ,this.map[xo][yf] ,this.map[xf][yo] ,this.map[xf][yf]});
+    	midpoint = roughen( midpoint ,halfwidth);    	
+    	this.map[xm][ym] = midpoint;
+    	
+    	if( this.map[xo][ym] == 0) {
+    		this.map[xo][ym] = roughen( avg( new float[]{ this.map[xo][yo] ,this.map[xo][yf] ,midpoint}) ,halfwidth);
+    	}if( this.map[xm][yo] == 0) {
+    		this.map[xm][yo] = roughen( avg( new float[]{ this.map[xo][yo] ,this.map[xf][yo] ,midpoint}) ,halfwidth);
+    	}if( this.map[xf][ym] == 0) {
+    		this.map[xf][ym] = roughen( avg( new float[]{ this.map[xf][yf] ,this.map[xf][yo] ,midpoint}) ,halfwidth);
+    	}if( this.map[xm][yf] == 0) {
+    		this.map[xm][yf] = roughen( avg( new float[]{ this.map[xo][yf] ,this.map[xf][yf] ,midpoint}) ,halfwidth);
+    	}
+    	
+        this.calculateMidpoints( xo ,yo ,xm ,ym);
+        this.calculateMidpoints( xm ,yo ,xf ,ym);
+        this.calculateMidpoints( xo ,ym ,xm ,yf);
+        this.calculateMidpoints( xm ,ym ,xf ,yf);    	
     }
 	
 	
+    private static float avg( float[] args) {
+    	
+    	float sum = 0;
+    	for( float v : args) {
+    		sum += v;
+    	}
+    	    	
+    	return (sum / args.length);
+    }
+    
 	
-	private float roughen( float value ,int upperBound ,int lowerBound) {
-		return value + ( this.roughness * (float)this.RNG.nextGaussian() * (upperBound - lowerBound)); 
+    
+    private float roughen( float value ,int distance) {
+		return value + ( this.variance * (float)this.RNG.nextGaussian() * distance); 
 	}
 	
 	
+	public int getHalfwidth() {
+		return this.map.length / 2;
+	}
+	
 	
 	private static float[][] convolve( float[][] input ,float[][]kernel) { //assuming omni-symmetric kernel
+		float[][] output = new float[3][3];
+		for(float[] v : output) {
+			Arrays.fill( v ,0);
+		}
 		
 		for( int i=0; i<input.length; i++) {
 			for( int j=0; j<input.length; j++) {
@@ -130,25 +140,27 @@ public class MidpointNoiseMap {
 				for( int h=0; h<kernel.length; h++) {
 					for( int l=0; l<kernel.length; l++) {
 						float eK = kernel[h][l];
-						int a = h - 1;//assuming 3x3
-						int b = l - 1;//assuming 3x3
-						float output = 0;
+						int a = i-1+h;//assuming 3x3
+						int b = j-1+l;//assuming 3x3
+						float oV = 0;
 						if( a > -1 && a < input.length && b > -1 && b < input.length) {
-							output = input[a][b];
+							oV = input[a][b];
 						}
-						accumulation += (output * eK);
+						if( i==1 && j==1) {
+							System.out.println(oV);
+							System.out.println(eK);
+						}
+						accumulation += (oV * eK);
 					}
 				}
-				input[i][j] = accumulation;
+				output[i][j] = accumulation;
 			}			
 		}
-		return input;
+		return output;
 	}
 	
 	
-	private static void singleConvolve() { //Not possible? Still need both matricies...
-		
-	}
+
 	
 	
 
@@ -162,36 +174,40 @@ public class MidpointNoiseMap {
         }
     }
 	
-	
+    
+    
+    
 	
 	public static void main(String args[]) {
 		
-//		MidpointNoiseMap nm = new MidpointNoiseMap( 8 ,0.1f);
-//		GreyScaleNoisePrinter.greyWriteImage( nm.getMap());
+		MidpointNoiseMap nm = new MidpointNoiseMap( 10 ,0.6f);
+		GreyScaleNoisePrinter.greyWriteImage( nm.getMap());
 		
 		
-		float[][] test = new float[3][3];
-		float[][] kernel = new float[3][3];
+//		float[][] test = new float[3][3];
+//		float[][] kernel = new float[3][3];
+//		
+//		for(float[] v : test) {
+//			Arrays.fill( v ,0);
+//			Arrays.fill( v ,0);
+//		}
+//
+//		
+//		kernel[0][0] = 0.25f;
+//		kernel[0][2] = 0.25f;
+//		kernel[2][0] = 0.25f;
+//		kernel[2][2] = 0.25f;
+//		
+//		test[0][0] = 0.75f;
+//		test[0][2] = 0.5f;
+//		test[2][0] = 0.5f;
+//		test[2][2] = 0.25f;
+//
+//
+//		printCSV( convolve( test ,kernel));
 		
-		for(float[] v : test) {
-			Arrays.fill( v ,0);
-			Arrays.fill( v ,0);
-		}
-
 		
-		kernel[0][0] = 0.25f;
-		kernel[0][2] = 0.25f;
-		kernel[2][0] = 0.25f;
-		kernel[2][2] = 0.25f;
 		
-		test[0][0] = 0.75f;
-		test[0][2] = 0.5f;
-		test[2][0] = 0.5f;
-		test[2][2] = 0.25f;
-
-		printCSV( kernel);
-		printCSV( test);
-		printCSV( convolve( test ,kernel));
 
 	}  
 	

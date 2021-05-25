@@ -66,9 +66,7 @@ import witherwar.system.SegmentGenerationTest;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
-import witherwar.utility.DisplacementFractalNoise;
 import witherwar.utility.GreyScaleNoisePrinter;
-import witherwar.utility.MidpointDisplacementNoise;
 import witherwar.utility.MidpointNoiseMap;
 import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
@@ -289,7 +287,50 @@ public class TEinTE
     	//completely works
 //    	world.spawnEntity( skele);
     	
-    	System.out.println( world.getChunkFromBlockCoords(pos).isLoaded());
+//    	System.out.println( world.getChunkFromBlockCoords(pos).isLoaded());
+    	
+    	
+    		
+//    		float[][] map = new MidpointNoiseMap( 4 ,0.1f).getMap();
+//    		
+//    		GreyScaleNoisePrinter.greyWriteImage( map);
+    		
+//    		int[][] map = MidpointDisplacementNoise.genMap( 4 ,0.1);	    		
+//    		MidpointDisplacementNoise.printAsCSV(map);
+    		
+    		
+//    		for( int x=-120; x<120; x++) {
+//    			for( int z=-100; z<100; z++) { //actually z, switched it
+//    				int y = SegmentGenerationTest.validShapeBlock(x, z);
+//    				if( y > 0) {
+//    					world.setBlockState( new BlockPos(x,y,z) ,Blocks.STONE.getDefaultState());
+//    				}
+//    			}	    		
+//    		}
+    		
+    		//generation sequence (where to start)
+    		//usable pattern (harder to determine than shape, since has to house structures)
+		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
+    		SegmentGenerationTest gen = new SegmentGenerationTest( pos);
+			GreyScaleNoisePrinter.greyWriteImage( gen.getMap());
+	
+			int px = pos.getX();
+			int py = pos.getY();
+			int pz = pos.getZ();
+	
+			for( int x=-120; x<120; x++) {
+				for( int z=-100; z<100; z++) {
+					for( int y=0; y<100; y++) {
+						BlockPos cpos = new BlockPos( x ,y ,z);
+						BlockPos worldPos = new BlockPos( x+px ,y+py ,z+pz);
+						if( gen.validBlock(cpos)) {
+	    					world.setBlockState( worldPos ,Blocks.STONE.getDefaultState());
+						}
+					}	    		
+				}
+			}
+		}
+    		
     	
     	
     	//for abrupt, mechanical movement
@@ -332,7 +373,6 @@ public class TEinTE
     
     
     
-    private boolean haveRun = false;
     
     @SubscribeEvent
     //client & server-side
@@ -354,41 +394,7 @@ public class TEinTE
 	    	
 	    	this.logPlayerPosition( world);
 	    	
-	    	if(!haveRun) {
-	    		
-	    		float[][] map = new MidpointNoiseMap( 4 ,0.1f).getMap();
-	    		
-	    		GreyScaleNoisePrinter.greyWriteImage( map);
-	    		
-//	    		int[][] map = MidpointDisplacementNoise.genMap( 4 ,0.1);	    		
-//	    		MidpointDisplacementNoise.printAsCSV(map);
-	    		
-	    		
-//	    		for( int x=-120; x<120; x++) {
-//	    			for( int z=-100; z<100; z++) { //actually z, switched it
-//	    				int y = SegmentGenerationTest.validShapeBlock(x, z);
-//	    				if( y > 0) {
-//	    					world.setBlockState( new BlockPos(x,y,z) ,Blocks.STONE.getDefaultState());
-//	    				}
-//	    			}	    		
-//	    		}
-	    		
-	    		//generation sequence (where to start)
-	    		//usable pattern (harder to determine than shape, since has to house structures)
-	    		
-	    		for( int x=-120; x<120; x++) {
-	    			for( int z=-100; z<100; z++) {
-	    				for( int y=0; y<100; y++) {
-	    					BlockPos pos = new BlockPos( x ,y ,z);
-	    					if( SegmentGenerationTest.validBlock(pos) || SegmentGenerationTest.toroid(x, z) == y) {
-		    					world.setBlockState( pos ,Blocks.STONE.getDefaultState());
-	    					}
-	    				}	    		
-	    			}
-	    		}
-	    		
-	    		haveRun = true;
-	    	}
+
 
 	    	
 			
