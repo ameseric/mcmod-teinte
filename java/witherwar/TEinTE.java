@@ -9,6 +9,8 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityFireball;
+import net.minecraft.entity.projectile.EntityLargeFireball;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -26,6 +28,7 @@ import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.Config.Name;
 import net.minecraftforge.common.config.Config.RangeInt;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -40,6 +43,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -62,7 +66,10 @@ import witherwar.proxy.Proxy;
 import witherwar.region.RegionManager;
 import witherwar.system.GlobalEntityManager;
 import witherwar.system.InvasionSystem;
+import witherwar.system.PlayerLifeSystem;
 import witherwar.system.SegmentGenerationTest;
+import witherwar.system.SegmentGenerationTest.Pattern;
+import witherwar.system.SegmentGenerationTest.Shape;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
@@ -96,6 +103,7 @@ public class TEinTE
 	private SystemBlockDegrade sysBlockDegrade;  
 	private SystemPower sysPower;
 	private TileLoadManager tiles;
+	private PlayerLifeSystem playerlives;
 	private int tickcount = 0;
 	
 	
@@ -291,28 +299,13 @@ public class TEinTE
     	
     	
     		
-//    		float[][] map = new MidpointNoiseMap( 4 ,0.1f).getMap();
-//    		
-//    		GreyScaleNoisePrinter.greyWriteImage( map);
-    		
-//    		int[][] map = MidpointDisplacementNoise.genMap( 4 ,0.1);	    		
-//    		MidpointDisplacementNoise.printAsCSV(map);
-    		
-    		
-//    		for( int x=-120; x<120; x++) {
-//    			for( int z=-100; z<100; z++) { //actually z, switched it
-//    				int y = SegmentGenerationTest.validShapeBlock(x, z);
-//    				if( y > 0) {
-//    					world.setBlockState( new BlockPos(x,y,z) ,Blocks.STONE.getDefaultState());
-//    				}
-//    			}	    		
-//    		}
     		
     		//generation sequence (where to start)
     		//usable pattern (harder to determine than shape, since has to house structures)
 		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
-    		SegmentGenerationTest gen = new SegmentGenerationTest( pos);
+    		SegmentGenerationTest gen = new SegmentGenerationTest( pos ,Shape.RING ,Pattern.CROSS);
 			GreyScaleNoisePrinter.greyWriteImage( gen.getMap());
+//			GreyScaleNoisePrinter.greyWriteImage( gen.getShapeMap() ,"pattern");
 	
 			int px = pos.getX();
 			int py = pos.getY();
@@ -331,15 +324,7 @@ public class TEinTE
 			}
 		}
     		
-    	
-    	
-    	//for abrupt, mechanical movement
-//    	skele.moveToBlockPosAndAngles( new BlockPos(0 ,pos.getY() ,0), 0, 0);
-    	
-    	//also fairly mechanical, despite what it says, uses motion/velocity, not block position
-//    	skele.move(MoverType.SELF ,1 ,0 ,1);
-    	
-    	
+
     	
     }
     
@@ -360,9 +345,10 @@ public class TEinTE
 		
 		this.regions = new RegionManager( this.savedata ,world);
 		this.tiles = new TileLoadManager( this.savedata ,world);
+		this.playerlives = new PlayerLifeSystem();
 		this.invader = new InvasionSystem();
 		
-		NBTSaveObject[] objectsToSave = { this.tiles ,this.regions};		
+		NBTSaveObject[] objectsToSave = { this.tiles ,this.regions}; //TODO: add playerlives		
 		this.savedata.setObjectsToSave( objectsToSave);
 		this.savedata.forceReadFromNBT();
 		
@@ -385,7 +371,6 @@ public class TEinTE
 		
 		
 		if( event.phase == Phase.START) {
-
 		}
 		
 		
@@ -395,8 +380,6 @@ public class TEinTE
 	    	this.logPlayerPosition( world);
 	    	
 
-
-	    	
 			
 			this.tiles.tick( tickcount ,world);
 			
@@ -417,6 +400,16 @@ public class TEinTE
         	
 	    			
     }
+    
+    
+    
+    @SubscribeEvent
+    public void onEntityDeath( LivingDeathEvent event) {
+    	if( event.getEntity() instanceof EntityPlayer) {
+    		this.playerlives.update( (EntityPlayer) event.getEntity());
+    	}
+    }
+    
     
     
     @SubscribeEvent
@@ -532,7 +525,7 @@ public class TEinTE
 	}
 
 	
-	
+	//TODO some of these need to be saved to and read from world data, otherwise every config change will impact every world.
 	@Config( modid=MODID ,name="This Needs To Be Set" ,category="General")
 	public static class config {
 		
@@ -557,19 +550,32 @@ public class TEinTE
 		@Name( value="Enable Region Overlay")
 		public static boolean allowRegionOverlay = true;
 		
+		
 		@Comment( value= {"Rate of invasions when playing with Invasion turned on."})
 		@Name( value="Invasion Intensity")
 		public static int invasionIntensity = 5;
 		
+		
 		@Comment( value= {"Amount of Food consumed when dashing."})
 		@Name( value="Hunger cost of Dash")
 		@RangeInt( min=0 ,max=40)
-		public static int dashHungerCost = 1;
+		public static int dashHungerCost = 1;		
 		
 		
 		@Comment( value= {"Allow Player Dash"})
 		@Name( value="Allow Player Dash")
 		public static boolean allowPlayerDash = true;
+		
+		
+		@Comment( value= {"Players have a limited number of lives."})
+		@Name( value="Limited Player Lives")
+		public static boolean limitedLives = false;
+		
+		
+		@Comment( value= {"Players share a limited number of lives."})
+		@Name( value="Shared Player Lives")
+		public static boolean sharedLives = false;
+
 	}
 	
 

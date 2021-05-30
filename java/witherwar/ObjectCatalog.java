@@ -6,6 +6,9 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.PotionType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -18,6 +21,9 @@ import witherwar.block.DebugBlock;
 import witherwar.block.RitualBlock;
 import witherwar.entity.GhastTestEntity;
 import witherwar.entity.WitherSkeletonTestEntity;
+import witherwar.items.TestFireball;
+import witherwar.potions.TestPotion;
+import witherwar.potions.TestPotionType;
 import witherwar.entity.DroneEntity;
 import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityMaw;
@@ -39,6 +45,7 @@ public class ObjectCatalog {
 	private static List<NewEntity> entitiesToRegister = new ArrayList<>();
 	private static List<NewTileEntity> tileEntitesToRegister = new ArrayList<>();
 	private static List<NewBlock> blocksToRegister = new ArrayList<>();
+	private static List<NewItem> itemsToRegister = new ArrayList<>();
 	
 
 	
@@ -68,6 +75,9 @@ public class ObjectCatalog {
 		tileEntitesToRegister.add( 	new NewTileEntity( 	TileEntityMaw.class 			,"witherwar:tile_entity_maw"));
 		
 		
+		itemsToRegister.add( new NewItem());
+		
+		
 		TERRA_KALI = 	new KaliCoreBlock();
 		TERRA_CATAR = 	new BlockCatarCortex();
 		FLESH = 		new BlockFlesh();
@@ -82,17 +92,17 @@ public class ObjectCatalog {
 
 		
 		
-		blocksToRegister.add( 		new NewBlock( "terra_kali"		,TERRA_KALI 	,"witherwar:terra_kali"));
-		blocksToRegister.add( 		new NewBlock( "terra_catar"		,TERRA_CATAR 	,"witherwar:terra_kali"));
-		blocksToRegister.add( 		new NewBlock( "flesh"			,FLESH			,"witherwar:flesh"));
-		blocksToRegister.add( 		new NewBlock( "terra_catar_maw"	,MAW 			,"minecraft:nether_wart_block"));
-		blocksToRegister.add( 		new NewBlock( "dead_ash"		,DEAD_ASH 		,"witherwar:dead_ash"));
-		blocksToRegister.add( 		new NewBlock( "guidestone"		,GUIDESTONE 	,"witherwar:guidestone"));
-		blocksToRegister.add( 		new NewBlock( "conduit" 		,CONDUIT	 	,"witherwar:conduit"));
-		blocksToRegister.add(		new NewBlock( "geyser"			,GEYSER			,"witherwar:geyser"));
-		blocksToRegister.add(		new NewBlock( "ritualblock"		,RITUALBLOCK	,"witherwar:ritualblock"));
-		blocksToRegister.add(		new NewBlock( "ash_repl"		,ASH_REPL_BLOCK	,"witherwar:dead_ash"));
-		blocksToRegister.add(		new NewBlock( "debug_block"		,DEBUG_BLOCK	,"witherwar:debug_block"));
+		blocksToRegister.add( 		new NewBlock( TERRA_KALI 	,"witherwar:terra_kali"));
+		blocksToRegister.add( 		new NewBlock( TERRA_CATAR 	,"witherwar:terra_kali"));
+		blocksToRegister.add( 		new NewBlock( FLESH			,"witherwar:flesh"));
+		blocksToRegister.add( 		new NewBlock( MAW 			,"minecraft:nether_wart_block"));
+		blocksToRegister.add( 		new NewBlock( DEAD_ASH 		,"witherwar:dead_ash"));
+		blocksToRegister.add( 		new NewBlock( GUIDESTONE 	,"witherwar:guidestone"));
+		blocksToRegister.add( 		new NewBlock( CONDUIT	 	,"witherwar:conduit"));
+		blocksToRegister.add(		new NewBlock( GEYSER		,"witherwar:geyser"));
+		blocksToRegister.add(		new NewBlock( RITUALBLOCK	,"witherwar:ritualblock"));
+		blocksToRegister.add(		new NewBlock( ASH_REPL_BLOCK,"witherwar:dead_ash"));
+		blocksToRegister.add(		new NewBlock( DEBUG_BLOCK	,"witherwar:debug_block"));
 
 		
 	}
@@ -125,7 +135,16 @@ public class ObjectCatalog {
 			nb.item = new ItemBlock( nb.block);
 			nb.item.setRegistryName( nb.block.getRegistryName());
 			ForgeRegistries.ITEMS.register( nb.item);
-		}		
+		}
+		
+		for( NewItem ni : itemsToRegister) {
+			ForgeRegistries.ITEMS.register( new TestFireball());
+		}
+		
+		TestPotion test = new TestPotion();
+		ForgeRegistries.POTIONS.register( test );
+		ForgeRegistries.POTION_TYPES.register( 
+				new PotionType( "noidea" ,new PotionEffect[] {new PotionEffect( test ,3600)}).setRegistryName( "noidea") );
 		
 		for( NewEntity ne : getNewEntities()) {
 			ForgeRegistries.ENTITIES.register( ne.entityEntry); //followup code in client proxy
@@ -159,6 +178,16 @@ public class ObjectCatalog {
 	
 	
 	
+	public static class NewItem{
+		
+		public NewItem() {
+			
+		}
+		
+	}
+	
+	
+	
 	
 	public static class NewTileEntity{
 		public Class<? extends TileEntity> tileEntityClass;
@@ -174,13 +203,11 @@ public class ObjectCatalog {
 	
 	
 	public static class NewBlock{
-		public String name;
 		public Block block;
 		public ItemBlock item;
 		public ResourceLocation resourceLocation;
 		
-		public NewBlock( String name ,Block block ,String modelResourceLocation) {
-			this.name = name;
+		public NewBlock( Block block ,String modelResourceLocation) {
 			this.block = block;
 			this.resourceLocation = new ResourceLocation( modelResourceLocation);
 		}

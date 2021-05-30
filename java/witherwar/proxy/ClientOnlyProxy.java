@@ -42,11 +42,8 @@ public class ClientOnlyProxy implements Proxy{
 	public void preInit() {		
 		
 		for( NewBlock nb : ObjectCatalog.getNewBlocks()) {
-			//System.out.println( nb.item);
-			//System.out.println( nb.resourceLocation);
 			this.setModelResourceLocation( nb.item ,nb.resourceLocation);
 		}
-
 	}
 	
 	
@@ -61,13 +58,12 @@ public class ClientOnlyProxy implements Proxy{
 		
         mc.getRenderManager().entityRenderMap.put( WitherSkeletonTestEntity.class, new RenderWitherSkeleton( mc.getRenderManager()));
         mc.getRenderManager().entityRenderMap.put( GhastTestEntity.class, new RenderGhast( mc.getRenderManager()));
-        mc.getRenderManager().entityRenderMap.put( DroneEntity.class, new DroneRender( mc.getRenderManager()));
-		
+        mc.getRenderManager().entityRenderMap.put( DroneEntity.class, new DroneRender( mc.getRenderManager()));		
 	}
 	
 	
 	
-	
+		
 	public void postInit() {
     	teinteGUI = new TeinteGUI();
     	MinecraftForge.EVENT_BUS.register( teinteGUI.renderHandler);
@@ -76,9 +72,7 @@ public class ClientOnlyProxy implements Proxy{
 
 	
 	
-	
-	
-	
+		
 	@Override
 	public boolean isDedicatedServer() {
 		// TODO Auto-generated method stub
@@ -87,16 +81,7 @@ public class ClientOnlyProxy implements Proxy{
 
 	
 	
-	@Override
-	// code taken from Jabelar, but seems to be an endless loop? Also doesn't seem useful.
-	public EntityPlayer getPlayerEntityFromContext(MessageContext ctx) {
-		return null;
-		//return (ctx.side.isClient() ? Minecraft.getMinecraft().player : WitherWar.proxy.getPlayerEntityFromContext(ctx));
-	}
 	
-	
-	
-
 	@Override
 	public void openGui(int ID ,IMessage msg) {
 		if( ID == 0) {
@@ -115,8 +100,7 @@ public class ClientOnlyProxy implements Proxy{
 	}
 
 
-
-
+	
 
 	@Override
 	public void onWorldLoad(Load event) {

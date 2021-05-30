@@ -25,10 +25,6 @@ public class ServerOnlyProxy implements Proxy{
 		return true;
 	}
 
-	@Override
-	public EntityPlayer getPlayerEntityFromContext(MessageContext ctx) {
-		return ctx.getServerHandler().player;
-	}
 
 	@Override
 	public void openGui(int ID, IMessage msg) {

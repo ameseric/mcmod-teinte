@@ -17,14 +17,6 @@ public interface Proxy {
 	
 	void onWorldLoad( WorldEvent.Load event);
 	
-    /**
-     * Returns a side-appropriate EntityPlayer for use during message handling.
-     *
-     * @param parContext the context
-     * @return the player entity from context
-     */
-    EntityPlayer getPlayerEntityFromContext(MessageContext ctx);
-    
     
     void openGui( int ID ,IMessage msg);
     

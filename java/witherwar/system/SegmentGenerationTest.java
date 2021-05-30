@@ -8,18 +8,61 @@ public class SegmentGenerationTest {
 	private BlockPos start;
 	private BlockPos index;
 	private int bound = 1;
-	private MidpointNoiseMap noisemap;
+	private MidpointNoiseMap patternmap;
+	private MidpointNoiseMap heightmap;
+	
+	private Shape shape;
+	private Pattern pattern;
 	
 	private final int P_BOUND = 4; //4,8,16,32
 	
 	
-	
-	
-	public SegmentGenerationTest( BlockPos pos) {
-		this.start = pos;
-		this.noisemap = new MidpointNoiseMap( 10 ,0.6f);
+	public enum Shape{
+		RING
+		,TOROID
 	}
 	
+	
+	public enum Pattern{
+		CROSS
+	}
+
+	
+	
+	
+	public SegmentGenerationTest( BlockPos pos ,Shape s ,Pattern p) {
+		this.start = pos;
+		this.patternmap = new MidpointNoiseMap( 10 ,0.4f);
+		this.heightmap = new MidpointNoiseMap( 10 ,0.4f);
+		this.heightmap.pullValuesAwayFromMean( 0.25f ,0.75f ,2);
+		this.shape = s;
+		this.pattern = p;
+	}
+	
+	
+	
+	public boolean validBlock( BlockPos pos) {
+		return validPatternBlock( pos) && validBoundaryBlock( pos);
+	}
+	
+	
+
+	public boolean validBoundaryBlock( BlockPos pos) {
+		
+		int y = 0;
+		
+		switch( this.shape) {
+		case TOROID: 
+			y = toroid( pos.getX() ,pos.getZ());
+			return pos.getY() < y;
+		case RING:
+			return this.withinRing( pos);
+		}
+
+		
+		return false; 
+	}
+		
 	
 	
 	//using cross pattern
@@ -29,8 +72,51 @@ public class SegmentGenerationTest {
 		return emptyBoxPattern( pos ,mod);
 	}
 	
+		
+	
+	private int getMod( BlockPos pos) {
+		
+		float mapValue = this.getNoiseMapValue( pos.getX() ,pos.getZ() ,false);
+		
+//		if( mapValue < 0.4) return 4;
+//		if( mapValue < 0.8) return 8;
+		
+		return Math.round(mapValue * 10) + 2;
+	}
 	
 	
+	
+	
+	
+	public float[][] getMap(){
+		return this.patternmap.getMap();
+	}
+	
+	
+	
+	private boolean withinHeightMap( BlockPos pos) {
+		float mapValue = this.getNoiseMapValue( pos.getX() ,pos.getZ() ,true);
+		//1.0 = y 200?
+		
+		return pos.getY() < (mapValue * 100); //TODO: set max height via constructor
+	}
+	
+	
+	
+	private float getNoiseMapValue( int x ,int z ,boolean height) {
+		int correction = this.patternmap.getHalfwidth() << 2;
+		int xtx = correction + x >> 2;
+		int ztx = correction + z >> 2;
+		
+		if( height) {
+			return this.heightmap.getMap()[xtx][ztx];
+		}
+		return this.patternmap.getMap()[xtx][ztx];
+	}
+	
+	
+	
+	//============== Patterns ==========//
 	private static boolean emptyBoxPattern( BlockPos pos ,int mod) {
 		int x = pos.getX() % mod;
 		int y = pos.getY() % mod;
@@ -46,24 +132,7 @@ public class SegmentGenerationTest {
 	
 	
 	
-	private int getMod( BlockPos pos) {
-		
-		int x = Math.abs(pos.getX()) >> 2;
-		int z = Math.abs( pos.getZ()) >> 2;
-		int mid = this.noisemap.getHalfwidth();
-		
-		
-		float mapValue = this.noisemap.getMap()[x+mid][z+mid];
-		
-		if( mapValue < 0.35) return 4;
-		if( mapValue < 0.55) return 8;
-		if( mapValue < 0.8) return 16;
-		
-		return 16;
-	}
-	
-	
-	
+	//=============== Shapes ============//	
 	public static int toroid( int x ,int z) {
 		int a = 30;
 		int c = 40;
@@ -72,37 +141,28 @@ public class SegmentGenerationTest {
 		double ysq = Math.pow( a ,2.0) - Math.pow(  c - Math.sqrt(xzsq), 2.0);		
 		return (int) Math.round( Math.sqrt( ysq));		
 	}
+	public boolean withinToroid( BlockPos pos) {
+		int y = toroid( pos.getX() ,pos.getZ());
+		return pos.getY() < y;
+	}
+	
+	
+	
+	public static int ring() {
+		int r = 40;
+		return (int) Math.pow(r, 2.0);
+	}
+	public boolean withinRing( BlockPos pos) {
+    	double xz = Math.pow( pos.getX() ,2.0) + Math.pow( pos.getZ() ,2.0);
+		
+		return this.withinHeightMap( pos) && xz < ring();
+	}
+	
 	
 	
 	
 
-	public boolean validShapeBlock( BlockPos pos) {
-		int y = SegmentGenerationTest.toroid( pos.getX() ,pos.getZ());
-		return pos.getY() < y; 
-	}
 	
-	
-	
-	public boolean validBlock( BlockPos pos) {
-		return validPatternBlock( pos) && validShapeBlock( pos);
-	}
-	
-	
-	public float[][] getMap(){
-		return this.noisemap.getMap();
-	}
-	
-	
-	
-    private boolean blockInBoundary( int x ,int z) {
-    	int r = this.bound;
-    	
-    	int ax = Math.abs(x);
-    	int az = Math.abs(z);
-    	double axz = Math.pow( ax ,2.0) + Math.pow( az ,2.0);
-    	
-    	return axz <= Math.pow( r ,2.0);
-    }
 	
 	
 	
