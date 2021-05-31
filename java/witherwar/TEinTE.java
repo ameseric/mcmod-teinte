@@ -3,14 +3,10 @@ package witherwar;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Queue;
 
+import akka.japi.Pair;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityFireball;
-import net.minecraft.entity.projectile.EntityLargeFireball;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -43,7 +39,6 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -57,9 +52,10 @@ import witherwar.command.CommandDarkenSky;
 import witherwar.command.CommandTeleportWW;
 import witherwar.disk.NBTSaveObject;
 import witherwar.disk.TeinteWorldSavedData;
-import witherwar.entity.WitherSkeletonTestEntity;
-import witherwar.faction.FactionManager;
 import witherwar.faction2.Faction2;
+import witherwar.faction2.structures.JodhHomeStructure;
+import witherwar.faction2.structures.JodhHomeStructure.Pattern;
+import witherwar.faction2.structures.JodhHomeStructure.Shape;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.Proxy;
@@ -67,14 +63,10 @@ import witherwar.region.RegionManager;
 import witherwar.system.GlobalEntityManager;
 import witherwar.system.InvasionSystem;
 import witherwar.system.PlayerLifeSystem;
-import witherwar.system.SegmentGenerationTest;
-import witherwar.system.SegmentGenerationTest.Pattern;
-import witherwar.system.SegmentGenerationTest.Shape;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
-import witherwar.utility.GreyScaleNoisePrinter;
-import witherwar.utility.MidpointNoiseMap;
+import witherwar.utility.noise.GreyScaleNoisePrinter;
 import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
 
@@ -303,16 +295,21 @@ public class TEinTE
     		//generation sequence (where to start)
     		//usable pattern (harder to determine than shape, since has to house structures)
 		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
-    		SegmentGenerationTest gen = new SegmentGenerationTest( pos ,Shape.RING ,Pattern.CROSS);
-			GreyScaleNoisePrinter.greyWriteImage( gen.getMap());
-//			GreyScaleNoisePrinter.greyWriteImage( gen.getShapeMap() ,"pattern");
+			System.out.println( "======================= STARTING STRUCTURE GENERATION");
+    		JodhHomeStructure gen = new JodhHomeStructure( pos ,Shape.RING ,Pattern.CROSS ,100);
+			GreyScaleNoisePrinter.greyWriteImage( gen.getHMap() ,"C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\height.png");
+			GreyScaleNoisePrinter.greyWriteImage( gen.getPMap() ,"C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\pattern.png");
+			System.out.println( "======================= STARTING STRUCTURE BUILDING");			
+			
+			//ArrayList<Pair<BlockPos,Block>> newBlocks = gen.getNextSegment();
+			
 	
 			int px = pos.getX();
 			int py = pos.getY();
 			int pz = pos.getZ();
 	
 			for( int x=-120; x<120; x++) {
-				for( int z=-100; z<100; z++) {
+				for( int z=-120; z<120; z++) {
 					for( int y=0; y<100; y++) {
 						BlockPos cpos = new BlockPos( x ,y ,z);
 						BlockPos worldPos = new BlockPos( x+px ,y+py ,z+pz);
@@ -322,6 +319,7 @@ public class TEinTE
 					}	    		
 				}
 			}
+			System.out.println( "======================= FINISHED");
 		}
     		
 

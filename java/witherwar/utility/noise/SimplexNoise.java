@@ -1,4 +1,4 @@
-package witherwar.utility;
+package witherwar.utility.noise;
 
 import java.util.Random;
 
@@ -231,7 +231,7 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
   
   public static void main( String args[]) {
 	  int size = 100;
-	  double scale = 0.02;
+	  double scale = 0.06;
 //	  Random rand = new Random();
 	  int shift = 75;//rand.nextInt();
 	  double[][] map = new double[size][size];
@@ -241,7 +241,7 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
 		  }
 	  }
 	  
-	  GreyScaleNoisePrinter.greyWriteImage( map);
+	  GreyScaleNoisePrinter.greyWriteImage( map ,"C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\saved.png");
 	  
   }
   

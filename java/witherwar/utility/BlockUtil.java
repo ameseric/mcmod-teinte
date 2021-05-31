@@ -26,7 +26,7 @@ import witherwar.faction.ResourceMap;
  * 
  * TODO: if we're keeping this, utilize EnumFacing rather than Symbol.
  */
-public class BlockUtil {	
+public abstract class BlockUtil {	
 	
 	public static boolean onlyTouchingBlockTypes( BlockPos currentPos ,BlockTypeCollection acceptedBlocks ,World world) {
 		HashMap<BlockPos,Block> map = getNeighborBlocks( currentPos ,world);
