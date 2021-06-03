@@ -1,21 +1,28 @@
 package witherwar.utility.noise;
 
+import java.util.Random;
+
 import net.minecraft.nbt.NBTTagCompound;
 
-public class SimplexNoiseMap extends NoiseMap{
+public class SimplexNoiseMap2D extends NoiseMap2D{
 
 	protected double scale;
 	protected int shift;
 	protected boolean normalize;
 
 	
-	public SimplexNoiseMap( int size ,double scale ,int shift ,boolean normalize) {
+	public SimplexNoiseMap2D( int size ,double scale ,int shift ,boolean normalize) {
 		super( size);
 		this.scale = scale;
 		this.shift = shift;
 		this.normalize = normalize;
 		
+				
 		this.generate(); //TODO: make optional?
+	}
+	
+	public SimplexNoiseMap2D( int size ,double scale ,boolean normalize) {
+		this( size ,scale ,new Random().nextInt() ,normalize);
 	}
 	
 	

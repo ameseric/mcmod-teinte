@@ -11,10 +11,14 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.gen.structure.template.PlacementSettings;
+import net.minecraft.world.gen.structure.template.Template;
+import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.common.DimensionManager;
@@ -52,10 +56,13 @@ import witherwar.command.CommandDarkenSky;
 import witherwar.command.CommandTeleportWW;
 import witherwar.disk.NBTSaveObject;
 import witherwar.disk.TeinteWorldSavedData;
+import witherwar.entity.WitherSkeletonTestEntity;
 import witherwar.faction2.Faction2;
-import witherwar.faction2.structures.JodhHomeStructure;
-import witherwar.faction2.structures.JodhHomeStructure.Pattern;
-import witherwar.faction2.structures.JodhHomeStructure.Shape;
+import witherwar.faction2.TestFaction;
+import witherwar.faction2.structures.JodhHome;
+import witherwar.faction2.structures.JodhHome.Pattern;
+import witherwar.faction2.structures.JodhHome.Shape;
+import witherwar.faction2.structures.LamedHome;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.Proxy;
@@ -67,6 +74,7 @@ import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
 import witherwar.utility.noise.GreyScaleNoisePrinter;
+import witherwar.utility.noise.SimplexNoiseMap3D;
 import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
 
@@ -278,53 +286,74 @@ public class TEinTE
     	WorldServer world = (WorldServer) event.getWorld();
     	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
     	
-//    	EntitySerpentWither skele = new EntitySerpentWither(world);
-//    	skele.setPosition( pos.getX() ,pos.getY()+2 ,pos.getZ());
-    	 
-    	//works, but have to reload chunk.
-//    	world.getChunkFromBlockCoords( pos).addEntity( skele);
-    	
-    	//completely works
-//    	world.spawnEntity( skele);
-    	
-//    	System.out.println( world.getChunkFromBlockCoords(pos).isLoaded());
-    	
     	
     		
     		
     		//generation sequence (where to start)
     		//usable pattern (harder to determine than shape, since has to house structures)
 		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
-			System.out.println( "======================= STARTING STRUCTURE GENERATION");
-    		JodhHomeStructure gen = new JodhHomeStructure( pos ,Shape.RING ,Pattern.CROSS ,100);
-			GreyScaleNoisePrinter.greyWriteImage( gen.getHMap() ,"C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\height.png");
-			GreyScaleNoisePrinter.greyWriteImage( gen.getPMap() ,"C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\pattern.png");
-			System.out.println( "======================= STARTING STRUCTURE BUILDING");			
+			
+			this.createNewFactionTest( pos);
+			
+//			String filepath = "C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\"; 
+//			System.out.println( "======================= STARTING STRUCTURE GENERATION");
+//    		JodhHomeStructure gen = new JodhHomeStructure( pos ,Shape.RING ,Pattern.CROSS ,100);
+//			GreyScaleNoisePrinter.greyWriteImage( gen.getHMap() ,filepath + "height.png");
+//			GreyScaleNoisePrinter.greyWriteImage( gen.getBMap() ,filepath + "build.png");
+//			LamedHomeStructure gen = new LamedHomeStructure( pos);
+//			System.out.println( "======================= STARTING STRUCTURE BUILDING");			
 			
 			//ArrayList<Pair<BlockPos,Block>> newBlocks = gen.getNextSegment();
 			
 	
-			int px = pos.getX();
-			int py = pos.getY();
-			int pz = pos.getZ();
-	
-			for( int x=-120; x<120; x++) {
-				for( int z=-120; z<120; z++) {
-					for( int y=0; y<100; y++) {
-						BlockPos cpos = new BlockPos( x ,y ,z);
-						BlockPos worldPos = new BlockPos( x+px ,y+py ,z+pz);
-						if( gen.validBlock(cpos)) {
-	    					world.setBlockState( worldPos ,Blocks.STONE.getDefaultState());
-						}
-					}	    		
-				}
-			}
-			System.out.println( "======================= FINISHED");
+//			int px = pos.getX();
+//			int py = pos.getY();
+//			int pz = pos.getZ();
+//	
+//			for( int x=-100; x<100; x++) {
+//				for( int z=-100; z<100; z++) {
+//					for( int y=0; y<100; y++) {
+//						BlockPos cpos = new BlockPos( x ,y ,z);
+//						BlockPos worldPos = new BlockPos( x+px ,y+py ,z+pz);
+//						if( gen.isValidPosition(cpos)) {
+//	    					world.setBlockState( worldPos ,Blocks.STONE.getDefaultState());
+//						}
+//					}	    		
+//				}
+//			}
+//			System.out.println( "======================= FINISHED");
 		}
     		
 
     	
     }
+    
+    
+    //TODO move
+    private void nbtStructureLoadTest( BlockPos pos ,WorldServer world) {
+		ResourceLocation tree_path = new ResourceLocation("witherwar:my_tree");
+		Template tree = world.getStructureTemplateManager().get( world.getMinecraftServer() ,tree_path);
+		System.out.println( tree.getSize());
+		tree.addBlocksToWorld( world ,pos ,(new PlacementSettings()).setIgnoreEntities( true) );    	
+    }
+    
+    
+    
+    private void entitySpawnTest( World world ,BlockPos pos) {
+    	WitherSkeletonTestEntity skele = new WitherSkeletonTestEntity( world);
+    	skele.setPosition( pos.getX() ,pos.getY()+2 ,pos.getZ());
+    	 
+    	//works, but have to reload chunk.
+    	//world.getChunkFromBlockCoords( pos).addEntity( skele);
+    	
+    	//completely works
+    	world.spawnEntity( skele);
+    	
+    	System.out.println( world.getChunkFromBlockCoords(pos).isLoaded());
+    }
+    
+    
+    
     
     
     
@@ -384,7 +413,11 @@ public class TEinTE
 //			this.invader.tick( tickcount ,world);
 			
 			for( Faction2 faction : this.factions) {
-				faction.tick(tickcount, world);
+				if( faction.isDead()) {
+					this.factions.remove( faction);
+				}else {
+					faction.tick(tickcount, world);
+				}
 			}
 	    	
 	    	
@@ -440,7 +473,7 @@ public class TEinTE
 	 */
 	
     public void createNewFactionTest( BlockPos pos) {
-    	this.factions.add( new Faction2( pos));
+    	this.factions.add( new TestFaction( pos));
     }
 	
 	

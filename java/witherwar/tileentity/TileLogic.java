@@ -9,7 +9,9 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import witherwar.disk.NBTSaveFormat;
+import witherwar.utility.Tickable;
 
 
 
@@ -25,7 +27,7 @@ import witherwar.disk.NBTSaveFormat;
  * This is cumbersome, but I have to work with what's given. And Blocks are stateless, so...
  *
  */
-public abstract class TileLogic implements NBTSaveFormat{
+public abstract class TileLogic implements NBTSaveFormat,Tickable{
 	
 	public static final int SERPENTMIND_ID = 0;
 	public static final int RITUALBLOCK_ID = 1;
@@ -60,7 +62,8 @@ public abstract class TileLogic implements NBTSaveFormat{
 	
 	
 	
-	public void tick( int tickcount ,World world) {
+	@Override
+	public void tick( int tickcount ,WorldServer world) {
 		
 		if( homeBlockRemoved( world)) {
 			this.amIDead = true;
@@ -90,7 +93,7 @@ public abstract class TileLogic implements NBTSaveFormat{
 	}
 	
 	
-	
+	@Override
 	public boolean isDead() {
 		return this.amIDead;
 	}	

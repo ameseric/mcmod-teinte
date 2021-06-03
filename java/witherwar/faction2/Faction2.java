@@ -13,10 +13,12 @@ import witherwar.entity.DroneEntity;
 import witherwar.entity.FactionEntity;
 import witherwar.entity.ai.FactionEntityTask;
 import witherwar.entity.ai.FactionHarvestTask;
+import witherwar.faction2.structures.Home;
+import witherwar.utility.Tickable;
 
 
 
-public class Faction2 {
+public abstract class Faction2 implements Tickable{
 	
 //	Resources will depend on faction
 //	but start with Stone?
@@ -25,17 +27,18 @@ public class Faction2 {
 //	and the distance from a particular unit?
 	
 	
-	private int tickrate = 40;
-	private int resourceCount = 100;
-	private ArrayList<FactionEntity> units = new ArrayList<>();
-	private ChunkPos harvestTest = new ChunkPos(0,0);
-	private BlockPos index = new BlockPos(16,255,15);
+	protected int tickrate = 40;
+	protected int resourceCount = 100;
+	protected ArrayList<FactionEntity> units = new ArrayList<>();
+	protected ChunkPos harvestTest = new ChunkPos(0,0);
+	protected BlockPos index = new BlockPos(16,255,15);
+	protected final Block homeblockType = ObjectCatalog.FLESH;
+	protected BlockPos homeblockPos;
+	protected ArrayList<FactionEntityTask> tasks = new ArrayList<>();
+	protected Home home;
+	private boolean firstrun = true;
 	
 	
-	private final Block homeblockType = ObjectCatalog.FLESH;
-	private BlockPos homeblockPos;
-	
-	private ArrayList<FactionEntityTask> tasks = new ArrayList<>();
 	
 	
 	public Faction2( BlockPos pos) {
@@ -44,35 +47,68 @@ public class Faction2 {
 	
 	
 	
+	@Override
 	public void tick( int tickcount ,WorldServer world) {
 		if( tickcount%this.tickrate != 0){
 			return;
 		}
 		
-		System.out.println( "Ticking!");
-
-		if( this.units.size() < 3) {
-			this.createUnit( this.homeblockPos ,world);
+		if( this.firstrun) {
+			this.parentInit();
+			this.onFirstTickCycle( world);
+			this.firstrun = false;
 		}
 		
+		this.updateTaskList();
+				
 		
-		
-//		if( this.resourceCount < 200) {
-//			this.createNewHarvestTask();
-//		}
-		
-		
-		
-		
+		this.ticklogic( world ,tickcount);
 		
 	}
 	
 	
 	
-	public void createUnit( BlockPos pos ,World world) {
+	private void updateTaskList() {
+		
+	}
+	
+	
+	
+	private void parentInit() {
+		//TODO stuff
+	}
+	
+	protected abstract void onFirstTickCycle( World world);
+	
+	
+	protected abstract void ticklogic( WorldServer world ,int tickcount);
+	
+	
+	
+	
+	//========== Boolean Checks =================
+	@Override
+	public boolean isDead() {
+		return !this.hasUnits() && !this.hasCoreEntity();
+	}
+	
+	
+	public boolean hasUnits() {
+		return this.units.size() > 0;
+	}
+	
+	
+	public abstract boolean hasCoreEntity();
+	
+	
+	
+	
+	//============= Internal Helpers
+	protected void createUnit( BlockPos pos ,World world) {
 		FactionEntity newUnit = new DroneEntity( world ,this); //TODO not sure what to do with Entity types
 		this.subtractResource( newUnit.getCost());
-		newUnit.setPosition( this.homeblockPos.getX() ,this.homeblockPos.getY()+2 ,this.homeblockPos.getZ());
+//		newUnit.setPosition( this.homeblockPos.getX() ,this.homeblockPos.getY()+2 ,this.homeblockPos.getZ());
+		newUnit.setPosition( pos.getX() , pos.getY() ,pos.getZ());
 		this.units.add( newUnit);
 		world.spawnEntity( newUnit);
 	}
@@ -80,10 +116,10 @@ public class Faction2 {
 	
 	
 	
-	public void subtractResource(int i) {
+	protected void subtractResource(int i) {
 		this.resourceCount -= i;
 	}
-	public void addResource(int i) {
+	protected void addResource(int i) {
 		this.resourceCount += i;
 	}
 	

@@ -1,16 +1,15 @@
 package witherwar.faction2.structures;
 
 import java.util.ArrayList;
+import net.minecraft.world.gen.structure.template.Template;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import witherwar.utility.Pair;
+
 
 public abstract class Structure {
 
 	
 	
-	public abstract ArrayList<Pair<BlockPos,Block>> getNextSegment();
+	public abstract ArrayList<Template.BlockInfo> getBlocks() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException;
 	
 	
 	

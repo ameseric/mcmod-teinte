@@ -13,7 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
  *
  * Range is *roughly* 0 -> 1, not -1 -> 1, with some minor outliers due to roughening (not normalized)
  */
-public class MidpointNoiseMap extends NoiseMap {
+public class MidpointNoiseMap2D extends NoiseMap2D {
 
 	private Random RNG;
 	private float roughness;
@@ -21,7 +21,7 @@ public class MidpointNoiseMap extends NoiseMap {
 	
 	
 	
-	public MidpointNoiseMap( int size ,float roughness) {
+	public MidpointNoiseMap2D( int size ,float roughness) {
 //		this.roughness = roughness;
 		super( size);
 		this.roughness = roughness;
@@ -35,7 +35,7 @@ public class MidpointNoiseMap extends NoiseMap {
 	
 	
 	
-	public static MidpointNoiseMap getLowMapWithHighAccent( int numberOfAccents) {
+	public static MidpointNoiseMap2D getLowMapWithHighAccent( int numberOfAccents) {
 		return null;
 	}
 	

@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import witherwar.disk.NBTSaveFormat;
 import witherwar.disk.NBTSaveObject;
 import witherwar.disk.TeinteWorldSavedData;
@@ -126,7 +127,7 @@ public class TileLoadManager extends NBTSaveObject{
 	
 	
 	//calls all entities every tick, and trusts them to distribute their workload
-	public void tick( int tickcount ,World world) {
+	public void tick( int tickcount ,WorldServer world) {
 		
 		if( this.performReset) {
 			this.resetCycle();

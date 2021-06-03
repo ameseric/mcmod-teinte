@@ -11,13 +11,13 @@ import witherwar.disk.NBTSaveFormat;
 import witherwar.utility.Pair;
 import witherwar.utility.Vec2;
 
-public abstract class NoiseMap implements NBTSaveFormat{
+public abstract class NoiseMap2D implements NBTSaveFormat{
 
 	protected double[][] map;
 	protected int size;
 	
 	
-	public NoiseMap( int size) {
+	public NoiseMap2D( int size) {
 		
 		this.size = (int)Math.pow( 2 ,size);
 		
@@ -79,14 +79,18 @@ public abstract class NoiseMap implements NBTSaveFormat{
 	}
 	
 	
+	public void spikeRandomValues( int numberOfSpikes ,int radius) {
+		this.spikeRandomValues(numberOfSpikes, this.map.length ,1.0 ,radius);
+	}
+	
 	//expensive, for front-load only
-	public void spikeRandomValues( int numberOfSpikes ,int range) {
+	public void spikeRandomValues( int numberOfSpikes ,int range ,double intensityModifier ,int radius) {
 		System.out.println( "======================= STARTING SPIKES");
-		double dist = 12.0;
+		double dist = radius;
 		ArrayList< Pair<Double,Vec2>> spikes = new ArrayList<>();
 		Random r = new Random();
 		for( int i=0; i<numberOfSpikes; i++) {			
-			double intensity = r.nextDouble();
+			double intensity = r.nextDouble() * intensityModifier;
 			int shiftfactor = this.getHalfwidth() - (range/2);
 			int x = (int) Math.round( (r.nextFloat() * range-1) + shiftfactor);
 			int y = (int) Math.round( (r.nextFloat() * range-1) + shiftfactor);
