@@ -1,6 +1,8 @@
 package witherwar.faction2.structures;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.ArrayDeque;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
@@ -12,17 +14,19 @@ public abstract class Home {
 
 	
 	protected BlockPos center;
+	protected ArrayDeque< Structure> queue = new ArrayDeque<>();
+	protected List<District> districts = new ArrayList<>();
+
+	
+	
 	
 	
 	public Home( BlockPos center) {
-		this.center = center;
+		this.center = center;		
 	}
 	
 	
 	
-	public FunctionalStructure getNextStructure( WorldServer world) {
-		return new MuirSpike( world);
-	}
 	
 	
 	
@@ -32,17 +36,35 @@ public abstract class Home {
 	
 	
 	
+	private BlockPos getBuildSpot( Structure s) {
+		for( District d : this.districts) {
+			if( d.hasStructure( s)) {
+				return d.getBuildSpot( s);
+			}
+		}
+		return null;
+	}
+	
+	
+	
 	public abstract boolean isValidPosition( BlockPos pos);
 	
 	
 	
 	public ArrayList< Template.BlockInfo> getNextSegment(){
-		Structure s = this.nextStructure();
+		Class<? extends Structure> s = this.nextStructure();
 		BlockPos buildspot = this.getBuildSpot( s);
 		if( buildspot == null) {
 			return this.getDistrictBuildSegment( s);
 		}
 		return s.getBlocks();
+	}
+	
+	
+	
+	
+	public Class<? extends Structure> nextStructure() {
+		return this.queue.peek();
 	}
 	
 	

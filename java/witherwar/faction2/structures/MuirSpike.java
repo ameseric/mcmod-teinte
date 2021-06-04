@@ -1,7 +1,6 @@
 package witherwar.faction2.structures;
 
 
-import net.minecraft.world.WorldServer;
 
 
 
@@ -9,12 +8,26 @@ import net.minecraft.world.WorldServer;
 
 
 public class MuirSpike extends FunctionalStructure{
+	
+	
+	private final static String FILENAME = "muir_spike";
 
 	
 	
-	public MuirSpike( WorldServer world ,District district) {
-		super("muir_spike" ,world);
+	public MuirSpike() {
+		super( FILENAME);
 	}
+
+
+
+	public static Structure getInertInstance() {
+		return new MuirSpike().setInert();
+	}
+
+
+
+	
+
 	
 	
 

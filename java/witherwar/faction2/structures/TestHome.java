@@ -11,16 +11,21 @@ import witherwar.utility.Pair;
 public class TestHome extends Home{
 
 	
-	private List<District> districts = new ArrayList<>();
-	
 	
 	
 	
 	public TestHome(BlockPos center) {
 		super(center);
-		districts.add( new District( "tall_things" ,new int[] {1,2,3,4,5,6,7,8,9,10} ,1));
-		districts.add( new District( "short_things" ,new int[] {11,12,16,17,21,22} ,1));
-		districts.add( new District( "center" ,new int[] {13} ,1));
+		
+		District tall = new District( "tall_things" ,new int[] {1,2,3,4,5,6,7,8,9,10});
+		tall.addStructure( MuirSpike.getInertInstance());
+		
+		
+		districts.add( tall);
+		districts.add( new District( "short_things" ,new int[] {11,12,16,17,21,22}).setHeight( 8));
+		districts.add( new District( "center" ,new int[] {13}).setLayers(10).setHeight(10));
+		
+		
 	}
 
 	
@@ -34,9 +39,6 @@ public class TestHome extends Home{
 	
 	
 
-	@Override
-	public ArrayList<Pair<BlockPos, Block>> getNextSegment() {
-		return null;
-	}
+
 
 }

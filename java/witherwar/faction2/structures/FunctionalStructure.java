@@ -9,11 +9,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.template.Template;
+import witherwar.TEinTE;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLogicContainer;
 import witherwar.utility.Tickable;
 
-public class FunctionalStructure extends Structure implements Tickable{
+public abstract class FunctionalStructure extends Structure implements Tickable{
 
 	protected Template template;
 	
@@ -24,20 +25,13 @@ public class FunctionalStructure extends Structure implements Tickable{
 	}
 	
 	
-	public FunctionalStructure( String name ,WorldServer world) {
-		this.loadTemplate( name ,world);
+	public FunctionalStructure( String name) {
+		this.template = TEinTE.instance.getTemplate( name);
 	}
 	
 	
 	
-	
-	
-	
-	
-	protected void loadTemplate( String name ,WorldServer world) {
-		ResourceLocation path = new ResourceLocation("witherwar:"+name);
-		this.template = world.getStructureTemplateManager().get( world.getMinecraftServer() ,path);		
-	}
+
 	
 	
 	
@@ -54,6 +48,12 @@ public class FunctionalStructure extends Structure implements Tickable{
 	@Override
 	public boolean isDead() {
 		return false;
+	}
+	
+	
+	@Override
+	public BlockPos getSize() {
+		return this.template.getSize();
 	}
 
 

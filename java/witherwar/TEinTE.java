@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import akka.japi.Pair;
+import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -59,10 +59,6 @@ import witherwar.disk.TeinteWorldSavedData;
 import witherwar.entity.WitherSkeletonTestEntity;
 import witherwar.faction2.Faction2;
 import witherwar.faction2.TestFaction;
-import witherwar.faction2.structures.JodhHome;
-import witherwar.faction2.structures.JodhHome.Pattern;
-import witherwar.faction2.structures.JodhHome.Shape;
-import witherwar.faction2.structures.LamedHome;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.Proxy;
@@ -73,8 +69,6 @@ import witherwar.system.PlayerLifeSystem;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
-import witherwar.utility.noise.GreyScaleNoisePrinter;
-import witherwar.utility.noise.SimplexNoiseMap3D;
 import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
 
@@ -100,10 +94,11 @@ public class TEinTE
 	private TeinteWorldSavedData savedata;
 	private RegionManager regions;
 	private InvasionSystem invader;
-	private SystemBlockDegrade sysBlockDegrade;  
-	private SystemPower sysPower;
+//	private SystemBlockDegrade sysBlockDegrade;  
+//	private SystemPower sysPower;
 	private TileLoadManager tiles;
 	private PlayerLifeSystem playerlives;
+	private TemplateManager templates;
 	private int tickcount = 0;
 	
 	
@@ -286,8 +281,7 @@ public class TEinTE
     	WorldServer world = (WorldServer) event.getWorld();
     	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
     	
-    	
-    		
+   		
     		
     		//generation sequence (where to start)
     		//usable pattern (harder to determine than shape, since has to house structures)
@@ -506,6 +500,11 @@ public class TEinTE
 	
 	public TileLogic getTileLogic( BlockPos pos) {
 		return this.tiles.get(pos);
+	}
+	
+	
+	public Template getTemplate( String name) {
+		return this.templates.get( null ,new ResourceLocation( MODID+":"+name));
 	}
 	
 	
