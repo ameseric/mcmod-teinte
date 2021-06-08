@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.structure.template.Template;
+import net.minecraft.world.gen.structure.template.Template.BlockInfo;
 import witherwar.utility.Pair;
 import witherwar.utility.Vec2;
 
@@ -12,8 +13,8 @@ public class LamedHome extends Home{
 
 	
 	
-	public LamedHome( BlockPos center) {
-		super( center);
+	public LamedHome( BlockPos center ,int size) {
+		super( center ,size);
 	}
 	
 	
@@ -25,7 +26,7 @@ public class LamedHome extends Home{
 	
 	
 	@Override
-	public ArrayList<Pair<BlockPos, Block>> getNextSegment() {
+	public ArrayList<BlockInfo> getNextSegment() {
 		return null;
 	}
 

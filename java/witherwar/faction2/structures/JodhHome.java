@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.gen.structure.template.Template.BlockInfo;
 import witherwar.utility.Pair;
 import witherwar.utility.noise.MidpointNoiseMap2D;
 import witherwar.utility.noise.NoiseMap2D;
@@ -37,7 +38,7 @@ public class JodhHome extends Home{
 	
 	
 	public JodhHome( BlockPos pos ,Shape s ,Pattern p ,int size) {
-		super( pos);
+		super( pos, size);
 		this.size = size;
 		this.buildmap = new SimplexNoiseMap2D( 6 ,0.02 ,25 ,true);
 		
@@ -209,7 +210,7 @@ public class JodhHome extends Home{
 
 
 	@Override
-	public ArrayList<Pair<BlockPos, Block>> getNextSegment() {
+	public ArrayList<BlockInfo> getNextSegment() {
 		// TODO Auto-generated method stub
 		return null;
 	}

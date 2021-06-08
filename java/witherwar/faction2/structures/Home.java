@@ -16,13 +16,16 @@ public abstract class Home {
 	protected BlockPos center;
 	protected ArrayDeque< Structure> queue = new ArrayDeque<>();
 	protected List<District> districts = new ArrayList<>();
+	/* the width and length of the Home in blocks */
+	protected int size;
 
 	
 	
 	
 	
-	public Home( BlockPos center) {
-		this.center = center;		
+	public Home( BlockPos center ,int size) {
+		this.center = center;
+		this.size = size;
 	}
 	
 	
@@ -52,18 +55,18 @@ public abstract class Home {
 	
 	
 	public ArrayList< Template.BlockInfo> getNextSegment(){
-		Class<? extends Structure> s = this.nextStructure();
-		BlockPos buildspot = this.getBuildSpot( s);
-		if( buildspot == null) {
-			return this.getDistrictBuildSegment( s);
-		}
-		return s.getBlocks();
+//		Class<? extends Structure> s = this.nextStructure();
+//		BlockPos buildspot = this.getBuildSpot( s);
+//		if( buildspot == null) {
+//			return this.getDistrictBuildSegment( s);
+//		}
+		return null;//s.getBlocks();
 	}
 	
 	
 	
 	
-	public Class<? extends Structure> nextStructure() {
+	public Structure nextStructure() {
 		return this.queue.peek();
 	}
 	

@@ -1,6 +1,7 @@
 package witherwar.block;
 
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockSand;
 import net.minecraft.block.material.Material;
@@ -8,7 +9,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import witherwar.TEinTE;
 
 
-public class BlockAsh extends BlockFalling{
+public class BlockAsh extends Block{// extends BlockFalling{
 	
 	public BlockAsh() {
 		super( Material.SAND);

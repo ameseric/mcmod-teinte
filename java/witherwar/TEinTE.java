@@ -3,13 +3,16 @@ package witherwar;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -33,6 +36,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -279,7 +283,7 @@ public class TEinTE
         //got another particle to work, some particles need specific arguments, also
     	//need to call through the proper channels
     	WorldServer world = (WorldServer) event.getWorld();
-    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
+//    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
     	
    		
     		
@@ -287,7 +291,7 @@ public class TEinTE
     		//usable pattern (harder to determine than shape, since has to house structures)
 		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
 			
-			this.createNewFactionTest( pos);
+//			this.createNewFactionTest( pos);
 			
 //			String filepath = "C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\"; 
 //			System.out.println( "======================= STARTING STRUCTURE GENERATION");
@@ -398,7 +402,7 @@ public class TEinTE
 		if( event.phase == Phase.END) {
 			
 	    	
-	    	this.logPlayerPosition( world);
+	    	this.logPlayerPosition();
 	    	
 
 			
@@ -538,8 +542,13 @@ public class TEinTE
 	
 //------------------------------  Assist Methods ------------------------------------------------------------//  
 	
-	private void logPlayerPosition( WorldServer world) {
-    	for( EntityPlayer player : world.playerEntities) {
+	//Must be called server-side, grabs world from DimensionManager
+	private void logPlayerPosition() {
+		List<EntityPlayerMP> players = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();
+		
+		
+//    	WorldServer world = DimensionManager.getWorld(0);
+		for( EntityPlayerMP player : players) {
     		if( !this.lastPlayerPos.containsKey(player)) {
     			this.lastPlayerPos.put( player ,new ArrayDeque<>());
     		}

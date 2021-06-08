@@ -1,9 +1,7 @@
 package witherwar.tileentity;
 
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.annotation.Nullable;
+import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,20 +32,18 @@ public abstract class TileLogic implements NBTSaveFormat,Tickable{
 	public static final int CONDUIT_ID = 2;
 	public static final int GEYSER_ID = 3;
 	public static final int REPLICATE_ID = 4;
+	public static final int GROWING_ID = 5;
 	
 	
 	private Block homeBlock;
 	private BlockPos pos;
-	private boolean amIDead = false;
-	
-	private boolean dirty = false;
-	
-	private boolean updatedOnTick = false;
-	
+	private boolean amIDead = false;	
+	private boolean dirty = false;	
+	private boolean updatedOnTick = false;	
 	protected int ticksUntilUpdate = 1;
-	private int tickcountAtLastUpdate = 0;
-	
+	private int tickcountAtLastUpdate = 0;	
 	private int id = -1;
+	protected static final Random RNG = new Random();
 	
 	
 	
@@ -159,6 +155,7 @@ public abstract class TileLogic implements NBTSaveFormat,Tickable{
 			case CONDUIT_ID: return new ConduitTile( pos);
 			case GEYSER_ID: return new AlchemyGeyserTile( pos);
 			case REPLICATE_ID: return new ReplicatingTile( pos);
+			case GROWING_ID: return new GrowingTile( pos);
 		}
 		throw new UnsupportedOperationException();
 	}

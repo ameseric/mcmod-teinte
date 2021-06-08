@@ -1,4 +1,4 @@
-package witherwar.tileentity;
+package witherwar.tileentity.deprecated;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,6 +12,7 @@ import witherwar.ObjectCatalog;
 import witherwar.utility.Symbol;
 
 //Needs cleaning, too many flag variables.
+@Deprecated
 public class TileEntityMaw extends TileEntityCustomTickingBase{
 	
 	private int ticks = 0;

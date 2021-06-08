@@ -14,8 +14,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLogicContainer;
+import witherwar.tileentity.deprecated.TileEntitySerpentmind;
 import witherwar.tileentity.KaliCoreTile;
-import witherwar.tileentity.TileEntitySerpentmind;
 
 public class KaliCoreBlock extends Block implements TileLogicContainer{
 	

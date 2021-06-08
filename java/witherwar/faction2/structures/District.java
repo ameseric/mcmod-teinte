@@ -11,11 +11,17 @@ public class District {
 	private int layers = 1;
 	private String name;
 	private HashSet<Structure> structures;
+	/* Number of blocks per segment*/
+	private int segmentSize;
+	
+//	private final static int SEGMENT_SIZE = 16;
 	
 	
-	public District( String name ,int[] segments) {
+	public District( String name ,int[] segments ,int homeSize) {
 		this.globalSegments = segments;
 		this.name = name;
+		this.segmentSize = homeSize / 5;
+		//generate noisemap -> place structures in HashList?
 	}
 	
 	
@@ -25,6 +31,9 @@ public class District {
 		
 		return null;
 	}
+	
+	
+	
 	
 	
 	
