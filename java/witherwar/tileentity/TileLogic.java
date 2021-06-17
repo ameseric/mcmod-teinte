@@ -32,7 +32,7 @@ public abstract class TileLogic implements NBTSaveFormat,Tickable{
 	public static final int CONDUIT_ID = 2;
 	public static final int GEYSER_ID = 3;
 	public static final int REPLICATE_ID = 4;
-	public static final int GROWING_ID = 5;
+	public static final int MONUMENT_ID = 5;
 	
 	
 	private Block homeBlock;
@@ -55,6 +55,8 @@ public abstract class TileLogic implements NBTSaveFormat,Tickable{
 		this.updatedOnTick = active;
 		this.ticksUntilUpdate = ticksUntilUpdate;
 	}
+	
+	
 	
 	
 	
@@ -134,10 +136,7 @@ public abstract class TileLogic implements NBTSaveFormat,Tickable{
 		this.dirty = false;
 		return compound;
 	}
-	@Override
-	public void readFromNBT(NBTTagCompound compound) {
-		
-	}
+
 	public void markDirty() {
 		this.dirty = true;
 	}
@@ -147,7 +146,6 @@ public abstract class TileLogic implements NBTSaveFormat,Tickable{
 	
 	
 	
-
 	public static TileLogic createTileLogicFromID(int id ,BlockPos pos ,World world) {
 		switch(id) {
 			case SERPENTMIND_ID: return new KaliCoreTile( pos);
@@ -155,9 +153,17 @@ public abstract class TileLogic implements NBTSaveFormat,Tickable{
 			case CONDUIT_ID: return new ConduitTile( pos);
 			case GEYSER_ID: return new AlchemyGeyserTile( pos);
 			case REPLICATE_ID: return new ReplicatingTile( pos);
-			case GROWING_ID: return new GrowingTile( pos);
+			case MONUMENT_ID: return new MonumentCell( pos);
 		}
 		throw new UnsupportedOperationException();
+	}
+	
+	
+	public static TileLogic createTileLogicFromNBT( NBTTagCompound nbt ,World world) {
+		BlockPos pos = new BlockPos( nbt.getInteger( "x") ,nbt.getInteger( "y") ,nbt.getInteger( "z") );
+		TileLogic tl = TileLogic.createTileLogicFromID( nbt.getInteger( "id"), pos, world);
+		tl.readFromNBT( nbt);
+		return tl;
 	}
 	
 

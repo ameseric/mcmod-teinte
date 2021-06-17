@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -75,6 +76,7 @@ import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
+import witherwar.worlds.structures.StructureGenerator;
 
 
 //TODO: Decide whether Manager classes can/should be discarded.
@@ -291,6 +293,9 @@ public class TEinTE
     		//usable pattern (harder to determine than shape, since has to house structures)
 		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
 			
+			
+			this.createStructureTest( pos ,world);
+			
 //			this.createNewFactionTest( pos);
 			
 //			String filepath = "C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\"; 
@@ -348,6 +353,29 @@ public class TEinTE
     	world.spawnEntity( skele);
     	
     	System.out.println( world.getChunkFromBlockCoords(pos).isLoaded());
+    }
+    
+    
+    
+    private void createStructureTest( BlockPos pos ,World world) {
+    	System.out.println( "Starting generation...");
+    	StructureGenerator sg = new StructureGenerator( pos ,pos.add(50,25,50));
+    	System.out.println( "Generation finished. Starting placement...");
+		int px = pos.getX();
+		int py = pos.getY();
+		int pz = pos.getZ();
+
+		for( int x=0; x<200; x++) {
+			for( int z=0; z<200; z++) {
+				for( int y=0; y<100; y++) {
+//					BlockPos cpos = new BlockPos( x ,y ,z);
+					BlockPos worldPos = new BlockPos( x+px ,y+py ,z+pz);
+					IBlockState bs = sg.getTranslatedBlockState( worldPos);
+					world.setBlockState( worldPos ,bs);
+				}	    		
+			}
+		}
+    	System.out.println( "Placement finished.");
     }
     
     
@@ -542,12 +570,12 @@ public class TEinTE
 	
 //------------------------------  Assist Methods ------------------------------------------------------------//  
 	
-	//Must be called server-side, grabs world from DimensionManager
+	//Must be called server-side
 	private void logPlayerPosition() {
-		List<EntityPlayerMP> players = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();
 		
+		List<EntityPlayerMP> players = 
+				FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();		
 		
-//    	WorldServer world = DimensionManager.getWorld(0);
 		for( EntityPlayerMP player : players) {
     		if( !this.lastPlayerPos.containsKey(player)) {
     			this.lastPlayerPos.put( player ,new ArrayDeque<>());

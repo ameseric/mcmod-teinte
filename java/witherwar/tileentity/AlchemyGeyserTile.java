@@ -1,6 +1,7 @@
 package witherwar.tileentity;
 
 import net.minecraft.block.Block;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
@@ -28,6 +29,12 @@ public class AlchemyGeyserTile extends FluidContainerTile{
 	@Override
 	public Fluid pullFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
 		return this.getContents();
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound compound) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

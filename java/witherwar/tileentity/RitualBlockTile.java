@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -143,6 +144,14 @@ public class RitualBlockTile extends FluidContainerTile {
 	
 	public BlockPos getInputPos( World world) {
 		return this.inputPos;
+	}
+
+
+
+	@Override
+	public void readFromNBT(NBTTagCompound compound) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

@@ -3,6 +3,7 @@ package witherwar.tileentity;
 import java.util.HashMap;
 
 import net.minecraft.block.Block;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
@@ -45,6 +46,14 @@ public class ConduitTile extends FluidContainerTile {
 	@Override
 	public void ticklogic(World world) {
 		//passive
+	}
+
+
+
+	@Override
+	public void readFromNBT(NBTTagCompound compound) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

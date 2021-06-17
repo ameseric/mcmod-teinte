@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
 import witherwar.tileentity.GrowingTile;
+import witherwar.tileentity.MonumentCell;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLogicContainer;
 
@@ -32,7 +33,7 @@ public class DebugBlock extends Block implements TileLogicContainer{
 	
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new GrowingTile( pos));
+		TEinTE.instance.registerBlockEntity( new MonumentCell( pos));
 		System.out.println( "Placed debug block.");
 	}
 

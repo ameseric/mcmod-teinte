@@ -7,6 +7,7 @@ import java.util.HashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -68,6 +69,15 @@ public class KaliCoreTile extends TileLogic{
 
 	public String getDataName() {
 		return "Serpentmind";
+	}
+
+
+
+
+	@Override
+	public void readFromNBT(NBTTagCompound compound) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

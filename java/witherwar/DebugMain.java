@@ -1,11 +1,12 @@
 package witherwar;
 
-
-
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class DebugMain {
 
 	
+	static ArrayList<String> strings;
 	
 	
 	public static void main(String args[]){
@@ -13,33 +14,25 @@ public class DebugMain {
 		System.out.println( "Hello world");
 
 
-	}
-	
-	
-	
-	
-	public class A{
-		int x = 9;
+		strings = new ArrayList<>();
+		strings.add( "Hello");
+		strings.add( "Testing");
 		
-		public A( int f) {
-			this.x = f;
+		Iterator<String> iter;
+		for( iter = strings.iterator(); iter.hasNext();) {
+			System.out.println( iter.next());
+			iter.remove();
 		}
 		
-		
+		System.out.println( strings.size());
 
-		
-		
+
 	}
 	
 	
-	public class B extends A{
-
-		public B( int f) {
-			super(f);
-		}
-		
-		
-	}
+	
+	
+	
 	
 	
 }
