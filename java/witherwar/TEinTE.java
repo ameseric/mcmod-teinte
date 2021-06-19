@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -76,7 +77,8 @@ import witherwar.system.SystemPower;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLoadManager;
 import witherwar.worlds.WorldCatalog;
-import witherwar.worlds.structures.StructureGenerator;
+import witherwar.worlds.structures.FortressTunnelBuilder;
+import witherwar.worlds.structures.StructureBuilder;
 
 
 //TODO: Decide whether Manager classes can/should be discarded.
@@ -85,6 +87,9 @@ import witherwar.worlds.structures.StructureGenerator;
 @Mod(modid = TEinTE.MODID, version = TEinTE.VERSION)
 public class TEinTE
 {
+	
+	public static final Random RNG = new Random();
+	
     public static final String MODID = "witherwar";
     public static final String VERSION = "0.1.00";
     public static final int TICKSASECOND = 20;
@@ -358,20 +363,30 @@ public class TEinTE
     
     
     private void createStructureTest( BlockPos pos ,World world) {
+    	long count = 0;
+    	int total = 0;
     	System.out.println( "Starting generation...");
-    	StructureGenerator sg = new StructureGenerator( pos ,pos.add(50,25,50));
+    	FortressTunnelBuilder sg = new FortressTunnelBuilder( pos ,pos.add(100 ,50 ,100));
     	System.out.println( "Generation finished. Starting placement...");
 		int px = pos.getX();
 		int py = pos.getY();
 		int pz = pos.getZ();
 
-		for( int x=0; x<200; x++) {
-			for( int z=0; z<200; z++) {
-				for( int y=0; y<100; y++) {
+		for( int x=0; x<120; x++) {
+			for( int z=0; z<120; z++) {
+				for( int y=0; y<70; y++) {
 //					BlockPos cpos = new BlockPos( x ,y ,z);
 					BlockPos worldPos = new BlockPos( x+px ,y+py ,z+pz);
 					IBlockState bs = sg.getTranslatedBlockState( worldPos);
-					world.setBlockState( worldPos ,bs);
+					if( bs != null) {
+						world.setBlockState( worldPos ,bs);
+					}
+					++count;
+					if(count > 100000) {
+						count = 0;
+						++total;
+						System.out.println( "Total count: " + total);
+					}
 				}	    		
 			}
 		}
