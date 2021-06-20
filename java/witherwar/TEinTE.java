@@ -377,7 +377,7 @@ public class TEinTE
 				for( int y=0; y<70; y++) {
 //					BlockPos cpos = new BlockPos( x ,y ,z);
 					BlockPos worldPos = new BlockPos( x+px ,y+py ,z+pz);
-					IBlockState bs = sg.getTranslatedBlockState( worldPos);
+					IBlockState bs = sg.getBlockState( worldPos);
 					if( bs != null) {
 						world.setBlockState( worldPos ,bs);
 					}

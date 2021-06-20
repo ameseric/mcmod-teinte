@@ -20,7 +20,7 @@ public class FortressTunnelBuilder extends StructureBuilder {
 	
 
 	@Override
-	void postprocess() {
+	void postprocess_initial() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -55,7 +55,7 @@ class MonumentGardenBuilder extends StructureBuilder{
 	
 
 	@Override
-	void postprocess() {
+	void postprocess_initial() {
 		// TODO Auto-generated method stub
 		
 	}
