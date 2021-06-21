@@ -10,12 +10,16 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import witherwar.TEinTE;
 import witherwar.utility.Pair;
+import witherwar.utility.VectorUtility;
 
 //NOTE: The "Blocks" used in this generator are not minecraft blocks.
 
+//NOTE: we try to always use even values for sizes, as these become odd for block segments (0,0,0) -> (x,y,z)
 
 public abstract class StructureBuilder {
 	
@@ -23,9 +27,11 @@ public abstract class StructureBuilder {
 	private ArrayList<Room> rooms = new ArrayList<>();
 
 	private BlockPos start ,end;	
-	private int layerSize = 7;
+	private int layerSize = 8;
 	
 	private HashSet<Pair<Integer,Integer>> supportcolumn = new HashSet<>();
+	
+	private static final IBlockState AIR = Blocks.AIR.getDefaultState();
 	
 	
 	
@@ -44,7 +50,7 @@ public abstract class StructureBuilder {
 	
 	
 	
-	
+	//==================  build phase  ======================
 	protected void build() {
 		BlockPos firstRoomStart = this.start.add( this.getXSize()/2 ,0 ,this.getZSize()/2);
 		BlockPos firstRoomEnd = firstRoomStart.add( 10 ,this.layerSize ,8);
@@ -72,48 +78,6 @@ public abstract class StructureBuilder {
 	
 	
 	
-	protected void cleanup() {
-
-		this.postprocess_initial();
-		
-		for( int y=this.end.getY(); y>=this.start.getY(); y--) { //start at ceiling and work down
-			for( int x=this.start.getX(); x<=this.end.getX(); x++) {
-				for( int z=this.start.getZ(); z<=this.end.getZ(); z++) {
-					BlockPos pos = new BlockPos( x ,y ,z);
-					Block block = this.getBlock(pos);
-					this.blockPostProcess( block);
-					if( block.isSolid()) {
-						this.supportcolumn.add( new Pair<Integer,Integer>(x,z));
-					}
-				}
-			}
-		}
-		
-		for( Room room : this.rooms) {
-			for( Door door : room.doors()) {
-				this.doorPostProcess( door);
-			}
-			this.roomPostProcess( room);
-		}
-		
-	}
-	
-	/**
-	 * Auto-called at start of cleanup phase (after build phase).
-	 */
-	abstract void postprocess_initial();
-	
-	
-	/**
-	 * Same as postprocess, but called for every block.
-	 * 
-	 * @param block
-	 */
-	abstract void blockPostProcess( Block block);
-	
-	
-	
-	
 	private void branchRooms( int index) {
 		if( index >= this.rooms.size()) {//this.rooms.size()) {
 			return;
@@ -133,12 +97,13 @@ public abstract class StructureBuilder {
 			int failures = 0;
 			while( true) {
 				newRoom = this.newRandomRoom();
-				newRoom.findStartFromDoor( door);
-				if( newRoom.tryToClaim( this.blocks)) {
-					newRoom.addDoor( door.facing.getOpposite() ,false ,true);
-					newRoom.addRandomDoors(door.facing.getOpposite());
-					this.addRoom( newRoom);
-//					this.registerXZColumns( newRoom);
+				if( this.tryToAddNewRoom( door ,newRoom)) {
+//				newRoom.findStartFromDoor( door);
+//				if( newRoom.tryToClaim( this.blocks)) {
+//					newRoom.addDoor( door.facing.getOpposite() ,false ,true);
+//					newRoom.addRandomDoors(door.facing.getOpposite());
+//					this.addRoom( newRoom);
+////					this.registerXZColumns( newRoom);
 					break;
 				}else{
 					++failures;
@@ -156,10 +121,31 @@ public abstract class StructureBuilder {
 	
 	
 	
+	
 	private Room newRandomRoom() {
-		return new Room( new BlockPos(0 ,0 ,0) 
-				,new BlockPos( this.getRandomRoomSize()-1 ,this.layerSize ,this.getRandomRoomSize()-1));
+		return new Room( this.getRandomRoomSize() ,this.layerSize ,this.getRandomRoomSize());
 	}
+	
+	
+	
+	
+//	private boolean tryToAddNewRoom( Door door ,int length ,int width) {
+//		Room newRoom = this.newRandomRoom();
+//		return this.tryToAddNewRoom( door ,newRoom);
+//	}
+		
+		
+	private boolean tryToAddNewRoom( Door door ,Room room) {
+		room.findStartFromDoor( door);
+		if( room.tryToClaim( this.blocks)) {
+			room.addDoor( door.facing.getOpposite() ,false ,true);
+			room.addRandomDoors(door.facing.getOpposite());
+			this.addRoom( room);
+			return true;
+		}
+		return false;
+	}
+	
 	
 	
 	
@@ -172,16 +158,64 @@ public abstract class StructureBuilder {
 	}
 	
 	
-
 	
+	
+	//================  cleanup phase  ===========================
+	protected void cleanup() {
+
+		this.postprocess_initial();
+		
+		
+		for( Room room : this.rooms) {
+			this.roomPostProcess( room);
+
+			for( Door door : room.doors()) {
+				this.doorPostProcess( door);
+			}
+		}
+		
+		
+		for( int y=this.end.getY(); y>=this.start.getY(); y--) { //start at ceiling and work down
+			for( int x=this.start.getX(); x<=this.end.getX(); x++) {
+				for( int z=this.start.getZ(); z<=this.end.getZ(); z++) {
+					BlockPos pos = new BlockPos( x ,y ,z);
+					Block block = this.getBlock(pos);
+					this.blockPostProcess( block);
+					if( block.isSolid()) {
+						this.supportcolumn.add( new Pair<Integer,Integer>(x,z));
+					}
+				}
+			}
+		}
+		
+
+		
+	}
+	
+	/**
+	 * Auto-called at start of cleanup phase (after build phase).
+	 */
+	abstract protected  void postprocess_initial();
+	
+	
+	/**
+	 * Same as postprocess, but called for every block.
+	 * 
+	 * @param block
+	 */
+	abstract protected void blockPostProcess( Block block);
+	
+
 	
 	/**
 	 * Default room modifier/decorator. Called after block and door postprocess.
 	 * @param room
 	 */
 	protected void roomPostProcess( Room room) {
-//		this.buildIfStairwell( room);
+		this.buildIfStairwell( room);
 	}
+	
+	
 	
 	
 	/**
@@ -194,13 +228,14 @@ public abstract class StructureBuilder {
 		if( door.isStairwell()) {
 			for( int x=-1; x<=1; x++) {
 				for( int z=-1; z<=1; z++) {
-					this.getBlock( pos.add( x ,0 ,z)).blockstate = Blocks.AIR.getDefaultState();
+					//this.getBlock( pos.add( x ,0 ,z)).blockstate = Blocks.AIR.getDefaultState();
+					this.getBlock( pos.add( x ,0 ,z)).markAsStairwell();
 				}
 			}
 			
 		}else {
-			this.getBlock( pos).blockstate = Blocks.AIR.getDefaultState();
-			this.getBlock( pos.add( 0,1,0)).blockstate = Blocks.AIR.getDefaultState();
+			this.getBlock( pos).markAsDoor();//.blockstate = Blocks.AIR.getDefaultState();
+			this.getBlock( pos.add( 0,1,0)).markAsDoor();//blockstate = Blocks.AIR.getDefaultState();
 		}
 	}
 	
@@ -220,19 +255,12 @@ public abstract class StructureBuilder {
 	
 	
 	
-//	private void registerXZColumns( Room room) {
-//		for( int x=room.start.getX(); x<=room.end.getX(); x++) {
-//			for( int z=room.start.getZ(); z<=room.end.getZ(); z++) {
-//				this.supportcolumn[x][z] = true;
-//			}
-//		}
-//	}
-	
-	
 	
 	private void addRoom( Room room) {
 		this.rooms.add( room);
 	}
+	
+	
 	
 	
 	//======================= Public =====================================================
@@ -288,17 +316,104 @@ public abstract class StructureBuilder {
 	
 	
 	protected void buildIfStairwell( Room room) {
-		BlockPos pos = room.getStairwell().location;
-		if( pos != null) {
-			int height = pos.subtract( room.getCenterBlock( EnumFacing.DOWN)).getY();
-			//stair -> block -> repeat
-			Blocks.NETHER_BRICK_STAIRS.getDefaultState().withProperty( BlockStairs.FACING ,EnumFacing.NORTH );
+		Door door = room.getDoor( EnumFacing.UP);
+		if( door != null) {
+			BlockPos top = door.location;
+			BlockPos bottom = room.getCenterBlock( EnumFacing.DOWN);
+			int height = top.subtract( bottom).getY() + 2; //+2 accounts for block vs point & reaching into the next room's threshold
+			IBlockState stair = Blocks.STONE_BRICK_STAIRS.getDefaultState();
+			IBlockState brick = Blocks.STONEBRICK.getDefaultState();
+			
+			EnumFacing face = EnumFacing.NORTH;
+			for( int i=1; i<height; i++) {
+				// pillar block
+				BlockPos pos = bottom.add( 0,i,0);
+				this.getBlock( pos).setState( brick);
+				
+				//stairs
+				pos = pos.add( face.getDirectionVec());
+				this.getBlock( pos).setState( stair.withProperty( BlockStairs.FACING ,face.rotateY() ));
+				face = face.rotateY();
+				this.getBlock( pos.add( face.getDirectionVec())).setState( brick);
+			}	
+		}
+	}
+	
+	
+	/**
+	 * default window test
+	 * @param room
+	 * @param blocksBetweenWindows
+	 */
+	protected void buildIfWindow( Room room ,int numberOfWindows ,IBlockState decoration) {
+		for( EnumFacing side : EnumFacing.HORIZONTALS) {
+			if( side == EnumFacing.NORTH) {
+				//start xo/zo/ym - xf/zo/ym
+				//TODO
+			}
 		}
 	}
 	
 	
 	
+	protected void tryToBuildNewConnections( Room room ,IBlockState blockType) {
+		if( room.doors().size() >= 2) { return;}
+
+		
+		int searchDistance = 10;		
+		
+		for( EnumFacing side : EnumFacing.HORIZONTALS) {
+			Vec3i v = VectorUtility.scale( side.getDirectionVec() ,searchDistance);
+			BlockPos start = room.getCenterBlock( side); 
+			BlockPos end = start.add( v);
+			Block b = this.getBlock( end);
+			if( b != null && b.isClaimed()) {
+				
+				this.makeHallway( room ,side ,searchDistance);
+//				this.makeHallway( start ,end ,side);
+				return;
+			}
+		}
+	}
+	
+	
+	private void makeHallway( Room room ,EnumFacing direction ,int length) {
+//		Room hallway = new Room();
+		int dx = 0;
+		int dz = 0;
+		switch( direction.getAxis()) {
+			case X: 
+				dx = length;
+				dz = 3;
+				break;
+			case Z:
+				dx = 3;
+				dz = length;
+				break;
+		}
+		Room hallway = new Room( dx ,5 ,dz);
+		Door door = new Door( room.getCenterBlock( direction) ,direction ,false);
+		room.addDoor( door);
+		hallway.findStartFromDoor( door);
+		hallway.partialClaim( this.blocks);
+		Door endOfHallway = new Door( hallway.getCenterBlock( direction) ,direction ,false);
+//		hallway.addDoor( door.facing ,false ,false);
+		hallway.addDoor( endOfHallway);
+		hallway.addDoor( door.facing.getOpposite() ,false ,false);
+		//keep reference?
+//		this.addRoom( hallway);
+		
+		//manual fix, TODO do better
+//		BlockPos fauxDoorPos = endOfHallway.location.add( direction.getDirectionVec());
+//		this.getBlock( fauxDoorPos).markAsDoor();  //TODO can be null? Not sure how.
+//		this.getBlock( fauxDoorPos.add(0,1,0)).markAsDoor();
+	}
+	
+	
+	
 }
+
+
 
 
 
@@ -312,6 +427,7 @@ class Block {
 	public boolean isFloor = false;
 	public boolean isCeiling = false;
 	public boolean isDoor = false; //ignore for now
+	public boolean isStairwell = false;
 	
 	
 	public Block( BlockPos pos) {
@@ -342,8 +458,40 @@ class Block {
 		this.blockstate = bs;
 	}
 	
+//	public ArrayList<BlockPos> getHorizontalNeighbors() {
+//		ArrayList<BlockPos> neighbors = new ArrayList<>();
+//		for( int x=-1; x<=1; x++) {
+//			for( int z=-1; z<=1; z++) {
+//				neighbors.add( new BlockPos( x ,0 ,z));
+//			}
+//		}
+//		return neighbors;
+//	}
+//	
+//	public ArrayList<BlockPos> getVerticalNeighbors() {
+//		ArrayList<BlockPos> neighbors = new ArrayList<>();
+//		for( int x=-1; x<=1; x++) {
+//			for( int z=-1; z<=1; z++) {
+//				neighbors.add( new BlockPos( x ,y ,z));
+//			}
+//		}
+//		return neighbors;
+//	}
+	
 	public boolean isEdge() {
-		return (this.isCeiling || this.isFloor || this.isWall);
+		return (this.isCeiling || this.isFloor || this.isWall) && !this.isDoor && !this.isStairwell;
+	}
+	
+	
+	public Block markAsDoor() {
+		this.isDoor = true;
+		return this;
+	}
+	
+	
+	public Block markAsStairwell() {
+		this.isStairwell = true;
+		return this;
 	}
 	
 
@@ -397,17 +545,26 @@ class Door {
 //assumed to have odd-numbered sizes, will always have center.
 class BlockSegment {
 	BlockPos start ,end;
-	int xPartial ,zPartial ,height ,dx ,dz;
+	//Partials are one short of half the dimension for odd-sized segments ( should always be odd).
+	int xPartial ,zPartial;
+	int height ,dx ,dz;
+
 	
 	public BlockSegment( BlockPos start ,BlockPos end) {
 		this.start = start;
 		this.end = end;
 		this.dx = end.getX() - start.getX() + 1; //because this is not point-based but block-based, the "length"
 		this.dz = end.getZ() - start.getZ() + 1; //is not end - start.
-		this.xPartial = dx / 2;
+		this.xPartial = dx / 2; //partials are rounded down
 		this.zPartial = dz / 2;
-		this.height = (end.getY() - start.getY());
+		this.height = (end.getY() - start.getY() + 1);
 
+	}
+	
+	
+	
+	public BlockSegment( int width ,int height ,int length) {
+		this( new BlockPos( 0,0,0) ,new BlockPos( width-1 ,height-1 ,length-1));
 	}
 	
 	
@@ -418,9 +575,9 @@ class BlockSegment {
 	
 	
 	private void calculateEndPos() {
-		int xf = this.start.getX() + this.xPartial * 2;
-		int zf = this.start.getZ() + this.zPartial * 2;
-		int yf = this.start.getY() + this.height;
+		int xf = this.start.getX() + this.dx - 1;
+		int zf = this.start.getZ() + this.dz - 1;
+		int yf = this.start.getY() + this.height - 1;
 		this.end = new BlockPos( xf ,yf ,zf);
 	}
 	
@@ -431,29 +588,48 @@ class BlockSegment {
 	public int zCenter() {
 		return this.start.getZ() + this.zPartial;
 	}
+	public BlockPos center() {
+		return this.getCenterBlock( EnumFacing.DOWN).add( 0 ,this.height/2 ,0);
+	}
 
 	
 	
 	
 	public boolean tryToClaim( HashMap<BlockPos,Block> blocks) {
+		return this.claim( blocks ,false ,false);
+	}
+	
+	
+	public void partialClaim( HashMap<BlockPos,Block> blocks) {
+		this.claim( blocks ,false ,true);
+	}
+	
+	
+	public boolean claim( HashMap<BlockPos,Block> blocks , boolean override ,boolean partial) {
 		BlockPos pos = new BlockPos(0,0,0);
 		Block block;
-//		System.out.println( "Starting dimension: " + this.start + " " + this.end);
+
 		ArrayList<Block> toClaim = new ArrayList<>();
 		for( int x=this.start.getX(); x<=this.end.getX(); x++) {
 			for( int y=this.start.getY(); y<=this.end.getY(); y++) {
 				for( int z=this.start.getZ(); z<=this.end.getZ(); z++) {
-					block = blocks.get( pos.add( x ,y ,z));
-					if( block == null || block.isClaimed()) {
+					
+					block = blocks.get( pos.add( x ,y ,z));					
+					
+					if( override) {
 						if( block != null) {
-//							System.out.println( "Failed block due to claim.");
-//							System.out.println( "Failed block: " + block.position);
-//							System.out.println( "Tried to claim: " + this.start + " " + this.end);
-//							System.out.println( "Claimed by: " + block.parent.start + " " + block.parent.end);
+							toClaim.add( block);
 						}
-						return false;
-					}else {
-						toClaim.add( block);
+					}else if( partial) {
+						if( !block.isClaimed()) {
+							toClaim.add( block);
+						}
+					}else {						
+						if( block == null || block.isClaimed()) {
+							return false;
+						}else {
+							toClaim.add( block);
+						}
 					}
 				}
 			}
@@ -487,34 +663,8 @@ class BlockSegment {
 		
 	}
 	
-
-}
-
-
-
-
-class Room extends BlockSegment{
 	
-	private ArrayList<Door> doors = new ArrayList<>();
-	
-
-	public Room(BlockPos start, BlockPos end) {
-		super(start, end);
-	}
-	
-	
-	public void addDoor( Door door) {
-		this.doors.add( door);
-	}
-	
-	
-	public void addDoor( EnumFacing side ,boolean decenter ,boolean source) {
-		BlockPos pos = this.getCenterBlock( side);
-		this.addDoor( new Door( pos ,side ,source));
-	}
-	
-	
-	public BlockPos getCenterBlock( EnumFacing side) {
+	public BlockPos getCenterBlock( EnumFacing side) { //TODO change, doesn't actually return center for horizontal facings
 		BlockPos pos = null;
 		switch( side) {
 		case EAST: 
@@ -539,6 +689,40 @@ class Room extends BlockSegment{
 		return pos;
 	}
 	
+
+}
+
+
+
+
+class Room extends BlockSegment{
+	
+	private ArrayList<Door> doors = new ArrayList<>();
+	
+	
+
+	public Room(BlockPos start, BlockPos end) {
+		super(start, end);
+	}	
+	
+	public Room(int width, int height, int length) {
+		super( width ,height ,length); 
+	}
+	
+
+
+	
+	public void addDoor( Door door) {
+		this.doors.add( door);
+	}
+	
+	
+	public void addDoor( EnumFacing side ,boolean decenter ,boolean source) {
+		BlockPos pos = this.getCenterBlock( side);
+		this.addDoor( new Door( pos ,side ,source));
+	}
+	
+	
 	
 	
 	public void addRandomDoors( EnumFacing avoid) {
@@ -557,24 +741,35 @@ class Room extends BlockSegment{
 	}
 	
 	
-	public boolean hasDoor( EnumFacing side) {
+	public Door getDoor( EnumFacing side) {
 		for( Door door : this.doors) {
 			if( door.facing == side) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
-	public Door getStairwell() {
-		for( Door door : this.doors) {
-			if( door.isStairwell()) {
 				return door;
 			}
 		}
 		return null;
 	}
+	
+	
+	public boolean hasDoor( EnumFacing side) {
+		return this.getDoor( side) != null;
+	}
+	
+	
+//	public Door getStairwell() {
+//		for( Door door : this.doors) {
+//			if( door.isStairwell()) {
+//				return door;
+//			}
+//		}
+//		return null;
+//	}
+	
+	
+	
+//	public int getPartial( EnumFacing side) {
+//		if( side == EnumFacing.X)
+//	}
 	
 	
 	public void findStartFromDoor( Door door){
