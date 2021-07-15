@@ -21,7 +21,7 @@ import witherwar.utility.Tickable;
  * Custom version of minecraft's TileEntities.
  * Was formerly BlockEntity, but made class names difficult to parse due to similarity with Block class.
  * Under this, a "tile" is really just a position in the world, analogous to a BlockPos.
- * A BlockPos will correspond to a BlockState, a Block, and possibly a TileEntity or a TileLogic.
+ * A BlockPos will correspond to a BlockState and possibly a TileEntity or a TileLogic.
  * This is cumbersome, but I have to work with what's given. And Blocks are stateless, so...
  *
  */
@@ -76,13 +76,13 @@ public abstract class TileLogic implements NBTSaveFormat,Tickable{
 
 		if( !this.amIDead && this.updatedOnTick && delta >= this.ticksUntilUpdate ) {
 			this.tickcountAtLastUpdate = tickcount;
-			ticklogic( world);
+			_ticklogic( world);
 		}
 	}
 	
 	
 	
-	public abstract void ticklogic( World world);
+	public abstract void _ticklogic( World world);
 	
 	
 	

@@ -76,7 +76,7 @@ public abstract class GrowingTile extends TileLogic{
 	
 	
 	@Override
-	public void ticklogic(World world) {
+	public void _ticklogic(World world) {
 		
 		if(this.parentsBefore > 20) {
 			this.iAmDead();

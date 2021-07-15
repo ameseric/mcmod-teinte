@@ -21,10 +21,7 @@ public class AshReplicatingBlock extends Block implements TileLogicContainer{
 		setCreativeTab( TEinTE.teinteTab);
 	}
 
-	@Override
-	public TileLogic getTileLogic(BlockPos pos) {
-		return TEinTE.instance.getTileLogic(pos);
-	}
+
 	
 	
 	

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
@@ -59,6 +60,7 @@ import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
 import witherwar.network.PlayerDashMessage;
 import witherwar.network.PlayerDashMessage.HandlePlayerDashMessage;
 import witherwar.command.CommandDarkenSky;
+import witherwar.command.CommandRunTests;
 import witherwar.command.CommandTeleportWW;
 import witherwar.disk.NBTSaveObject;
 import witherwar.disk.TeinteWorldSavedData;
@@ -98,22 +100,17 @@ public class TEinTE
     
     public HashMap<EntityPlayer ,ArrayDeque<Vec3d>> lastPlayerPos = new HashMap<>(); //TODO see if better solution
     
-//    public FactionManager factions = new FactionManager();
-    
-    public GlobalEntityManager gemtest = new GlobalEntityManager();
-	
 	private TeinteWorldSavedData savedata;
 	private RegionManager regions;
-	private InvasionSystem invader;
-//	private SystemBlockDegrade sysBlockDegrade;  
-//	private SystemPower sysPower;
 	private TileLoadManager tiles;
 	private PlayerLifeSystem playerlives;
 	private TemplateManager templates;
 	private int tickcount = 0;
 	
 	
-	//temp
+
+	
+	//temporary
 	public ArrayList<Faction2> factions = new ArrayList<>();
 	
 	
@@ -182,14 +179,14 @@ public class TEinTE
  //------------------------------  Non-Init Event Handlers ------------------------------------------------------------//
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public void onRenderBlockOverlay( RenderBlockOverlayEvent event) {
+    public void _onRenderBlockOverlay( RenderBlockOverlayEvent event) {
 //    	System.out.println( "OVERLAY TEST");
     }
     
     
     
     @SubscribeEvent
-    public void onChunkLoad( ChunkEvent.Load event) {
+    public void _onChunkLoad( ChunkEvent.Load event) {
 //    	System.out.println( "OVERLAY TEST");
     }
     
@@ -197,7 +194,7 @@ public class TEinTE
     
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public void onFogDensity( EntityViewRenderEvent.FogDensity event) {
+    public void _onFogDensity( EntityViewRenderEvent.FogDensity event) {
 //	    event.setDensity(0.1F);
 //	    event.setCanceled(true);
     }
@@ -205,7 +202,7 @@ public class TEinTE
     
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public void onFogColor( EntityViewRenderEvent.FogColors event) {
+    public void _onFogColor( EntityViewRenderEvent.FogColors event) {
 //	    event.setBlue(0.1F);
 //	    event.setGreen(0.1F);
 //	    event.setRed(0.1F);
@@ -215,14 +212,14 @@ public class TEinTE
     
     
     
-    public void onChunkUnload( ChunkEvent.Unload event) {
+    public void _onChunkUnload( ChunkEvent.Unload event) {
     }
     
     
     
     @SubscribeEvent
     //Triggers on client and server
-    public void onWorldLoad( WorldEvent.Load event) {
+    public void _onWorldLoad( WorldEvent.Load event) {
     	
     	
 //    	if( this.data == null) {
@@ -248,8 +245,7 @@ public class TEinTE
     
     
     @SubscribeEvent
-    public void playerLoggedOn( PlayerLoggedInEvent event) {
-//    	this.regions.playerMap.put( event.player ,""); //changed access, good?
+    public void _playerLoggedOn( PlayerLoggedInEvent event) {
     	this.regions.addPlayer( event.player);
     }
     
@@ -258,10 +254,10 @@ public class TEinTE
 
 	@SubscribeEvent
     @SideOnly(Side.CLIENT)
-	public void onClientTick(TickEvent.ClientTickEvent event) throws Exception {
+	public void _onClientTick(TickEvent.ClientTickEvent event) throws Exception {
 
 		if(event.phase.equals(Phase.END)){			
-			if( config.allowPlayerDash && proxy.isDashing()) {
+			if( config.allowPlayerDash && proxy.playerIsDashing()) {
 				TEinTE.networkwrapper.sendToServer( new PlayerDashMessage( ));
 			}
 
@@ -284,22 +280,19 @@ public class TEinTE
     
     @SubscribeEvent
     //Appears to be server-side only
-    public void onPlayerBlockPlace( BlockEvent.PlaceEvent event) {
-    	BlockPos pos = event.getPos();
-        
-        //got another particle to work, some particles need specific arguments, also
-    	//need to call through the proper channels
-    	WorldServer world = (WorldServer) event.getWorld();
+    public void _onPlayerBlockPlace( BlockEvent.PlaceEvent event) {
+
+//    	BlockPos pos = event.getPos();
+//    	WorldServer world = (WorldServer) event.getWorld();
+
 //    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
     	
    		
     		
-    		//generation sequence (where to start)
-    		//usable pattern (harder to determine than shape, since has to house structures)
 		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
 			
-			
-			this.createStructureTest( pos ,world);
+			System.out.println( "Placed stone block");
+//			this.createStructureTest( pos ,world);
 			
 //			this.createNewFactionTest( pos);
 			
@@ -337,6 +330,127 @@ public class TEinTE
     }
     
     
+  
+    
+    
+    
+    
+    
+    @EventHandler
+    // Happens after dimension loading
+    public void _onServerLoad(FMLServerStartingEvent event)
+    {
+    	event.registerServerCommand( new CommandDarkenSky());
+    	event.registerServerCommand( new CommandTeleportWW());
+    	event.registerServerCommand( new CommandRunTests());
+    	
+    	WorldServer world = DimensionManager.getWorld(0);
+    	
+
+		this.savedata = TeinteWorldSavedData.getInstance( world);
+    	
+		
+		this.regions = new RegionManager( this.savedata ,world);
+		this.tiles = new TileLoadManager( this.savedata ,world);
+		this.playerlives = new PlayerLifeSystem();
+		
+		NBTSaveObject[] objectsToSave = { this.tiles ,this.regions}; //TODO: add playerlives		
+		this.savedata.setObjectsToSave( objectsToSave);
+		this.savedata.forceReadFromNBT();
+		
+		MinecraftForge.EVENT_BUS.register( this.regions);
+    		//if config data is saved, use that in place of current config data?
+
+    }
+    
+    
+    
+    
+    @SubscribeEvent
+    //client & server-side
+    //ticks are phased, start/end
+    public void _onServerTick( TickEvent.ServerTickEvent event) {
+    	
+    	
+    	WorldServer world = DimensionManager.getWorld(0);
+		if( world.isRemote) { return;} //if logical client return
+		
+		
+		if( event.phase == Phase.START) {
+		}
+		
+		
+		if( event.phase == Phase.END) {
+			
+	    	
+	    	this.logPlayerPosition();
+	    	
+
+			
+			this.tiles.tick( tickcount ,world);
+			
+//			this.invader.tick( tickcount ,world);
+			
+//			for( Faction2 faction : this.factions) {
+//				if( faction.isDead()) {
+//					this.factions.remove( faction);
+//				}else {
+//					faction.tick(tickcount, world);
+//				}
+//			}
+	    	
+	    	
+			if( config.allowRegionOverlay) {
+				this.regions.tick( tickcount ,world);
+			}
+			
+			
+			tickcount += 1;
+		}
+        	
+	    			
+    }
+    
+    
+    
+    @SubscribeEvent
+    public void _onEntityDeath( LivingDeathEvent event) {
+    	if( event.getEntity() instanceof EntityPlayer) {
+    		this.playerlives.update( (EntityPlayer) event.getEntity());
+    	}
+    }
+    
+    
+    
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void _onConfigChanged( ConfigChangedEvent.OnConfigChangedEvent event) {
+    	ConfigManager.sync( MODID ,Config.Type.INSTANCE);
+    }
+    
+    
+    
+    
+
+    
+    
+  
+	//@SubscribeEvent
+	//triggers twice per tick, for 'start' and 'end'
+	//triggers independently for each dimension
+	public void _onWorldTick( TickEvent.WorldTickEvent event){
+		
+		if( event.world.isRemote) { return;} //if logical client, return
+		
+
+	}
+	
+	
+	
+	
+	
+	
+//------------------  Temporary behavior tests  ------------------
     //TODO move
     private void nbtStructureLoadTest( BlockPos pos ,WorldServer world) {
 		ResourceLocation tree_path = new ResourceLocation("witherwar:my_tree");
@@ -392,123 +506,12 @@ public class TEinTE
 		}
     	System.out.println( "Placement finished.");
     }
-    
-    
-    
-    
-    
-    
-    @EventHandler
-    // Happens after dimension loading
-    public void onServerLoad(FMLServerStartingEvent event)
-    {
-    	event.registerServerCommand( new CommandDarkenSky());
-    	event.registerServerCommand( new CommandTeleportWW());
-    	
-    	WorldServer world = DimensionManager.getWorld(0);
-    	
-
-		this.savedata = TeinteWorldSavedData.getInstance( world);
-    	
-		
-		this.regions = new RegionManager( this.savedata ,world);
-		this.tiles = new TileLoadManager( this.savedata ,world);
-		this.playerlives = new PlayerLifeSystem();
-		this.invader = new InvasionSystem();
-		
-		NBTSaveObject[] objectsToSave = { this.tiles ,this.regions}; //TODO: add playerlives		
-		this.savedata.setObjectsToSave( objectsToSave);
-		this.savedata.forceReadFromNBT();
-		
-		MinecraftForge.EVENT_BUS.register( this.regions);
-    		//if config data is saved, use that in place of current config data?
-
-    }
-    
-    
-    
-    
-    @SubscribeEvent
-    //client & server-side
-    //ticks are phased, start/end
-    public void onServerTick( TickEvent.ServerTickEvent event) {
-    	
-    	
-    	WorldServer world = DimensionManager.getWorld(0);
-		if( world.isRemote) { return;} //if logical client return
-		
-		
-		if( event.phase == Phase.START) {
-		}
-		
-		
-		if( event.phase == Phase.END) {
-			
-	    	
-	    	this.logPlayerPosition();
-	    	
-
-			
-			this.tiles.tick( tickcount ,world);
-			
-//			this.invader.tick( tickcount ,world);
-			
-			for( Faction2 faction : this.factions) {
-				if( faction.isDead()) {
-					this.factions.remove( faction);
-				}else {
-					faction.tick(tickcount, world);
-				}
-			}
-	    	
-	    	
-			if( config.allowRegionOverlay) {
-				this.regions.tick( tickcount ,world);
-			}
-			
-			
-			tickcount += 1;
-		}
-        	
-	    			
-    }
-    
-    
-    
-    @SubscribeEvent
-    public void onEntityDeath( LivingDeathEvent event) {
-    	if( event.getEntity() instanceof EntityPlayer) {
-    		this.playerlives.update( (EntityPlayer) event.getEntity());
-    	}
-    }
-    
-    
-    
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void onConfigChanged( ConfigChangedEvent.OnConfigChangedEvent event) {
-    	ConfigManager.sync( MODID ,Config.Type.INSTANCE);
-    }
-    
-    
-    
-    
-
-    
-    
-  
-	//@SubscribeEvent
-	//triggers twice per tick, for 'start' and 'end'
-	//triggers independently for each dimension
-	public void onWorldTick( TickEvent.WorldTickEvent event){
-		
-		if( event.world.isRemote) { return;} //if logical client, return
-		
-
-	}
+	
+	
+	
 
 	
- //------------------------------  API Calls ------------------------------------------------------------//   
+ //------------------------------  Public Interface  ----------------------------------------------------//   
 	/* I chose this structure to allow Teinte full access to the various Managers/Handlers, while shielding their public
 	 * methods from other classes.
 	 */
@@ -555,32 +558,12 @@ public class TEinTE
 	}
 	
 	
-/**	
-	private void birthTerralith() {
-		World world = DimensionManager.getWorld(0);
+//	public void spawnTileLogicIfNeeded( Block b ,BlockPos pos) {
+//		this.tiles.spawnTileLogicIfNeeded( b ,pos);
+//	}
+	
+	
 
-		List<EntityPlayer> players = world.playerEntities;
-		Random rand = new Random();
-				
-		if( players.size() > 0) {
-			int choice = rand.nextInt( players.size());
-			BlockPos center = players.get(choice).getPosition();
-			
-			int x = center.getX() + (rand.nextInt( 16) - rand.nextInt( 16));
-			int z = center.getZ() + (rand.nextInt( 16) - rand.nextInt( 16));
-			//BlockPos placement = new BlockPos( x+center.getX() ,200 ,z+center.getZ());
-			
-			for( int i=200; i>2; i--) {
-				BlockPos current = new BlockPos( x ,i ,z);
-				IBlockState cs = world.getBlockState( current);
-				if( cs.getBlock().getDefaultState() != Blocks.AIR.getDefaultState()) {
-					world.setBlockState( current ,WitherWar.newBlocks.get("flesh").block.getDefaultState() );
-					break;
-				}
-			}
-		}
-	}
-**/	
 
 	
 //------------------------------  Assist Methods ------------------------------------------------------------//  
@@ -588,8 +571,8 @@ public class TEinTE
 	//Must be called server-side
 	private void logPlayerPosition() {
 		
-		List<EntityPlayerMP> players = 
-				FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();		
+		List<EntityPlayerMP> players = MCForge.getAllPlayersOnServer();
+						
 		
 		for( EntityPlayerMP player : players) {
     		if( !this.lastPlayerPos.containsKey(player)) {

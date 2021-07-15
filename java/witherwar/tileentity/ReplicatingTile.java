@@ -62,7 +62,7 @@ public class ReplicatingTile extends TileLogic{
 	
 
 	@Override
-	public void ticklogic(World worldIn) {
+	public void _ticklogic(World worldIn) {
 		WorldServer world = (WorldServer) worldIn;
 		
 		if( firstrun && BlockUtil.notTouchingAir( this.getPos() ,world)) {

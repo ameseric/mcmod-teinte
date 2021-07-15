@@ -1,4 +1,4 @@
-package witherwar.alchemy;
+package witherwar.hermetics;
 
 import java.util.ArrayList;
 import java.util.Collections;

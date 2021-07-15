@@ -1,9 +1,9 @@
-package witherwar.alchemy;
+package witherwar.hermetics;
 
 import java.util.ArrayList;
 
 
-public class Fluid {
+public class ElementalFluid {
 
 	private ArrayList<Element> elements;
 	private ArrayList<ElementalBond> bonds;
@@ -11,16 +11,17 @@ public class Fluid {
 	
 	
 	
-	public Fluid( ArrayList<Element> elements) {
+	public ElementalFluid( ArrayList<Element> elements) {
 		this.elements = elements;
 		this.calculateBonds();
 	}
 	
-	public Fluid() {
+	public ElementalFluid() {
 		this.elements = new ArrayList<>();
+		this.bonds = new ArrayList<>();
 	}
 	
-	public Fluid( Element[] arr) {
+	public ElementalFluid( Element[] arr) {
 		this();
 		this.add( arr);
 	}
@@ -38,7 +39,7 @@ public class Fluid {
 	
 	
 	
-	public void add( Fluid f) {
+	public void add( ElementalFluid f) {
 		for( Element e : f.getElements()) {
 			this.add(e ,false);
 		}
@@ -83,10 +84,10 @@ public class Fluid {
 	
 	@Override
 	public boolean equals( Object o) {
-		if( !(o instanceof Fluid)) {
+		if( !(o instanceof ElementalFluid)) {
 			return false;
 		}
-		Fluid f = (Fluid) o;
+		ElementalFluid f = (ElementalFluid) o;
 		
 		return this.elements == f.getElements();
 	}	
@@ -99,8 +100,8 @@ public class Fluid {
 	
 	
 	
-	public static Fluid random() {
-		Fluid f = new Fluid();
+	public static ElementalFluid random() {
+		ElementalFluid f = new ElementalFluid();
 		for( Element e : Element.values()) {
 			double rand = Math.random();
 			if( rand < 0.7) {
@@ -111,8 +112,8 @@ public class Fluid {
 		return f;
 	}
 	
-	public static Fluid empty() {
-		return new Fluid();
+	public static ElementalFluid empty() {
+		return new ElementalFluid();
 	}
 
 	

@@ -15,6 +15,10 @@ public class DebugMain {
 	public static void main(String args[]){
 		
 		System.out.println( "Hello world");
+		
+		
+		TestMain tester = new TestMain();
+		tester.run();
 
 
 //		strings = new ArrayList<>();

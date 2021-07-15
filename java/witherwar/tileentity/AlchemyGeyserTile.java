@@ -5,15 +5,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
-import witherwar.alchemy.Element;
-import witherwar.alchemy.Fluid;
+import witherwar.hermetics.Element;
+import witherwar.hermetics.ElementalFluid;
 
-public class AlchemyGeyserTile extends FluidContainerTile{
+public class AlchemyGeyserTile extends ElementalFluidContainerTile{
 
 	public AlchemyGeyserTile(BlockPos pos) {
 		super(pos ,ObjectCatalog.GEYSER ,TileLogic.GEYSER_ID ,false ,1);
-		this.setContents( Fluid.random() );
-		System.out.println( this.getContents());
+		this.setContents( ElementalFluid.random() );
+		System.out.println( this.peekAtContents());
 		System.out.println( );
 	}
 
@@ -23,12 +23,12 @@ public class AlchemyGeyserTile extends FluidContainerTile{
 	}
 
 	@Override
-	public void ticklogic(World world) {
+	public void _ticklogic(World world) {
 	}
 	
 	@Override
-	public Fluid pullFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
-		return this.getContents();
+	public ElementalFluid _takeFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
+		return this.peekAtContents();
 	}
 
 	@Override

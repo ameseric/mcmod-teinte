@@ -7,13 +7,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
-import witherwar.alchemy.Fluid;
-import witherwar.alchemy.FluidContainer;
+import witherwar.hermetics.ElementalFluid;
+import witherwar.hermetics.ElementalFluidContainer;
 import witherwar.utility.BlockUtil;
 
 
 
-public class ConduitTile extends FluidContainerTile {
+public class ConduitTile extends ElementalFluidContainerTile {
 
 	public ConduitTile(BlockPos pos) {
 		super( pos ,ObjectCatalog.CONDUIT ,TileLogic.CONDUIT_ID ,false ,1);
@@ -21,17 +21,17 @@ public class ConduitTile extends FluidContainerTile {
 
 
 	
-	public Fluid pullFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
+	public ElementalFluid _takeFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
 		HashMap<BlockPos ,Block> neighbors = BlockUtil.getNeighborBlocks( myPos ,world);
-		Fluid input = new Fluid();
+		ElementalFluid input = new ElementalFluid();
 		for( BlockPos neighborPos : neighbors.keySet()) {
 			Block neighbor = neighbors.get( neighborPos);
-			if( neighbor instanceof FluidContainer && !neighborPos.equals( requesterPos)) {
-				input.add( ((FluidContainer) neighbor).pullFluid( myPos ,neighborPos ,world));
+			if( neighbor instanceof ElementalFluidContainer && !neighborPos.equals( requesterPos)) {
+				input.add( ((ElementalFluidContainer) neighbor)._takeFluid( myPos ,neighborPos ,world));
 			}
 		}
 
-		return this.cycleFluid( input);
+		return this._cycleFluid( input);
 	}
 	
 	
@@ -44,7 +44,7 @@ public class ConduitTile extends FluidContainerTile {
 	
 	
 	@Override
-	public void ticklogic(World world) {
+	public void _ticklogic(World world) {
 		//passive
 	}
 

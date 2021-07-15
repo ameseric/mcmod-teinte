@@ -51,7 +51,7 @@ public class KaliCoreTile extends TileLogic{
 	
 	
 	@Override
-	public void ticklogic( World world) {
+	public void _ticklogic( World world) {
 		HashMap<BlockPos,Block> neighbors = BlockUtil.getNeighborBlocks( this.getPos() ,world);
 		
 		for( BlockPos pos : neighbors.keySet() ) {

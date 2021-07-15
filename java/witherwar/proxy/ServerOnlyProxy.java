@@ -38,7 +38,7 @@ public class ServerOnlyProxy implements Proxy{
 	}
 
 	@Override
-	public boolean isDashing() {
+	public boolean playerIsDashing() {
 		// TODO Auto-generated method stub
 		return false;
 	}

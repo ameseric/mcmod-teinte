@@ -38,14 +38,6 @@ public class DebugBlock extends Block implements TileLogicContainer{
 	}
 
 
-
-
-
-	@Override
-	public TileLogic getTileLogic(BlockPos pos) {
-		return TEinTE.instance.getTileLogic( pos);
-	}
-
 	
 	
 }

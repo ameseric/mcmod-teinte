@@ -11,12 +11,12 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
 import witherwar.TEinTE;
-import witherwar.alchemy.Fluid;
-import witherwar.alchemy.FluidContainer;
 import witherwar.block.DirectionalBlock;
 import witherwar.block.FluidContainerBlock;
+import witherwar.hermetics.ElementalFluid;
+import witherwar.hermetics.ElementalFluidContainer;
 
-public class RitualBlockTile extends FluidContainerTile {
+public class RitualBlockTile extends ElementalFluidContainerTile {
 
 	
 	private EnumFacing facing;
@@ -29,7 +29,7 @@ public class RitualBlockTile extends FluidContainerTile {
 	private boolean busy = false;
 	
 
-	private Fluid fuelType = new Fluid();
+	private ElementalFluid fuelType = new ElementalFluid();
 	
 	
 	public RitualBlockTile(BlockPos pos ,World world) {
@@ -42,41 +42,100 @@ public class RitualBlockTile extends FluidContainerTile {
 
 
 	
-	public void ticklogic( World world) {
-		if( this.canWork( world)) {
-			this.performWork();
-		}else if( this.hasNoOutput( world)) {
-			Fluid f = this.pullFluid( this.getPos() ,this.getPos() ,world);
+	public void _ticklogic( World world) {
+		if( canWork( world)) {
+			performWork();
+		}else if( hasNoOutput( world)) {
+			ElementalFluid f = _takeFluid( getPos() ,getPos() ,world);
 			System.out.println( f);
 		}
 	}
 	
 	
 	@Override
-	public Fluid pullFluid(BlockPos requesterPos, BlockPos myPos, World world) {
-		if( !requesterPos.equals( this.outputPos) || !this.hasInputProduct()) {
-			return Fluid.empty();
+	public ElementalFluid _takeFluid(BlockPos requesterPos, BlockPos myPos, World world) {
+		if( !requesterPos.equals( this.outputPos) || !hasInputProduct()) {
+			return ElementalFluid.empty();
 		}
 		
 		
 		Block inputBlock = world.getBlockState( this.inputPos).getBlock();
-		Fluid input = new Fluid();
-		if( inputBlock instanceof FluidContainer) {
-			input.add( ((FluidContainer) inputBlock).pullFluid(requesterPos, this.inputPos, world));
+		ElementalFluid input = new ElementalFluid();
+		if( inputBlock instanceof ElementalFluidContainer) {
+			input.add( ((ElementalFluidContainer) inputBlock)._takeFluid(requesterPos, this.inputPos, world));
 		}
 
-		return this.cycleFluid(input);
+		return _cycleFluid(input);
 	}
 	
 	
 	
-	public Fluid pullFuel() {
-		return null;
+	
+	
+	
+	
+	
+	
+	public boolean hasFuel( World world) {
+		TileLogic tl = TEinTE.instance.getTileLogic( this.fuelPos);
+		if( tl instanceof ElementalFluidContainerTile) {
+			return ((ElementalFluidContainerTile) tl).peekAtContents().equals( this.fuelType);
+		}
+		return false;
 	}	
 	
 	
+	public boolean canWork( World world) {
+		return hasFuel( world) && hasInputProduct();
+	}
+
+	
+	public boolean hasFluid() {
+		return false;
+	}
+	
+	
+	public boolean hasInputProduct() {
+		return true;
+	}
+	
+	
+	public boolean hasNoOutput( World world) {
+		return !( world.getBlockState( this.outputPos).getBlock() instanceof FluidContainerBlock);
+	}
+	
+	
+	public String getDataName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	public BlockPos getOutputPos( World world) {
+		return this.outputPos;
+	}
+	
+	
+	public BlockPos getInputPos( World world) {
+		return this.inputPos;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private ElementalFluid pullFuel() {
+		return null;
+	}
+	
+		
 	private void performWork() {
-		this.pullFuel();
+		pullFuel();
 		this.worktick += 1;
 		if( this.worktick == this.WORKTICKLENGTH) {
 			this.busy = false;
@@ -95,57 +154,13 @@ public class RitualBlockTile extends FluidContainerTile {
 	
 	
 	
-	public boolean hasFuel( World world) {
-		TileLogic tl = TEinTE.instance.getTileLogic( this.fuelPos);
-		if( tl instanceof FluidContainerTile) {
-			return ((FluidContainerTile) tl).getContents().equals( this.fuelType);
-		}
-		return false;
-	}	
-	
-	public boolean canWork( World world) {
-		return this.hasFuel( world) && this.hasInputProduct();
-	}
 
-	public boolean hasFluid() {
-		return false;
-	}
-	
-	
-	public boolean hasInputProduct() {
-		return true;
-	}
-	
-	
-	public boolean hasNoOutput( World world) {
-		return !( world.getBlockState( this.outputPos).getBlock() instanceof FluidContainerBlock);
-	}
 
 	
 	
-	public Fluid cycleFluid( Fluid input) {
-		Fluid output = this.getContents();
-		this.setContents( input);
-		return output;
-	}
+
 
 	
-	public String getDataName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	
-	public BlockPos getOutputPos( World world) {
-		return this.outputPos;
-	}
-	
-	
-	public BlockPos getInputPos( World world) {
-		return this.inputPos;
-	}
-
 
 
 	@Override

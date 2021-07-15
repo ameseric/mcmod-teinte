@@ -112,7 +112,7 @@ public class ClientOnlyProxy implements Proxy{
 
 
 	@Override
-	public boolean isDashing() {
+	public boolean playerIsDashing() {
 		return dashKeybind.isPressed();
 		
 	}

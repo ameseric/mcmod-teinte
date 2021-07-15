@@ -54,11 +54,6 @@ public class KaliCoreBlock extends Block implements TileLogicContainer{
 		TEinTE.instance.registerBlockEntity( new KaliCoreTile( pos));
 	}
 
-
-	@Override
-	public TileLogic getTileLogic( BlockPos pos) {
-		return TEinTE.instance.getTileLogic( pos);
-	}
 	
 //	@Override //TODO: superfulous? BEManager already removes dead entities.
 //	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {

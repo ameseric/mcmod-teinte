@@ -7,9 +7,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
-import witherwar.alchemy.Element;
-import witherwar.alchemy.Fluid;
-import witherwar.alchemy.FluidContainer;
+import witherwar.hermetics.Element;
+import witherwar.hermetics.ElementalFluid;
+import witherwar.hermetics.ElementalFluidContainer;
 import witherwar.tileentity.AlchemyGeyserTile;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.RitualBlockTile;
@@ -17,7 +17,7 @@ import witherwar.tileentity.RitualBlockTile;
 
 
 
-public class AlchemyGeyserBlock extends FluidContainerBlock{
+public class AlchemyGeyserBlock extends Block{
 
 	
 	public AlchemyGeyserBlock() {

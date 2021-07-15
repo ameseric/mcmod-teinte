@@ -6,7 +6,6 @@ import net.minecraft.world.World;
 
 public interface TileLogicContainer {
 
-	public TileLogic getTileLogic( BlockPos pos);
 	
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state);
 

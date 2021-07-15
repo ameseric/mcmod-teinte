@@ -6,13 +6,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
-import witherwar.alchemy.Fluid;
-import witherwar.alchemy.FluidContainer;
+import witherwar.hermetics.ElementalFluid;
+import witherwar.hermetics.ElementalFluidContainer;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLogicContainer;
 
 
-public abstract class FluidContainerBlock extends Block implements FluidContainer ,TileLogicContainer{
+public abstract class FluidContainerBlock extends Block implements ElementalFluidContainer ,TileLogicContainer{
 
 	
 	
@@ -23,8 +23,8 @@ public abstract class FluidContainerBlock extends Block implements FluidContaine
 
 	
 	
-	public Fluid pullFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
-		return ((FluidContainer) this.getTileLogic(myPos)).pullFluid( requesterPos ,myPos ,world);
+	public ElementalFluid _takeFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
+		return ((ElementalFluidContainer) this.getTileLogic(myPos))._takeFluid( requesterPos ,myPos ,world);
 	}
 
 
@@ -33,7 +33,6 @@ public abstract class FluidContainerBlock extends Block implements FluidContaine
 		return TEinTE.instance.getTileLogic( pos);
 	}
 
-	
 	
 
 	

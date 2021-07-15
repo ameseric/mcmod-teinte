@@ -21,7 +21,7 @@ public interface Proxy {
     void openGui( int ID ,IMessage msg);
     
     
-    public boolean isDashing();
+    public boolean playerIsDashing();
 	
 	
 }

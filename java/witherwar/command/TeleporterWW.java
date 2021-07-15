@@ -10,6 +10,9 @@ import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nonnull;
 
+
+
+
 public class TeleporterWW extends Teleporter {
 
     public TeleporterWW(WorldServer world, double x, double y, double z) {

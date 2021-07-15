@@ -5,14 +5,14 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
-import witherwar.alchemy.Fluid;
-import witherwar.alchemy.FluidContainer;
+import witherwar.hermetics.ElementalFluid;
+import witherwar.hermetics.ElementalFluidContainer;
 import witherwar.tileentity.TileLogic;
 import witherwar.tileentity.TileLogicContainer;
 import witherwar.tileentity.RitualBlockTile;
 
 
-public class RitualBlock extends DirectionalBlock implements FluidContainer ,TileLogicContainer{
+public class RitualBlock extends DirectionalBlock{
 
 	
 	
@@ -25,10 +25,6 @@ public class RitualBlock extends DirectionalBlock implements FluidContainer ,Til
 	}
 
 	
-	public TileLogic getTileLogic(BlockPos pos) {
-		return TEinTE.instance.getTileLogic( pos);
-	}
-	
 	
 	
 	@Override
@@ -36,11 +32,6 @@ public class RitualBlock extends DirectionalBlock implements FluidContainer ,Til
 		TEinTE.instance.registerBlockEntity( new RitualBlockTile( pos ,world));
 	}
 
-
-	@Override
-	public Fluid pullFluid(BlockPos requesterPos, BlockPos myPos, World world) {
-		return ((FluidContainer) this.getTileLogic(myPos)).pullFluid( requesterPos ,myPos ,world);
-	}
 
 
 }
