@@ -1,6 +1,7 @@
 package witherwar.tilelogic;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
@@ -37,15 +38,16 @@ public class ConduitTile extends ElementalFluidContainerTile {
 
 
 
-	//TODO this is broken, wait to fix until proven in-game
-	public ElementalFluid _takeFluid( BlockPos requesterPos) {
+	public ElementalFluid _takeFluid( BlockPos requesterPos ,HashSet<BlockPos> traversed) {
+		traversed.add( getPos());
+		
 		HashMap<BlockPos ,Tile> neighbors = MCForge.getNeighbors( getPos());
 		ElementalFluid input = new ElementalFluid();
 		
 		for( BlockPos neighborPos : neighbors.keySet()) {
 			TileLogic neighbor = neighbors.get( neighborPos).logic();
-			if( neighbor instanceof ElementalFluidContainer && !neighborPos.equals( requesterPos)) {
-				input.add( ((ElementalFluidContainer) neighbor)._takeFluid( getPos()));
+			if( neighbor instanceof ElementalFluidContainer && !traversed.contains(neighborPos)) {
+				input.add( ((ElementalFluidContainer) neighbor)._takeFluid( getPos() ,traversed));
 			}
 		}
 		return _cycleFluid( input);

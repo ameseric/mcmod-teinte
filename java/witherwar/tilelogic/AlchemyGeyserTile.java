@@ -1,5 +1,7 @@
 package witherwar.tilelogic;
 
+import java.util.HashSet;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -38,8 +40,9 @@ public class AlchemyGeyserTile extends ElementalFluidContainerTile{
 	}
 	
 	@Override
-	public ElementalFluid _takeFluid( BlockPos requesterPos) {
+	public ElementalFluid _takeFluid( BlockPos requesterPos ,HashSet<BlockPos> traversed) {
 		System.out.println( "Got to geyser...");
+		traversed.add( getPos());
 		return this.peekAtContents();
 	}
 

@@ -1,5 +1,7 @@
 package witherwar.tilelogic;
 
+import java.util.HashSet;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -45,24 +47,25 @@ public class RitualBlockTile extends ElementalFluidContainerTile {
 	public void _ticklogic( World world) {
 		if( isEndOfChain()) {
 			System.out.println( "triggering pull...");
-			ElementalFluid e = ElementalFluid.empty();
-			ElementalFluid f = getInput()._takeFluid( getPos());
-			e.add( f);
-			_cycleFluid( e);
+			HashSet<BlockPos> traversed = new HashSet<BlockPos>();
+			traversed.add( getPos());
+			ElementalFluid f = getInput()._takeFluid( getPos() ,traversed);
+			_cycleFluid( f);
 		}
 		System.out.println( this.peekAtContents());
 	}
 	
 	
 	@Override
-	public ElementalFluid _takeFluid(BlockPos requesterPos) {
-		if( !requesterPos.equals( getOutputPos())) {
+	public ElementalFluid _takeFluid(BlockPos requesterPos ,HashSet<BlockPos> traversed) {
+		if( !requesterPos.equals( getOutputPos()) || traversed.contains(getPos())) {
 			return ElementalFluid.empty();
 		}
+		traversed.add( getPos());
 		
 		ElementalFluid input = ElementalFluid.empty();
 		if( hasInput()) {
-			 input = getInput()._takeFluid( getPos());
+			 input = getInput()._takeFluid( getPos() ,traversed);
 		}
 
 		return _cycleFluid(input);
@@ -161,9 +164,6 @@ public class RitualBlockTile extends ElementalFluidContainerTile {
 	}
 	
 	
-	private ElementalFluid takeFluidFromInput() {
-		return getInput()._takeFluid( getPos());
-	}
 	
 	
 	private void setupExternalPositions() {

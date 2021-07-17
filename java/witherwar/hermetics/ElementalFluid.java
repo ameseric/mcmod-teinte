@@ -6,64 +6,75 @@ import java.util.ArrayList;
 public class ElementalFluid {
 
 	private ArrayList<Element> elements;
-	private ArrayList<ElementalBond> bonds;
+//	private ArrayList<ElementalBond> bonds;
 	
 	
 	
 	
 	public ElementalFluid( ArrayList<Element> elements) {
 		this.elements = elements;
-		this.calculateBonds();
 	}
 	
 	public ElementalFluid() {
 		this.elements = new ArrayList<>();
-		this.bonds = new ArrayList<>();
-	}
+	}	
 	
-	public ElementalFluid( Element[] arr) {
-		this();
-		this.add( arr);
-	}
-	
-	
-	
-	
-	
-	private void calculateBonds() {
-		this.bonds = ElementalBond.getAllPossibleBonds( (ArrayList<Element>) this.elements.clone());
-	}
-	
-	
+
 	
 	
 	public void add( ElementalFluid f) {
 		for( Element e : f.getElements()) {
-			this.add(e ,false);
+			add(e);
 		}
-		this.calculateBonds();
-	}
-	
-	public void add( Element[] arr) {
-		for( Element e : arr) {
-			this.add( e ,false);
-		}
-		this.calculateBonds();
 	}
 	
 	public void add( Element e) {
-		this.add( e ,true);
-	}
-	
-	private void add( Element e ,boolean bondCheck) {
-		if( !this.elements.contains(e)) {
+		if( e != null && !this.elements.contains(e)) {
 			this.elements.add(e);
 		}
-		if( bondCheck) {
-			this.calculateBonds();
-		}
 	}
 	
+	
+	public ElementalFluid remove( Element e) {
+		ElementalFluid f = new ElementalFluid();
+		if( has( e)) {
+			transfer( e ,f);
+			
+			Element glbe = null;
+			if( has( e.getGreaterBondingElement())) {
+				glbe = e.getGreaterBondingElement();
+			}else if( has( e.getLesserBondingElement())){
+				glbe = e.getLesserBondingElement();
+			}
+			
+			if( glbe != null) {
+				transfer( glbe ,f);
+				Element tbe = e.getTrinaryBondingElement( glbe); 
+				if( has( tbe)) {
+					transfer( tbe ,f);
+				}
+			}
+		}
+		return f;
+	}
+	
+	
+	private void transfer( Element e ,ElementalFluid f) {
+		getElements().remove( e);
+		f.add( e);
+	}
+	
+	
+	
+	public boolean has( Element e) {
+		return getElements().contains( e);
+	}
+	
+	
+	public ArrayList<ElementalBond> getBonds(){
+//		calculateBonds();
+		return ElementalBond.getAllPossibleBonds( (ArrayList<Element>) this.elements.clone());
+	}
 	
 	
 	public ArrayList<Element> getElements() {
@@ -93,7 +104,7 @@ public class ElementalFluid {
 	
 	@Override
 	public String toString() {
-		return this.bonds.toString();
+		return getElements().toString();
 	}
 	
 	
@@ -103,16 +114,22 @@ public class ElementalFluid {
 		for( Element e : Element.values()) {
 			double rand = Math.random();
 			if( rand < 0.7) {
-				f.add( e ,false);
+				f.add( e);
 			}
 		}
-		f.calculateBonds();
 		return f;
 	}
 	
 	public static ElementalFluid empty() {
 		return new ElementalFluid();
 	}
+	
+	
+	
+	
+//	private void calculateBonds() {
+//		this.bonds = ElementalBond.getAllPossibleBonds( (ArrayList<Element>) this.elements.clone());
+//	}
 
 	
 }
