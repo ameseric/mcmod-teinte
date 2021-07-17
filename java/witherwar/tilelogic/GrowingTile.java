@@ -1,4 +1,4 @@
-package witherwar.tileentity;
+package witherwar.tilelogic;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -23,6 +23,10 @@ public abstract class GrowingTile extends TileLogic{
 	private Block liveCell;
 	
 	protected EnumFacing directionOfGrowth;
+	
+	
+	
+
 	
 	
 	
@@ -52,9 +56,10 @@ public abstract class GrowingTile extends TileLogic{
 	
 	
 	
-
-	public GrowingTile(BlockPos pos ,Block b ,int id ,int ticksUntilUpdate) {
-		super( pos, b, id, true, ticksUntilUpdate);
+	public GrowingTile() {}
+	
+	public GrowingTile(BlockPos pos ,Block b ,int ticksUntilUpdate) {
+		super( pos, b, true, ticksUntilUpdate);
 	}
 	
 

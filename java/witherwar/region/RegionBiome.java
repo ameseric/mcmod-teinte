@@ -35,7 +35,6 @@ public class RegionBiome extends Region{
 	private HashSet<Integer> rejectedBiomes = Sets.newHashSet( 16 ,25 ,26);
 	private final int REGION_SIZE_LIMIT = 1000;	
 	
-	//similarBiome setup
 	static {
 		List< HashSet<Integer>> biomeGroups = new ArrayList<>();		
 		biomeGroups.add( Sets.newHashSet( 0 ,24 ,46 ,49 ,45 ,48 ,44 ,47)); //oceans

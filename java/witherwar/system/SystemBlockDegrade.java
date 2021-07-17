@@ -11,12 +11,8 @@ public class SystemBlockDegrade implements NBTSaveFormat{
 	static final int NEUTRAL = 1;
 	static final int SLOW = 0;
 	
-	private TeinteWorldSavedData savedata;
 	
 	
-	public SystemBlockDegrade( TeinteWorldSavedData data) {
-		this.savedata = data;
-	}
 	
 	
 	public void tick( TickEvent.WorldTickEvent event ,int tickcount) {
@@ -40,10 +36,6 @@ public class SystemBlockDegrade implements NBTSaveFormat{
 	}
 	
 	
-	@Override
-	public void markDirty() {
-		this.savedata.markDirty();
-	}
 
 
 	@Override

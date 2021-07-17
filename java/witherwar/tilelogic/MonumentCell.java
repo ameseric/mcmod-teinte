@@ -1,9 +1,10 @@
-package witherwar.tileentity;
+package witherwar.tilelogic;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import witherwar.TEinTE;
 import witherwar.utility.Symbol;
 
 
@@ -12,13 +13,16 @@ import witherwar.utility.Symbol;
 public class MonumentCell extends GrowingTile{
 	
 	
+	static {
+		TileLogicManager.registerClass( new MonumentCell());
+	}
 	
 	
 	
+	public MonumentCell() {}
 	
-
 	public MonumentCell(BlockPos pos) {
-		super(pos ,Blocks.OBSIDIAN ,TileLogic.MONUMENT_ID ,40);
+		super(pos ,Blocks.OBSIDIAN ,40);
 		this.celltype = CellType.SEED;
 	}
 	
@@ -62,18 +66,19 @@ public class MonumentCell extends GrowingTile{
 	@Override
 	protected boolean canGrow() {
 		return true;
-	}
-
-
-	
-
-
+	}	
 
 
 
 
 	@Override
-	public void readFromNBT(NBTTagCompound compound) {
+	protected NBTTagCompound __writeToNBT(NBTTagCompound nbt) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void __readFromNBT(NBTTagCompound nbt) {
 		// TODO Auto-generated method stub
 		
 	}

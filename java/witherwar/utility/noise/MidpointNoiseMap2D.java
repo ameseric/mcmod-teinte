@@ -141,15 +141,6 @@ public class MidpointNoiseMap2D extends NoiseMap2D {
 	}
 
 
-
-	@Override
-	public void markDirty() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
 	@Override
 	public String getDataName() {
 		// TODO Auto-generated method stub

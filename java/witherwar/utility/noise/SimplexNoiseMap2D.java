@@ -68,15 +68,6 @@ public class SimplexNoiseMap2D extends NoiseMap2D{
 
 
 
-	@Override
-	public void markDirty() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-
 
 	@Override
 	public String getDataName() {

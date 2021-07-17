@@ -48,7 +48,7 @@ public abstract class Faction2 implements Tickable{
 	
 	
 	@Override
-	public void tick( int tickcount ,WorldServer world) {
+	public void _tick( int tickcount ,WorldServer world) {
 		if( tickcount%this.tickrate != 0){
 			return;
 		}

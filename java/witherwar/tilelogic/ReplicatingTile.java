@@ -1,4 +1,4 @@
-package witherwar.tileentity;
+package witherwar.tilelogic;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -27,8 +27,17 @@ public class ReplicatingTile extends TileLogic{
 	private boolean firstrun = true;
 
 	
+	
+	static {
+		TileLogicManager.registerClass( new AlchemyGeyserTile());
+	}
+	
+	
+	
+	public ReplicatingTile() {}
+	
 	public ReplicatingTile(BlockPos pos) { //(int)(Math.random() * 500)+20
-		super(pos, ObjectCatalog.ASH_REPL_BLOCK, TileLogic.REPLICATE_ID, true ,getRandomTickAmount(100));
+		super(pos, ObjectCatalog.ASH_REPL_BLOCK, true ,getRandomTickAmount(100));
 		this.dontChange.add( Blocks.OBSIDIAN);
 		this.dontChange.add( ObjectCatalog.TERRA_KALI);
 		this.dontChange.add( Blocks.AIR);
@@ -106,10 +115,14 @@ public class ReplicatingTile extends TileLogic{
 	}
 
 
-
+	@Override
+	protected NBTTagCompound __writeToNBT(NBTTagCompound nbt) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound compound) {
+	protected void __readFromNBT(NBTTagCompound nbt) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -8,7 +8,7 @@ public interface Tickable {
 	public boolean isDead();
 	
 	
-	public void tick( int tickcount ,WorldServer world);
+	public void _tick( int tickcount ,WorldServer world);
 	
 	
 }

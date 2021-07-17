@@ -10,9 +10,9 @@ import witherwar.TEinTE;
 import witherwar.hermetics.Element;
 import witherwar.hermetics.ElementalFluid;
 import witherwar.hermetics.ElementalFluidContainer;
-import witherwar.tileentity.AlchemyGeyserTile;
-import witherwar.tileentity.TileLogic;
-import witherwar.tileentity.RitualBlockTile;
+import witherwar.tilelogic.AlchemyGeyserTile;
+import witherwar.tilelogic.RitualBlockTile;
+import witherwar.tilelogic.TileLogic;
 
 
 
@@ -30,7 +30,7 @@ public class AlchemyGeyserBlock extends Block{
 
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new AlchemyGeyserTile( pos));
+		TEinTE.instance.registerTileLogic( new AlchemyGeyserTile( pos));
 	}
 
 

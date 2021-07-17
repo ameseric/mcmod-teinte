@@ -10,8 +10,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.template.Template;
 import witherwar.TEinTE;
-import witherwar.tileentity.TileLogic;
-import witherwar.tileentity.TileLogicContainer;
+import witherwar.tilelogic.TileLogic;
+import witherwar.tilelogic.TileLogicContainer;
 import witherwar.utility.Tickable;
 
 public abstract class FunctionalStructure extends Structure implements Tickable{
@@ -58,7 +58,7 @@ public abstract class FunctionalStructure extends Structure implements Tickable{
 
 
 	@Override
-	public void tick(int tickcount, WorldServer world) {
+	public void _tick(int tickcount, WorldServer world) {
 				
 	}
 	

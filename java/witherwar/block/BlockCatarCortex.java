@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
-import witherwar.tileentity.deprecated.TileEntityCataromotus;
+import witherwar.tileentity.TileEntityCataromotus;
 
 public class BlockCatarCortex extends Block{
 	

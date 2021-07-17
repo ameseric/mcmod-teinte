@@ -1,4 +1,4 @@
-package witherwar.tileentity;
+package witherwar.tilelogic;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;

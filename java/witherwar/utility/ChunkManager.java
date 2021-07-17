@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager.OrderedLoadingCallback;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
-import witherwar.tileentity.deprecated.TileEntitySerpentmind;
+import witherwar.tileentity.TileEntitySerpentmind;
 
 
 /**

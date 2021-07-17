@@ -6,12 +6,14 @@ import java.util.HashSet;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 import witherwar.TEinTE;
 import witherwar.region.RegionManager;
 import witherwar.system.SystemBlockDegrade;
 import witherwar.system.SystemPower;
+import witherwar.utility.Tickable;
 
 /**
  * 
@@ -27,7 +29,7 @@ import witherwar.system.SystemPower;
 
 
 
-public class TeinteWorldSavedData extends WorldSavedData {
+public class TeinteWorldSavedData extends WorldSavedData implements Tickable{
 	
 	private static final String DATA_NAME = TEinTE.MODID + "_SaveData";
 	
@@ -49,15 +51,7 @@ public class TeinteWorldSavedData extends WorldSavedData {
 		super(s);
 	}
 	
-	
-	
-	public void setObjectsToSave( NBTSaveObject[] a ) {
-		this.objectsForReadWrite = a;
-	}
-	
 
-	
-	
 	
 
 	
@@ -65,24 +59,16 @@ public class TeinteWorldSavedData extends WorldSavedData {
 	
 	
 	@Override
-	//called by getOrLoadData
-	//we defer the actual read until manually called in forceReadFromNBT()
+	//called by getOrLoadData (triggered in getInstance) (might actually be earlier, during forge init?)
 	public void readFromNBT(NBTTagCompound nbt) {
 		System.out.println( "=================" + nbt.toString() + "================");
-
-		//this.regionMap.readFromNBT( nbt);
-		
-//		for( NBTSaveObject systemToSave : this.objectsForReadWrite){
-//			NBTTagCompound objectNBT = nbt.getCompoundTag( systemToSave.getDataName());
-//			systemToSave.readFromNBT( objectNBT);
-//		}
 		this.nbtcopy = nbt.copy();
 	}
 	
 	
 	
-	public void forceReadFromNBT() {
-		System.out.println( "Copy of nbt: " + this.nbtcopy);
+	private void lazyReadFromNBT(){
+		System.out.println( "Local nbt copy: " + this.nbtcopy);
 		for( NBTSaveObject systemToSave : this.objectsForReadWrite){
 			NBTTagCompound objectNBT = this.nbtcopy.getCompoundTag( systemToSave.getDataName());
 			systemToSave.readFromNBT( objectNBT);
@@ -129,8 +115,8 @@ public class TeinteWorldSavedData extends WorldSavedData {
 	
 
 	//meant for Overworld dimension (0) storage only (for now) (but is using global MapStorage)
-	public static TeinteWorldSavedData getInstance( World world) {
-		MapStorage storage = world.getMapStorage();//getPerWorldStorage(); //TODO: Switch perWorld to Global
+	public static TeinteWorldSavedData getInstance( World world ,NBTSaveObject[] objs) {
+		MapStorage storage = world.getMapStorage();//getPerWorldStorage();
 		TeinteWorldSavedData instance = (TeinteWorldSavedData) storage.getOrLoadData(TeinteWorldSavedData.class, DATA_NAME);
 
 		if (instance == null) {
@@ -139,8 +125,28 @@ public class TeinteWorldSavedData extends WorldSavedData {
 			instance.nbtcopy = new NBTTagCompound();
 		}
 		
+		instance.objectsForReadWrite = objs;
+		instance.lazyReadFromNBT();
+		
 		return instance;
 	}
+
+	
+	@Override
+	public boolean isDead() {
+		return false;
+	}
+
+	
+	@Override
+	public void _tick(int tickcount, WorldServer world) {
+		for( NBTSaveObject systemToSave : this.objectsForReadWrite){
+			if( systemToSave.isDirty()) {
+				markDirty();
+			}
+		}
+	}
+
 	
 	
 	

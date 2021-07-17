@@ -12,8 +12,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
-import witherwar.tileentity.deprecated.TileEntityMaw;
-import witherwar.tileentity.deprecated.TileEntitySerpentmind;
+import witherwar.tileentity.TileEntityMaw;
+import witherwar.tileentity.TileEntitySerpentmind;
 
 public class BlockCatarMaw extends Block{
 	

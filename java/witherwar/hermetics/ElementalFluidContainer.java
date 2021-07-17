@@ -5,7 +5,7 @@ import net.minecraft.world.World;
 
 public interface ElementalFluidContainer {
 	
-	public ElementalFluid _takeFluid( BlockPos requesterPos ,BlockPos requesteePos ,World world);
+	public ElementalFluid _takeFluid( BlockPos requesterPos);
 	
 	public ElementalFluid peekAtContents();
 	

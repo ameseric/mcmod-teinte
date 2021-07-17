@@ -1,4 +1,4 @@
-package witherwar.tileentity;
+package witherwar.tilelogic;
 
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import witherwar.utility.HashBlockCollection;
 
 
 
-
+@Deprecated
 public class KaliCoreTile extends TileLogic{
 
 	private final IBlockState SKIN = Blocks.OBSIDIAN.getDefaultState();
@@ -30,8 +30,16 @@ public class KaliCoreTile extends TileLogic{
 	private GrowthSystem growth = new GrowthSystem();
 	
 	
+	
+	static {
+		TileLogicManager.registerClass( new KaliCoreTile());
+	}
+	
+	
+	public KaliCoreTile() {}
+	
 	public KaliCoreTile(BlockPos pos) {
-		super(pos ,ObjectCatalog.TERRA_KALI ,0 ,true ,10);
+		super(pos ,ObjectCatalog.TERRA_KALI ,true ,10);
 		
 		this.dontChange.add( Blocks.OBSIDIAN);
 		this.dontChange.add( Blocks.AIR);
@@ -72,10 +80,14 @@ public class KaliCoreTile extends TileLogic{
 	}
 
 
-
+	@Override
+	protected NBTTagCompound __writeToNBT(NBTTagCompound nbt) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound compound) {
+	protected void __readFromNBT(NBTTagCompound nbt) {
 		// TODO Auto-generated method stub
 		
 	}

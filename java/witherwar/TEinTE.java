@@ -6,17 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -39,7 +35,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -71,16 +66,10 @@ import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.Proxy;
 import witherwar.region.RegionManager;
-import witherwar.system.GlobalEntityManager;
-import witherwar.system.InvasionSystem;
-import witherwar.system.PlayerLifeSystem;
-import witherwar.system.SystemBlockDegrade;
-import witherwar.system.SystemPower;
-import witherwar.tileentity.TileLogic;
-import witherwar.tileentity.TileLoadManager;
+import witherwar.tilelogic.TileLogicManager;
+import witherwar.tilelogic.TileLogic;
 import witherwar.worlds.WorldCatalog;
 import witherwar.worlds.structures.FortressTunnelBuilder;
-import witherwar.worlds.structures.StructureBuilder;
 
 
 //TODO: Decide whether Manager classes can/should be discarded.
@@ -90,11 +79,10 @@ import witherwar.worlds.structures.StructureBuilder;
 public class TEinTE
 {
 	
-	public static final Random RNG = new Random();
-	
     public static final String MODID = "witherwar";
     public static final String VERSION = "0.1.00";
     public static final int TICKSASECOND = 20;
+	public static final Random RNG = new Random();
 	public static final SimpleNetworkWrapper networkwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
     public static CreativeTabs teinteTab;
     
@@ -102,23 +90,23 @@ public class TEinTE
     
 	private TeinteWorldSavedData savedata;
 	private RegionManager regions;
-	private TileLoadManager tiles;
-	private PlayerLifeSystem playerlives;
+	private TileLogicManager tiles;
+//	private PlayerLifeSystem playerlives;
 	private TemplateManager templates;
 	private int tickcount = 0;
-	
-	
-
-	
-	//temporary
-	public ArrayList<Faction2> factions = new ArrayList<>();
-	
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static Proxy proxy;
 	
 	@Mod.Instance("witherwar")
 	public static TEinTE instance;
+	
+
+	
+	//temporary
+	public ArrayList<Faction2> factions = new ArrayList<>();
+	
+
 
 
 	
@@ -134,8 +122,7 @@ public class TEinTE
 				return new ItemStack( Items.END_CRYSTAL);
 			}};
 			
-		ObjectCatalog.registerPreInitObjects();
-		
+		ObjectCatalog.registerPreInitObjects();		
   	
     	
     	networkwrapper.registerMessage( HandleMessageRegionOverlayOn.class, MessageRegionOverlayOn.class, 0, Side.CLIENT);
@@ -145,21 +132,17 @@ public class TEinTE
 
     	WorldCatalog.registerDimensions();
     	
-		proxy.preInit();
-		
+		proxy.preInit();		
     }
 
     
 
-	
 	@EventHandler
     public void init( FMLInitializationEvent event){
     	//ForgeChunkManager.setForcedChunkLoadingCallback( instance, new ChunkManager());
     	MinecraftForge.EVENT_BUS.register( instance);
     	proxy.init();
-    }
-	
-    
+    }    
 	
 	
 	
@@ -170,8 +153,6 @@ public class TEinTE
 
     
     
-    
- //------------------------------  END Initialization ------------------------------------------------------------//   
     
     
  
@@ -213,6 +194,7 @@ public class TEinTE
     
     
     public void _onChunkUnload( ChunkEvent.Unload event) {
+
     }
     
     
@@ -292,9 +274,7 @@ public class TEinTE
 		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
 			
 			System.out.println( "Placed stone block");
-//			this.createStructureTest( pos ,world);
-			
-//			this.createNewFactionTest( pos);
+
 			
 //			String filepath = "C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\"; 
 //			System.out.println( "======================= STARTING STRUCTURE GENERATION");
@@ -338,7 +318,7 @@ public class TEinTE
     
     @EventHandler
     // Happens after dimension loading
-    public void _onServerLoad(FMLServerStartingEvent event)
+    public void _onServerLoad(FMLServerStartingEvent event) throws InstantiationException, IllegalAccessException
     {
     	event.registerServerCommand( new CommandDarkenSky());
     	event.registerServerCommand( new CommandTeleportWW());
@@ -347,19 +327,21 @@ public class TEinTE
     	WorldServer world = DimensionManager.getWorld(0);
     	
 
-		this.savedata = TeinteWorldSavedData.getInstance( world);
     	
 		
-		this.regions = new RegionManager( this.savedata ,world);
-		this.tiles = new TileLoadManager( this.savedata ,world);
-		this.playerlives = new PlayerLifeSystem();
+		this.regions = new RegionManager( world);
+		this.tiles = new TileLogicManager( world ,"default");
+//		this.playerlives = new PlayerLifeSystem();
+
 		
-		NBTSaveObject[] objectsToSave = { this.tiles ,this.regions}; //TODO: add playerlives		
-		this.savedata.setObjectsToSave( objectsToSave);
-		this.savedata.forceReadFromNBT();
 		
-		MinecraftForge.EVENT_BUS.register( this.regions);
-    		//if config data is saved, use that in place of current config data?
+		NBTSaveObject[] objectsOnDisk = { this.tiles ,this.regions}; //TODO: add playerlives
+		this.savedata = TeinteWorldSavedData.getInstance( world ,objectsOnDisk);
+		
+		
+//		this.savedata.setObjectsToSave( objectsToSave);
+//		this.savedata.forceReadFromNBT();
+		
 
     }
     
@@ -389,6 +371,8 @@ public class TEinTE
 			
 			this.tiles.tick( tickcount ,world);
 			
+			this.savedata._tick( tickcount ,world);
+			
 //			this.invader.tick( tickcount ,world);
 			
 //			for( Faction2 faction : this.factions) {
@@ -415,9 +399,9 @@ public class TEinTE
     
     @SubscribeEvent
     public void _onEntityDeath( LivingDeathEvent event) {
-    	if( event.getEntity() instanceof EntityPlayer) {
-    		this.playerlives.update( (EntityPlayer) event.getEntity());
-    	}
+//    	if( event.getEntity() instanceof EntityPlayer) {
+//    		this.playerlives.update( (EntityPlayer) event.getEntity());
+//    	}
     }
     
     
@@ -538,7 +522,7 @@ public class TEinTE
 	}
 	
 	
-	public void registerBlockEntity( TileLogic be) {
+	public void registerTileLogic( TileLogic be) {
 		this.tiles.add( be);
 	}
 	
@@ -556,6 +540,12 @@ public class TEinTE
 	public Template getTemplate( String name) {
 		return this.templates.get( null ,new ResourceLocation( MODID+":"+name));
 	}
+	
+	
+//	public void registerTileLogicClass( TileLogic tl) {
+////		this.factory.register( tl);
+//		TileLogicFactory.register( tl);
+//	}
 	
 	
 //	public void spawnTileLogicIfNeeded( Block b ,BlockPos pos) {

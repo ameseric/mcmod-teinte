@@ -12,10 +12,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
-import witherwar.tileentity.TileLogic;
-import witherwar.tileentity.TileLogicContainer;
-import witherwar.tileentity.deprecated.TileEntitySerpentmind;
-import witherwar.tileentity.KaliCoreTile;
+import witherwar.tileentity.TileEntitySerpentmind;
+import witherwar.tilelogic.KaliCoreTile;
+import witherwar.tilelogic.TileLogic;
+import witherwar.tilelogic.TileLogicContainer;
 
 public class KaliCoreBlock extends Block implements TileLogicContainer{
 	
@@ -51,7 +51,7 @@ public class KaliCoreBlock extends Block implements TileLogicContainer{
 
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new KaliCoreTile( pos));
+		TEinTE.instance.registerTileLogic( new KaliCoreTile( pos));
 	}
 
 	

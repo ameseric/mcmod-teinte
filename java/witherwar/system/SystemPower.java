@@ -38,12 +38,6 @@ public class SystemPower implements NBTSaveFormat{
 	
 	
 	
-	@Override
-	public void markDirty() {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 
 	@Override

@@ -8,9 +8,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
-import witherwar.tileentity.ReplicatingTile;
-import witherwar.tileentity.TileLogic;
-import witherwar.tileentity.TileLogicContainer;
+import witherwar.tilelogic.ReplicatingTile;
+import witherwar.tilelogic.TileLogic;
+import witherwar.tilelogic.TileLogicContainer;
 
 public class AshReplicatingBlock extends Block implements TileLogicContainer{
 	
@@ -39,7 +39,7 @@ public class AshReplicatingBlock extends Block implements TileLogicContainer{
 	
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new ReplicatingTile( pos)); //TODO consider comparing classes for TileLogic
+		TEinTE.instance.registerTileLogic( new ReplicatingTile( pos)); //TODO consider comparing classes for TileLogic
 	}
 	
 	

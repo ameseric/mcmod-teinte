@@ -31,9 +31,7 @@ public class ElementalFluid {
 	
 	
 	private void calculateBonds() {
-		System.out.println( this.bonds);
-		this.bonds = ElementalBond.getAllPossibleBonds( this.elements);
-		System.out.println( this.bonds);
+		this.bonds = ElementalBond.getAllPossibleBonds( (ArrayList<Element>) this.elements.clone());
 	}
 	
 	

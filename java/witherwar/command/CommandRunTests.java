@@ -8,7 +8,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import witherwar.TEinTE;
-import witherwar.TestMain;
+import witherwar.test.TestMain;
 
 public class CommandRunTests extends CommandBase{
 	private final List<String> aliases;

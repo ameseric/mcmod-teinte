@@ -2,14 +2,15 @@ package witherwar.block;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.TEinTE;
 import witherwar.hermetics.ElementalFluid;
 import witherwar.hermetics.ElementalFluidContainer;
-import witherwar.tileentity.TileLogic;
-import witherwar.tileentity.TileLogicContainer;
-import witherwar.tileentity.RitualBlockTile;
+import witherwar.tilelogic.RitualBlockTile;
+import witherwar.tilelogic.TileLogic;
+import witherwar.tilelogic.TileLogicContainer;
 
 
 public class RitualBlock extends DirectionalBlock{
@@ -29,7 +30,8 @@ public class RitualBlock extends DirectionalBlock{
 	
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerBlockEntity( new RitualBlockTile( pos ,world));
+		EnumFacing face = state.getValue( DirectionalBlock.FACING);
+		TEinTE.instance.registerTileLogic( new RitualBlockTile( pos ,face));
 	}
 
 

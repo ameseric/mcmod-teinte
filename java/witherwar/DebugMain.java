@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.minecraft.util.math.BlockPos;
+import witherwar.test.TestMain;
 import witherwar.worlds.structures.StructureBuilder;
 
 public class DebugMain {

@@ -1,21 +1,32 @@
-package witherwar.tileentity;
+package witherwar.tilelogic;
 
-import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.ObjectCatalog;
-import witherwar.hermetics.Element;
+import witherwar.TEinTE;
 import witherwar.hermetics.ElementalFluid;
 
 public class AlchemyGeyserTile extends ElementalFluidContainerTile{
+	
+	
+	static {
+		TileLogicManager.registerClass( new AlchemyGeyserTile());
+	}
+	
+	
+	public AlchemyGeyserTile() {}
 
 	public AlchemyGeyserTile(BlockPos pos) {
-		super(pos ,ObjectCatalog.GEYSER ,TileLogic.GEYSER_ID ,false ,1);
+		super(pos ,ObjectCatalog.GEYSER ,false ,1);
 		this.setContents( ElementalFluid.random() );
+		System.out.println( this.peekAtContents().getElements());
 		System.out.println( this.peekAtContents());
-		System.out.println( );
 	}
+	
+	
+	
+	
 
 	@Override
 	public String getDataName() {
@@ -27,12 +38,21 @@ public class AlchemyGeyserTile extends ElementalFluidContainerTile{
 	}
 	
 	@Override
-	public ElementalFluid _takeFluid( BlockPos requesterPos ,BlockPos myPos ,World world) {
+	public ElementalFluid _takeFluid( BlockPos requesterPos) {
+		System.out.println( "Got to geyser...");
 		return this.peekAtContents();
 	}
 
+
+
 	@Override
-	public void readFromNBT(NBTTagCompound compound) {
+	protected NBTTagCompound __writeToNBT(NBTTagCompound nbt) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void __readFromNBT(NBTTagCompound nbt) {
 		// TODO Auto-generated method stub
 		
 	}

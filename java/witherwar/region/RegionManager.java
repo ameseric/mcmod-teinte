@@ -1,12 +1,9 @@
 package witherwar.region;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -14,11 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldSavedData;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import witherwar.TEinTE;
-import witherwar.disk.NBTSaveFormat;
 import witherwar.disk.NBTSaveObject;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageRegionOverlayOn;
@@ -40,8 +33,7 @@ public class RegionManager extends NBTSaveObject{
 	
 
 	
-	public RegionManager( WorldSavedData data ,World world) {
-		super( data);
+	public RegionManager( World world) {
 		this.world = world; //Only used because of MessageHandler lacking reference?
 		this.initDataStructs();
 	}	
@@ -222,7 +214,7 @@ public class RegionManager extends NBTSaveObject{
 		}		
 		
 		//compound.setTag( "TeinteRegionMap" ,this.nbt);
-		this.setDirty( false);
+		this.markClean();
 		return this.localnbt;
 	}
 	

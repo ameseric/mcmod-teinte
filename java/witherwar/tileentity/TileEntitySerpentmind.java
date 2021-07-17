@@ -1,4 +1,4 @@
-package witherwar.tileentity.deprecated;
+package witherwar.tileentity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
