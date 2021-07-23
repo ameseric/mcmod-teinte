@@ -1,7 +1,9 @@
 package witherwar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import net.minecraft.util.math.BlockPos;
 import witherwar.test.TestMain;
@@ -18,8 +20,14 @@ public class DebugMain {
 		System.out.println( "Hello world");
 		
 		
-		TestMain tester = new TestMain();
-		tester.run();
+//		for( int i=0; i<20; i=i+5) {
+//			System.out.println( i);
+//		}
+		
+		
+		System.out.println( 544>>4);
+		System.out.println( 528>>4);
+		
 
 
 //		strings = new ArrayList<>();
@@ -42,7 +50,14 @@ public class DebugMain {
 	
 	
 	
-	
+	public static int returnNull() {
+		int b = 8;
+		Integer t = null;
+		if( 7 > 6) {
+			b = t;
+		}
+		return b;
+	}
 	
 	
 	

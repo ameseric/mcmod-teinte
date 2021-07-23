@@ -106,11 +106,11 @@ public abstract class GrowingTile extends TileLogic{
 	
 	
 	private BlockInfo getNextBlock( World world) {
-		if( world.getBlockState( this.getPos().up()) == Blocks.AIR.getDefaultState()) {
+		if( world.getBlockState( this.pos().up()) == Blocks.AIR.getDefaultState()) {
 			if( RNG.nextDouble() < 0.65) {
-				return new BlockInfo( this.getPos().up() ,this.liveCell.getDefaultState() ,null);
+				return new BlockInfo( this.pos().up() ,this.liveCell.getDefaultState() ,null);
 			}else {				
-				return new BlockInfo( getRandomHorizontal( this.getPos()) ,this.liveCell.getDefaultState() ,null);
+				return new BlockInfo( getRandomHorizontal( this.pos()) ,this.liveCell.getDefaultState() ,null);
 			}
 		}
 		return null;

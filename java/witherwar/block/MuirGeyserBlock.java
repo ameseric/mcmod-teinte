@@ -1,5 +1,7 @@
 package witherwar.block;
 
+
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,34 +11,32 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import witherwar.MCForge;
 import witherwar.TEinTE;
+import witherwar.hermetics.MuirElement;
 import witherwar.hermetics.Muir;
 import witherwar.hermetics.ElementalFluidContainer;
 import witherwar.tilelogic.MuirGasContainerTile;
+import witherwar.tilelogic.MuirGeyserTile;
+import witherwar.tilelogic.MuirGeyserTile;
 import witherwar.tilelogic.RitualBlockTile;
 import witherwar.tilelogic.TileLogic;
-import witherwar.tilelogic.TileLogicContainer;
 
 
-public class RitualBlock extends DirectionalBlock{
+
+
+public class MuirGeyserBlock extends Block{
 
 	
-	
-	
-	public RitualBlock() {
+	public MuirGeyserBlock() {
 		super(Material.ROCK);
-		setUnlocalizedName( "ritualblock");  // unlocalized name ties block to resources.lang file, I.e. "Serpentmind" or what have you
-		setRegistryName( "ritualblock");		   //registry name ties block to the resources.blockstates json file. I.e. our blockstate json file is named after the registry name
+		setUnlocalizedName("geyser");
+		setRegistryName("geyser");
 		setCreativeTab( TEinTE.teinteTab);
-		setResistance( 10.0f);
 	}
 
-	
-	
-	
+
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		EnumFacing face = state.getValue( DirectionalBlock.FACING);
-		TEinTE.instance.registerTileLogic( new RitualBlockTile( pos ,face));
+		TEinTE.instance.registerTileLogic( new MuirGeyserTile( pos));
 	}
 	
 	
@@ -47,7 +47,6 @@ public class RitualBlock extends DirectionalBlock{
     	System.out.println( mc.contents());
     	return true;
     }
-
 
 
 }

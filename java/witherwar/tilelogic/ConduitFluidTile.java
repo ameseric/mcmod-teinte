@@ -10,27 +10,27 @@ import net.minecraft.world.World;
 import witherwar.MCForge;
 import witherwar.ObjectCatalog;
 import witherwar.TEinTE;
-import witherwar.hermetics.ElementalFluid;
+import witherwar.hermetics.Muir;
 import witherwar.hermetics.ElementalFluidContainer;
 import witherwar.utility.BlockUtil;
 import witherwar.utility.Tile;
 
 
 
-public class ConduitTile extends ElementalFluidContainerTile {
+public class ConduitFluidTile extends MuirFluidContainerTile {
 
 	
 	static {
-		TileLogicManager.registerClass( new ConduitTile());
+		TileLogicManager.registerClass( new ConduitFluidTile());
 	}
 	
 	
 	
 	
-	public ConduitTile() {
+	public ConduitFluidTile() {
 		this( new BlockPos(0,0,0));
 	}	
-	public ConduitTile(BlockPos pos) {
+	public ConduitFluidTile(BlockPos pos) {
 		super( pos ,ObjectCatalog.CONDUIT ,false ,1);
 	}
 
@@ -38,16 +38,16 @@ public class ConduitTile extends ElementalFluidContainerTile {
 
 
 
-	public ElementalFluid _takeFluid( BlockPos requesterPos ,HashSet<BlockPos> traversed) {
-		traversed.add( getPos());
+	public Muir _takeFluid( BlockPos requesterPos ,HashSet<BlockPos> traversed) {
+		traversed.add( pos());
 		
-		HashMap<BlockPos ,Tile> neighbors = MCForge.getNeighbors( getPos());
-		ElementalFluid input = new ElementalFluid();
+		HashMap<BlockPos ,Tile> neighbors = MCForge.getNeighbors( pos());
+		Muir input = new Muir();
 		
 		for( BlockPos neighborPos : neighbors.keySet()) {
 			TileLogic neighbor = neighbors.get( neighborPos).logic();
 			if( neighbor instanceof ElementalFluidContainer && !traversed.contains(neighborPos)) {
-				input.add( ((ElementalFluidContainer) neighbor)._takeFluid( getPos() ,traversed));
+				input.add( ((ElementalFluidContainer) neighbor)._takeFluid( pos() ,traversed));
 			}
 		}
 		return _cycleFluid( input);

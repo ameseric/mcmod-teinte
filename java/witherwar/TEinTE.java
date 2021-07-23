@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -62,6 +63,9 @@ import witherwar.disk.TeinteWorldSavedData;
 import witherwar.entity.WitherSkeletonTestEntity;
 import witherwar.faction2.Faction2;
 import witherwar.faction2.TestFaction;
+import witherwar.hermetics.Atmosphere;
+import witherwar.network.ClientFogUpdate;
+import witherwar.network.ClientFogUpdate.HandleClientFogUpdate;
 import witherwar.network.MessageEditGuidestone;
 import witherwar.network.MessageEditGuidestone.HandleMessageEditGuidestone;
 import witherwar.proxy.Proxy;
@@ -93,7 +97,13 @@ public class TEinTE
 	private TileLogicManager tiles;
 //	private PlayerLifeSystem playerlives;
 	private TemplateManager templates;
+	private Atmosphere atmosphere;
 	private int tickcount = 0;
+
+	
+	
+	private Vec3d clientFogColor = new Vec3d(0.9 ,0.9 ,0.9);
+	private float clientFogDensity = 0.05f;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static Proxy proxy;
@@ -129,6 +139,7 @@ public class TEinTE
     	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.CLIENT);
     	networkwrapper.registerMessage( HandleMessageEditGuidestone.class, MessageEditGuidestone.class, 1, Side.SERVER);
     	networkwrapper.registerMessage( HandlePlayerDashMessage.class ,PlayerDashMessage.class, 2, Side.SERVER);
+    	networkwrapper.registerMessage( HandleClientFogUpdate.class ,ClientFogUpdate.class, 3, Side.CLIENT);
 
     	WorldCatalog.registerDimensions();
     	
@@ -176,19 +187,17 @@ public class TEinTE
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void _onFogDensity( EntityViewRenderEvent.FogDensity event) {
-//	    event.setDensity(0.1F);
-//	    event.setCanceled(true);
+	    event.setDensity( this.clientFogDensity);
+	    event.setCanceled(true); //must be cancelled
     }
     
     
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void _onFogColor( EntityViewRenderEvent.FogColors event) {
-//	    event.setBlue(0.1F);
-//	    event.setGreen(0.1F);
-//	    event.setRed(0.1F);
-//
-//	    event.setCanceled(true);
+	    event.setBlue( (float) this.clientFogColor.z);
+	    event.setGreen( (float) this.clientFogColor.y);
+	    event.setRed( (float) this.clientFogColor.x);
     }
     
     
@@ -229,6 +238,7 @@ public class TEinTE
     @SubscribeEvent
     public void _playerLoggedOn( PlayerLoggedInEvent event) {
     	this.regions.addPlayer( event.player);
+    	this.atmosphere.addPlayer( (EntityPlayerMP) event.player);
     }
     
 
@@ -264,16 +274,16 @@ public class TEinTE
     //Appears to be server-side only
     public void _onPlayerBlockPlace( BlockEvent.PlaceEvent event) {
 
-//    	BlockPos pos = event.getPos();
-//    	WorldServer world = (WorldServer) event.getWorld();
+    	BlockPos pos = event.getPos();
+    	WorldServer world = (WorldServer) event.getWorld();
 
-//    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,3 ,0 ,0 ,0 ,0 ,null);
+    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,10 ,0 ,0 ,0 ,0 ,null);
     	
    		
     		
 		if( event.getPlacedBlock().getBlock() == Blocks.STONE) {
 			
-			System.out.println( "Placed stone block");
+//			System.out.println( "Placed stone block");
 
 			
 //			String filepath = "C:\\Users\\Guiltygate\\Documents\\mc_work\\old_setup\\wither_war\\"; 
@@ -318,6 +328,7 @@ public class TEinTE
     
     @EventHandler
     // Happens after dimension loading
+    // server side only?
     public void _onServerLoad(FMLServerStartingEvent event) throws InstantiationException, IllegalAccessException
     {
     	event.registerServerCommand( new CommandDarkenSky());
@@ -331,6 +342,8 @@ public class TEinTE
 		
 		this.regions = new RegionManager( world);
 		this.tiles = new TileLogicManager( world ,"default");
+		this.atmosphere = new Atmosphere();
+		this.atmosphere.setupInitialCellMap(); //TODO will be executed based on savedata at a later date
 //		this.playerlives = new PlayerLifeSystem();
 
 		
@@ -367,7 +380,8 @@ public class TEinTE
 	    	
 	    	this.logPlayerPosition();
 	    	
-
+//	    	updatePlayerFogValues();
+	    	this.atmosphere._tick( tickcount);
 			
 			this.tiles.tick( tickcount ,world);
 			
@@ -577,6 +591,13 @@ public class TEinTE
     		Vec3d pos = new Vec3d( player.lastTickPosX ,player.lastTickPosY ,player.lastTickPosZ);
     		posQ.add( pos);
     	}
+	}
+	
+	
+	
+	public void updatePlayerFogValues( float red ,float blue ,float green ,float density) {
+		this.clientFogColor = new Vec3d( red ,green ,blue);
+		this.clientFogDensity = density;
 	}
 
 	

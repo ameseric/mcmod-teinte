@@ -57,7 +57,7 @@ public class TileLogicManager extends NBTSaveObject{
 
 	
 	public void add( TileLogic be) {
-		this.tiles.put( be.getPos() ,be);
+		this.tiles.put( be.pos() ,be);
 		this.markDirty();
 	}
 	

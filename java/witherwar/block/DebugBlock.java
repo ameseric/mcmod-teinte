@@ -33,7 +33,7 @@ public class DebugBlock extends Block implements TileLogicContainer{
 	
 	@Override
 	public void onBlockAdded( World world ,BlockPos pos ,IBlockState state) {
-		TEinTE.instance.registerTileLogic( new MonumentCell( pos));
+//		TEinTE.instance.registerTileLogic( new MonumentCell( pos));
 		System.out.println( "Placed debug block.");
 	}
 

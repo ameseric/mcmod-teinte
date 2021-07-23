@@ -95,17 +95,26 @@ public abstract class TileLogic extends NBTSaveObject implements Tickable{
 	public boolean isDead() {
 		return this.amIDead;
 	}	
-	public BlockPos getPos() {
+	public BlockPos pos() {
 		return this.pos;
 	}
-	public double getX() {
+	public int posX() {
 		return this.pos.getX();
 	}
-	public double getY() {
+	public int absX() {
+		return Math.abs( this.posX());
+	}
+	public int posY() {
 		return this.pos.getY();
 	}
-	public double getZ() {
+	public int absY() {
+		return Math.abs( this.posY());
+	}
+	public int posZ() {
 		return this.pos.getZ();
+	}
+	public int absZ() {
+		return Math.abs( this.posZ());
 	}
 	public Block getHomeBlock() {
 		return this.homeBlock;

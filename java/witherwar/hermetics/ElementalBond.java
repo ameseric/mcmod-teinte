@@ -6,7 +6,7 @@ import java.util.Collections;
 
 public class ElementalBond {
 
-	private ArrayList<Element> elements; //always sorted due to creation in getAllPossibleBonds
+	private ArrayList<MuirElement> elements; //always sorted due to creation in getAllPossibleBonds
 	private BondType type = BondType.MONO;
 	
 	
@@ -18,7 +18,7 @@ public class ElementalBond {
 	
 	
 	
-	private ElementalBond( ArrayList<Element> elements) {
+	private ElementalBond( ArrayList<MuirElement> elements) {
 		this.elements = elements;
 		this.type = BondType.values()[this.elements.size()-1];
 	}
@@ -40,7 +40,7 @@ public class ElementalBond {
 	
 	
 	
-	public Element getTrinaryTransform() {
+	public MuirElement getTrinaryTransform() {
 		if( !this.isTriBond()) {
 			return null;
 		}
@@ -49,20 +49,20 @@ public class ElementalBond {
 	}
 	
 	
-	public static ArrayList<ElementalBond> getAllPossibleBonds( ArrayList<Element> f) {
+	public static ArrayList<ElementalBond> getAllPossibleBonds( ArrayList<MuirElement> f) {
 		Collections.sort( f);
 		ArrayList<ElementalBond> bonds = new ArrayList<>();
 		
 		
 		while( !f.isEmpty()) {
 			
-			ArrayList<Element> bond = new ArrayList<>();
-			Element currentElement = f.remove(0);
+			ArrayList<MuirElement> bond = new ArrayList<>();
+			MuirElement currentElement = f.remove(0);
 			bond.add( currentElement);
 			
-			Element glbe;
-			if( currentElement == Element.A && f.contains( Element.A.getGreaterBondingElement())) {
-				glbe = Element.A.getGreaterBondingElement();
+			MuirElement glbe;
+			if( currentElement == MuirElement.A && f.contains( MuirElement.A.getGreaterBondingElement())) {
+				glbe = MuirElement.A.getGreaterBondingElement();
 				f.remove( glbe);
 				bond.add( 0 ,glbe);
 				
@@ -75,7 +75,7 @@ public class ElementalBond {
 			}
 			
 			if( bond.size() > 1) {
-				Element tbe = currentElement.getTrinaryBondingElement( glbe);
+				MuirElement tbe = currentElement.getTrinaryBondingElement( glbe);
 				if( f.contains( tbe)) {
 					bond.add( tbe);
 					f.remove( tbe);

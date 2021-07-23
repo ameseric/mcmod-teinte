@@ -28,7 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import witherwar.TEinTE;
 import witherwar.entity.DroneEntity;
 import witherwar.faction2.Faction2;
-import witherwar.tilelogic.AlchemyGeyserTile;
+import witherwar.tilelogic.MuirGeyserTile;
 import witherwar.tilelogic.ReplicatingTile;
 import witherwar.tilelogic.RitualBlockTile;
 import witherwar.tilelogic.TileLogic;

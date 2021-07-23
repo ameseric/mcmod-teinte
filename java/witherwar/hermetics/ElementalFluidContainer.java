@@ -7,9 +7,9 @@ import net.minecraft.world.World;
 
 public interface ElementalFluidContainer {
 	
-	public ElementalFluid _takeFluid( BlockPos requesterPos ,HashSet<BlockPos> traversed);
+	public Muir _takeFluid( BlockPos requesterPos ,HashSet<BlockPos> traversed);
 	
-	public ElementalFluid peekAtContents();
+	public Muir peekAtContents();
 	
 	
 	

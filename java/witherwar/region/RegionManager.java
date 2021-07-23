@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import witherwar.MCForge;
 import witherwar.TEinTE;
 import witherwar.disk.NBTSaveObject;
 import witherwar.network.MessageEditGuidestone;
@@ -61,7 +62,7 @@ public class RegionManager extends NBTSaveObject{
 		if( (tickcount % 10) != 0 || this.map.isEmpty()) { return;}
 		//TODO: RegionMap needs updating for multiple Dimensions if desired
 		
-		List<EntityPlayer> players = world.playerEntities;
+		List<EntityPlayerMP> players = MCForge.getAllPlayersOnServer();
 		
 		for( EntityPlayer player : players) {
 			if( player.getPosition().getY() > 58) { //&& transient worm in effect

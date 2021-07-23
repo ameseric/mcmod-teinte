@@ -28,7 +28,7 @@ import witherwar.tileentity.TileEntityCataromotus;
 import witherwar.tileentity.TileEntityMaw;
 import witherwar.tileentity.TileEntitySerpentmind;
 import witherwar.entity.DroneEntity;
-import witherwar.block.AlchemyGeyserBlock;
+import witherwar.block.MuirGeyserBlock;
 import witherwar.block.AshReplicatingBlock;
 import witherwar.block.BlockAsh;
 import witherwar.block.BlockCatarCortex;
@@ -85,7 +85,7 @@ public class ObjectCatalog {
 		DEAD_ASH =	 	new BlockAsh();
 		GUIDESTONE = 	new BlockGuidestone();
 		CONDUIT =		new ConduitBlock();
-		GEYSER =		new AlchemyGeyserBlock();
+		GEYSER =		new MuirGeyserBlock();
 		RITUALBLOCK =	new RitualBlock();
 		ASH_REPL_BLOCK =new AshReplicatingBlock();
 		DEBUG_BLOCK =	new DebugBlock();

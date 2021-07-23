@@ -29,7 +29,7 @@ public class ReplicatingTile extends TileLogic{
 	
 	
 	static {
-		TileLogicManager.registerClass( new AlchemyGeyserTile());
+		TileLogicManager.registerClass( new MuirGeyserTile());
 	}
 	
 	
@@ -74,7 +74,7 @@ public class ReplicatingTile extends TileLogic{
 	public void _ticklogic(World worldIn) {
 		WorldServer world = (WorldServer) worldIn;
 		
-		if( firstrun && BlockUtil.notTouchingAir( this.getPos() ,world)) {
+		if( firstrun && BlockUtil.notTouchingAir( this.pos() ,world)) {
 			this.ticksUntilUpdate = this.ticksUntilUpdate * 10;				
 		}
 		firstrun = false;
@@ -87,12 +87,12 @@ public class ReplicatingTile extends TileLogic{
 		
 		
 		//particle test
-    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,this.getX() ,this.getY() ,this.getZ() ,3 
+    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,this.posX() ,this.posY() ,this.posZ() ,3 
     			,0 ,2 ,0 ,0 ,null);
 
 		
 		
-		HashMap<BlockPos, Block> neighbors = BlockUtil.getNeighborBlocks( this.getPos() ,world ,true);
+		HashMap<BlockPos, Block> neighbors = BlockUtil.getNeighborBlocks( this.pos() ,world ,true);
 		
 		boolean nochanges = true;
 		for( BlockPos neighborPos : neighbors.keySet()) {
