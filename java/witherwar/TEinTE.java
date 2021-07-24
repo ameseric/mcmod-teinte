@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -64,6 +65,7 @@ import witherwar.entity.WitherSkeletonTestEntity;
 import witherwar.faction2.Faction2;
 import witherwar.faction2.TestFaction;
 import witherwar.hermetics.Atmosphere;
+import witherwar.hermetics.Muir;
 import witherwar.network.ClientFogUpdate;
 import witherwar.network.ClientFogUpdate.HandleClientFogUpdate;
 import witherwar.network.MessageEditGuidestone;
@@ -102,8 +104,8 @@ public class TEinTE
 
 	
 	
-	private Vec3d clientFogColor = new Vec3d(0.9 ,0.9 ,0.9);
-	private float clientFogDensity = 0.05f;
+	private Vec3d clientFogColor = Atmosphere.DEFAULT_COLOR;
+	private float clientFogDensity = 0.01f;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static Proxy proxy;
@@ -195,9 +197,9 @@ public class TEinTE
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void _onFogColor( EntityViewRenderEvent.FogColors event) {
-	    event.setBlue( (float) this.clientFogColor.z);
-	    event.setGreen( (float) this.clientFogColor.y);
-	    event.setRed( (float) this.clientFogColor.x);
+	    event.setBlue( (float) (event.getBlue() + this.clientFogColor.z));
+	    event.setGreen( (float) (event.getGreen() + this.clientFogColor.y));
+	    event.setRed( (float) (event.getRed() + this.clientFogColor.x));
     }
     
     
@@ -553,6 +555,20 @@ public class TEinTE
 	
 	public Template getTemplate( String name) {
 		return this.templates.get( null ,new ResourceLocation( MODID+":"+name));
+	}
+	
+	
+	public void addToAtmosphere( BlockPos pos ,Muir m) {
+		this.atmosphere.addMuir( new ChunkPos(pos) ,m);
+	}
+	
+	public void removeFromAtmosphere( BlockPos pos ,int amount) {
+//		this.atmosphere.addMuir( new ChunkPos(pos) ,m);
+//		this.atmosphere.remove();
+	}
+	
+	public boolean acceptingMuir( BlockPos pos) {
+		return this.atmosphere.acceptingMuir(pos);
 	}
 	
 	

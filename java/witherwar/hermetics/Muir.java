@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import net.minecraft.util.math.Vec3d;
+
 
 public class Muir {
 	
@@ -65,7 +67,7 @@ public class Muir {
 			amount += balance;
 			elements.put( e ,0);
 			f.add( e ,amount);
-		}		
+		}
 		
 		return f;
 	}
@@ -88,9 +90,30 @@ public class Muir {
 	}
 	
 	
-	public boolean isEmpty() {
-		return this.elements.isEmpty();
+	public int getTotalAmount() {		
+		int amount = 0;
+		for( int amountOfElement : this.elements.values()) {
+			amount += amountOfElement;
+		}
+		return amount;
 	}
+	
+	
+	public Vec3d getColor() {
+		Vec3d color = new Vec3d(0,0,0);
+		float totalAmount = getTotalAmount();
+		float amount = 0;
+		for( MuirElement e : this.elements.keySet()) {
+			amount = this.elements.get(e);
+			if( amount > 0) {
+				float scale = amount / totalAmount;
+				Vec3d elementColor = e.color().scale( scale); 
+				color = color.add( elementColor );
+			}
+		}
+		return color;
+	}
+
 	
 	
 	public Muir copy() {

@@ -20,13 +20,9 @@ public class DebugMain {
 		System.out.println( "Hello world");
 		
 		
-//		for( int i=0; i<20; i=i+5) {
-//			System.out.println( i);
-//		}
-		
-		
-		System.out.println( 544>>4);
-		System.out.println( 528>>4);
+		System.out.println( 2%4);
+		System.out.println( 4%4);
+		System.out.println( 6%4);
 		
 
 

@@ -38,15 +38,15 @@ public class ElementalBond {
 	}
 
 	
-	
-	
-	public MuirElement getTrinaryTransform() {
-		if( !this.isTriBond()) {
-			return null;
-		}
-		
-		return this.elements.get(0).getTrinaryProduct();
-	}
+//	
+//	
+//	public MuirElement getTrinaryTransform() {
+//		if( !this.isTriBond()) {
+//			return null;
+//		}
+//		
+//		return this.elements.get(0).getTrinaryProduct();
+//	}
 	
 	
 	public static ArrayList<ElementalBond> getAllPossibleBonds( ArrayList<MuirElement> f) {

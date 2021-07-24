@@ -24,7 +24,7 @@ public class MuirGeyserTile extends MuirGasContainerTile{
 	public MuirGeyserTile() {}
 
 	public MuirGeyserTile(BlockPos pos) {
-		super(pos ,ObjectCatalog.GEYSER ,true ,200);
+		super(pos ,ObjectCatalog.GEYSER ,true ,20);
 		this.contents = Muir.random();
 		System.out.println( contents());
 	}
@@ -47,6 +47,10 @@ public class MuirGeyserTile extends MuirGasContainerTile{
 			if( neighbor instanceof MuirGasContainer) {
 				( (MuirGasContainer) neighbor).add( contents());
 				System.out.println( "Adding contents...");
+			}else {
+				if( TEinTE.instance.acceptingMuir( pos())) {
+					TEinTE.instance.addToAtmosphere( pos() ,contents());
+				}
 			}
 		}
 	}

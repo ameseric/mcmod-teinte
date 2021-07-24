@@ -2,24 +2,59 @@ package witherwar.hermetics;
 
 import java.util.Comparator;
 
+import net.minecraft.util.math.Vec3d;
+
 public enum MuirElement implements Comparator<MuirElement>{
 
-	A( 0),
-	B( 1),
-	C( 2),
-	D( 3),
-	E( 4),
-	F( 5),
-	G( 6);
+	A( 0 ,true ,true	,new Vec3d( 0.0 ,-0.3 ,-0.3)),
+	B( 1 ,true ,true	,new Vec3d( -0.08 ,-0.22 ,-0.3)),
+	C( 2 ,false ,true	,new Vec3d( -0.15 ,-0.15 ,-0.3)),
+	D( 3 ,false ,true	,new Vec3d( -0.22 ,-0.08 ,-0.3)),
+	E( 4 ,false ,false	,new Vec3d( -0.3 ,0.0 ,-0.3)),
+	F( 5 ,false ,false	,new Vec3d( -0.3 ,-0.15 ,-0.15)),
+	G( 6 ,true ,false	,new Vec3d( -0.3 ,-0.3 ,0)),
+	H( 7 ,true ,false	,new Vec3d( -0.15 ,-0.15 ,-0.3));
 	
 	
-	private int index; 
-	private static final int NUM = 7;
+	private static final int NUM = 8;
+	private int index;
+	private boolean noble;
+	private boolean ordered;
+	private Vec3d color;
 	
 	
-	private MuirElement( int index) {
+	private MuirElement( int index ,boolean isNoble ,boolean isOrdered ,Vec3d color) {
 		this.index = index;
+		this.noble = isNoble;
+		this.ordered = isOrdered;
+		this.color = color;
 	}
+	
+	
+	
+	
+	public boolean isNoble() {
+		return this.noble;
+	}
+	
+	public boolean isOrdered() {
+		return this.ordered;
+	}
+	
+	
+	public MuirElement bondTxElement() {
+		return this.getLesserBondingElement();
+	}
+	
+	public Vec3d color() {
+		return this.color;
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	public static MuirElement getGreaterElement( MuirElement e1 ,MuirElement e2) {
@@ -61,12 +96,9 @@ public enum MuirElement implements Comparator<MuirElement>{
 	
 	
 	//Assuming this Element has the greatest energy in the trinary bond
-	public MuirElement getTrinaryProduct() {
-		int index = this.index + 2;
-		if( index >= MuirElement.NUM) { 
-			index = index - MuirElement.NUM;
-		}
-		return MuirElement.values()[ this.index - 5];
+	public MuirElement getBinaryProduct() {
+		int index = (this.index + 3) % MuirElement.NUM;
+		return MuirElement.values()[ index];
 	}
 
 	
