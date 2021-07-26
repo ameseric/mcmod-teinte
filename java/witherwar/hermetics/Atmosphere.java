@@ -1,7 +1,9 @@
 package witherwar.hermetics;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
@@ -12,10 +14,12 @@ import net.minecraft.util.math.Vec3i;
 import witherwar.MCForge;
 import witherwar.TEinTE;
 import witherwar.network.ClientFogUpdate;
+import witherwar.tilelogic.TileLogic;
 
 public class Atmosphere {
 	
-	private HashMap<ChunkPos,Muir> cells = new HashMap<>();
+	private HashMap<ChunkPos,AtmosCell> cells = new HashMap<>();
+	private Iterator< ChunkPos> iter = null;
 	
 	private HashMap<EntityPlayerMP ,ChunkPos> players = new HashMap<>();
 	
@@ -26,6 +30,9 @@ public class Atmosphere {
 	private int xIndex = -bound;
 	private int zIndex = -bound;
 	private int interval = 10;
+	
+	private int activeCellUpdateLimit = 10;
+	private int totalCellUpdateLimit = 1000;
 	
 	
 	
@@ -42,10 +49,8 @@ public class Atmosphere {
 	
 		//change, store chunk location of players (similar to region) and send update
 		//based on that.
-		ChunkPos ppos = null;
 		if( tickcount%10 == 0) {
 			for( EntityPlayerMP player : MCForge.getAllPlayersOnServer()) {
-				ppos = new ChunkPos(player.getPosition());
 //				ChunkPos pos = new ChunkPos( player.getPosition());
 //				if( !(pos.equals( this.players.get(player)))) { //TODO rewrite for clarity
 //					this.players.put( player ,pos);
@@ -58,13 +63,23 @@ public class Atmosphere {
 //				}
 			}
 		}
+
+		
+//		iterateByInterval();
+		
+		
+		iterateByAddition();
+		
+		
+		
+	}
+	
+	
+	
+	private void iterateByInterval() {
 		for( int x=this.xIndex; x<this.xIndex+1; x++) {
 			for( int z=this.zIndex; z<this.zIndex+this.interval; z++) {
 				averageCell( x ,z);
-				if( ppos != null && ppos.x == x && ppos.z == z) {
-					System.out.println( "Averaging your values...");
-					System.out.println( getMuir(ppos));
-				}
 			}
 		}
 		this.zIndex += this.interval;		
@@ -77,6 +92,32 @@ public class Atmosphere {
 			this.xIndex = -this.bound;
 			System.out.println( "Full cycle.");
 		}
+	}
+	
+	
+	
+	private void iterateByAddition() {
+		if( iter == null || !iter.hasNext()) {
+			iter = this.cells.keySet().iterator();
+			System.out.println( "Full cycle.");
+		}
+		
+		int cellsUpdated = 0;
+		int cellsChecked = 0;
+		for( iter=iter; iter.hasNext();) {
+			ChunkPos pos = iter.next();
+			AtmosCell c = getCell( pos);
+			if( c.needsUpdated) {
+				System.out.println( pos);
+				averageCell( pos.x ,pos.z);
+				c.needsUpdated = false;
+				cellsUpdated++;
+			}
+			cellsChecked++;
+			if( cellsUpdated > this.activeCellUpdateLimit || cellsChecked > this.totalCellUpdateLimit) {
+				break;
+			}
+		}
 		
 	}
 	
@@ -84,7 +125,7 @@ public class Atmosphere {
 	
 	
 	public void addCell( ChunkPos pos) {
-		this.cells.put( pos ,Muir.empty());
+		this.cells.put( pos ,new AtmosCell());
 	}
 	
 	
@@ -94,17 +135,31 @@ public class Atmosphere {
 	
 	
 	public void addMuir( ChunkPos pos ,Muir m) {
-		getMuir( pos).add( m);
+		AtmosCell c = getCell( pos);
+		c.muir.add( m);
+		c.needsUpdated = true;
 	}
 	
 	
 	
 	public Muir getMuir( ChunkPos pos) {
-		return this.cells.get( pos);
+		AtmosCell c = getCell( pos);
+		if( c != null) {
+			return c.muir;
+		}
+		return null;
 	}
 	
 	public Muir getMuir( BlockPos pos) {
 		return getMuir( new ChunkPos( pos));
+	}
+	
+	private AtmosCell getCell( ChunkPos pos) {
+		return this.cells.get( pos);
+	}
+	
+	private AtmosCell getCell( BlockPos pos) {
+		return getCell( new ChunkPos( pos));
 	}
 	
 	public boolean acceptingMuir( BlockPos pos) {
@@ -120,7 +175,7 @@ public class Atmosphere {
 		System.out.println( pos);
 		for( int x=-bound; x<bound; x=x+16) {
 			for( int z=-bound; z<bound; z=z+16) {
-				this.cells.put( new ChunkPos( pos.add( x ,0 ,z)) ,Muir.empty());
+				this.cells.put( new ChunkPos( pos.add( x ,0 ,z)) ,new AtmosCell());
 			}
 		}
 	}
@@ -130,7 +185,10 @@ public class Atmosphere {
 	
 	private Vec3d getFogColor( BlockPos pos) {
 //		return this.DEFAULT_COLOR.add( getMuir(pos).getColor());
-		return getMuir(pos).getColor();
+		Muir m = getMuir(pos);
+		Vec3d color = m.getColor();
+		color = color.scale( m.getTotalAmount() / MAX_DEFAULT);
+		return color;
 	}
 	
 	
@@ -143,26 +201,42 @@ public class Atmosphere {
 	
 	
 	private void averageCell( int x ,int z) {
+		System.out.println( "Averaging...");
 		BlockPos pos = new BlockPos( x<<4 ,0 ,z<<4);
-		pos = pos.add( MCForge.getOverworld().getSpawnPoint());
+		System.out.println( pos);
+//		pos = pos.add( MCForge.getOverworld().getSpawnPoint());
+		System.out.println( pos);
 		Muir m = getMuir( pos);
 		if( m == null) {
+			System.out.println( "No muir.");
 			return;
 		}
 		
 		for( EnumFacing face : EnumFacing.HORIZONTALS) {
 			Vec3i v = face.getDirectionVec();
-			Muir f = getMuir( pos.add( v.getX()*16 ,0 ,v.getZ()*16));
-			if( f != null) {
-				m.averageWith( f);
+			AtmosCell c = getCell( pos.add( v.getX()*16 ,0 ,v.getZ()*16));
+			if( c != null) {
+				m.averageWith( c.muir);
+				c.needsUpdated = true;
 			}
 		}
 		
 	}
 	
+
+	
 	
 	
 
+}
+
+
+
+class AtmosCell{
+	
+	public boolean needsUpdated = false;
+	public Muir muir = Muir.empty();
+	
 }
 
 

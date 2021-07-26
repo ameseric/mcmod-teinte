@@ -12,7 +12,7 @@ public class Muir {
 	
 
 	private HashMap<MuirElement,Integer> elements = new HashMap<>();
-	private static final int DIFFUSION_THRESHOLD = 5;
+	private static final int DIFFUSION_THRESHOLD = 20;
 //	private ArrayList<ElementalBond> bonds;	
 	
 	{

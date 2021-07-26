@@ -104,8 +104,10 @@ public class TEinTE
 
 	
 	
-	private Vec3d clientFogColor = Atmosphere.DEFAULT_COLOR;
-	private float clientFogDensity = 0.01f;
+	private Vec3d newFogColor = new Vec3d(0,0,0);
+	private float newFogDensity = 0.005f;
+	private float currentFogDensity = newFogDensity;
+	private Vec3d currentFogColor = newFogColor;
 	
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static Proxy proxy;
@@ -189,7 +191,18 @@ public class TEinTE
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void _onFogDensity( EntityViewRenderEvent.FogDensity event) {
-	    event.setDensity( this.clientFogDensity);
+    	
+//    	if( this.currentFogDensity != this.newFogDensity) {
+//    		float diff = (this.newFogDensity - this.currentFogDensity);
+//    		if( diff > 0.0005) {
+//    			float delta = diff/(diff*400);
+//    			this.currentFogDensity += delta;
+//    		}
+//    	}
+    	//TODO use minimum step value to determine factor
+    	this.currentFogDensity = transitionATowardsB( this.currentFogDensity ,this.newFogDensity ,0.0001f);
+    	
+	    event.setDensity( this.currentFogDensity);
 	    event.setCanceled(true); //must be cancelled
     }
     
@@ -197,10 +210,32 @@ public class TEinTE
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void _onFogColor( EntityViewRenderEvent.FogColors event) {
-	    event.setBlue( (float) (event.getBlue() + this.clientFogColor.z));
-	    event.setGreen( (float) (event.getGreen() + this.clientFogColor.y));
-	    event.setRed( (float) (event.getRed() + this.clientFogColor.x));
+    	
+    	float blue = transitionATowardsB( (float) this.currentFogColor.z ,(float) this.newFogColor.z ,0.001f);
+    	float green = transitionATowardsB( (float) this.currentFogColor.y ,(float) this.newFogColor.y ,0.001f);
+    	float red = transitionATowardsB( (float) this.currentFogColor.x ,(float) this.newFogColor.x ,0.001f);
+    	this.currentFogColor = new Vec3d( red ,green ,blue);
+    	
+	    event.setBlue( event.getBlue() + blue);
+	    event.setGreen( event.getGreen() + green);
+	    event.setRed( event.getRed() + red);
     }
+    
+    
+    private float transitionATowardsB( float valueA ,float valueB ,float minimum) {
+    	float factor = (1f / minimum);
+    	
+    	if( valueA != valueB) {
+    		float diff = valueB - valueA;
+    		float absDiff = Math.abs( diff);
+    		if( absDiff > minimum) {
+    			float delta = diff / (absDiff * factor);
+    			return valueA = valueA + delta;
+    		}
+    	}
+    	return valueA;
+    }
+    
     
     
     
@@ -612,8 +647,8 @@ public class TEinTE
 	
 	
 	public void updatePlayerFogValues( float red ,float blue ,float green ,float density) {
-		this.clientFogColor = new Vec3d( red ,green ,blue);
-		this.clientFogDensity = density;
+		this.newFogColor = new Vec3d( red ,green ,blue);
+		this.newFogDensity = density;
 	}
 
 	
