@@ -6,12 +6,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import org.lwjgl.opengl.GLContext;
+
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
@@ -44,6 +54,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -105,10 +117,12 @@ public class TEinTE
 	
 	
 	private Vec3d newFogColor = new Vec3d(0,0,0);
-	private float newFogDensity = 0.005f;
-	private float currentFogDensity = newFogDensity;
+	private float newFogDensity = 0;
+	private float currentFogDensity = 0;
 	private Vec3d currentFogColor = newFogColor;
+	private int fogRenderCount = 0;
 	
+
 	@SidedProxy( clientSide="witherwar.proxy.ClientOnlyProxy" ,serverSide="witherwar.proxy.ServerOnlyProxy")
 	public static Proxy proxy;
 	
@@ -187,23 +201,66 @@ public class TEinTE
     }
     
     
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    //does not trigger if we cancel in fogDensity
+    //EXP & EXP2 cause exponential increase, only affected by density value.
+    //LINEAR doesn't seem to be affected by denstiy, but only start/end
+    //called 6x per screen render, 5x for 0, 1x for -1, detailed below
+    //6 draws over fluids
+    //5 draws over ??? (looked, unsure)
+    //4 draws over terrain
+    //3 is used to apply fog *between* the y cloud level and the ground level. Going above this level reveals the clouds, and hides the ground.
+    //2 draws over ??? (looked, unsure)
+    //1, the -1 call fogs the skybox (not the horizon) (+sun? inconclusive)
+    public void _onFogRender(EntityViewRenderEvent.RenderFogEvent event) {
+    	
+        float f = event.getFarPlaneDistance();        
+//        if( event.getFogMode() != -1) {
+        	
+        	this.currentFogDensity = transitionATowardsB( this.currentFogDensity ,this.newFogDensity ,0.0002f);
+        	
+//        	if( this.currentFogDensity >= 0.005f) {
+//        		GlStateManager.setFog( GlStateManager.FogMode.EXP);
+//        		GlStateManager.setFogDensity( this.currentFogDensity*0.18f);
+//        	}
+        	
+        	
+        	float segment = f * 0.75f;
+        	float delta60 = segment * (this.currentFogDensity * 1.67f);
+        	float delta100 = (f*0.5f) * this.currentFogDensity;
+        			
+        	if( delta60 > segment) { delta60 = segment;}
+        	
+	        if(event.getFogMode() == -1) { //sky fogs quickly, completely
+	        	this.fogRenderCount = 1;
+		        GlStateManager.setFogStart( 0f);
+	        	GlStateManager.setFogEnd( f - (delta60*1.3f));
+	        }else if( this.fogRenderCount == 3){ //clouds fog completely
+		        GlStateManager.setFogStart( (f * 0.75f) - delta60);
+	        	GlStateManager.setFogEnd( f - (delta60*1.3f));
+	        }else {
+		        GlStateManager.setFogStart( (f * 0.75f) - delta60);
+	        	GlStateManager.setFogEnd( (f-10) - delta100); //cap out at 1.0, @50% //move far plane in to help hide pop-in?
+	        }
+//        }
+        
+	        this.fogRenderCount++;
+
+    }
+    
     
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void _onFogDensity( EntityViewRenderEvent.FogDensity event) {
+//    	this.currentFogDensity = transitionATowardsB( this.currentFogDensity ,this.newFogDensity ,0.0001f);
+//        GlStateManager.setFog(GlStateManager.FogMode.EXP);
+//    	
+//    	
+//	    event.setDensity( 0.005f);
+//	    event.setCanceled(true); //must be cancelled
     	
-//    	if( this.currentFogDensity != this.newFogDensity) {
-//    		float diff = (this.newFogDensity - this.currentFogDensity);
-//    		if( diff > 0.0005) {
-//    			float delta = diff/(diff*400);
-//    			this.currentFogDensity += delta;
-//    		}
-//    	}
-    	//TODO use minimum step value to determine factor
-    	this.currentFogDensity = transitionATowardsB( this.currentFogDensity ,this.newFogDensity ,0.0001f);
-    	
-	    event.setDensity( this.currentFogDensity);
-	    event.setCanceled(true); //must be cancelled
+
     }
     
     
@@ -405,7 +462,9 @@ public class TEinTE
     	
     	
     	WorldServer world = DimensionManager.getWorld(0);
-		if( world.isRemote) { return;} //if logical client return
+		if( world.isRemote) {
+			System.out.println( "Server tick on client?");
+			return;} //if logical client return
 		
 		
 		if( event.phase == Phase.START) {
@@ -602,8 +661,8 @@ public class TEinTE
 //		this.atmosphere.remove();
 	}
 	
-	public boolean acceptingMuir( BlockPos pos) {
-		return this.atmosphere.acceptingMuir(pos);
+	public boolean acceptingMuir( BlockPos pos ,int pressure) {
+		return this.atmosphere.acceptingMuir( pos ,pressure);
 	}
 	
 	
@@ -643,6 +702,110 @@ public class TEinTE
     		posQ.add( pos);
     	}
 	}
+	
+	
+	
+//    private void setupFog(int startCoords, float partialTicks)
+//    {
+//        Entity entity = this.mc.getRenderViewEntity();
+////        this.setupFogColor(false);
+////        GlStateManager.glNormal3f(0.0F, -1.0F, 0.0F);
+////        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+////        IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(this.mc.world, entity, partialTicks);
+////        float hook = net.minecraftforge.client.ForgeHooksClient.getFogDensity(this, entity, iblockstate, partialTicks, 0.1F);
+////        if (hook >= 0) GlStateManager.setFogDensity(hook);
+////        else
+//        if (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).isPotionActive(MobEffects.BLINDNESS))
+//        {
+//            float f1 = 5.0F;
+//            int i = ((EntityLivingBase)entity).getActivePotionEffect(MobEffects.BLINDNESS).getDuration();
+//
+//            if (i < 20)
+//            {
+//                f1 = 5.0F + (this.farPlaneDistance - 5.0F) * (1.0F - (float)i / 20.0F);
+//            }
+//
+//            GlStateManager.setFog(GlStateManager.FogMode.LINEAR);
+//
+//            if (startCoords == -1)
+//            {
+//                GlStateManager.setFogStart(0.0F);
+//                GlStateManager.setFogEnd(f1 * 0.8F);
+//            }
+//            else
+//            {
+//                GlStateManager.setFogStart(f1 * 0.25F);
+//                GlStateManager.setFogEnd(f1);
+//            }
+//
+//            if (GLContext.getCapabilities().GL_NV_fog_distance)
+//            {
+//                GlStateManager.glFogi(34138, 34139);
+//            }
+//        }
+//        else if (this.cloudFog)
+//        {
+//            GlStateManager.setFog(GlStateManager.FogMode.EXP);
+//            GlStateManager.setFogDensity(0.1F);
+//        }
+//        else if (iblockstate.getMaterial() == Material.WATER)
+//        {
+//            GlStateManager.setFog(GlStateManager.FogMode.EXP);
+//
+//            if (entity instanceof EntityLivingBase)
+//            {
+//                if (((EntityLivingBase)entity).isPotionActive(MobEffects.WATER_BREATHING))
+//                {
+//                    GlStateManager.setFogDensity(0.01F);
+//                }
+//                else
+//                {
+//                    GlStateManager.setFogDensity(0.1F - (float)EnchantmentHelper.getRespirationModifier((EntityLivingBase)entity) * 0.03F);
+//                }
+//            }
+//            else
+//            {
+//                GlStateManager.setFogDensity(0.1F);
+//            }
+//        }
+//        else if (iblockstate.getMaterial() == Material.LAVA)
+//        {
+//            GlStateManager.setFog(GlStateManager.FogMode.EXP);
+//            GlStateManager.setFogDensity(2.0F);
+//        }
+//        else
+//        {
+//            float f = this.farPlaneDistance;
+//            GlStateManager.setFog(GlStateManager.FogMode.LINEAR);
+//
+//            if (startCoords == -1)
+//            {
+//                GlStateManager.setFogStart(0.0F);
+//                GlStateManager.setFogEnd(f);
+//            }
+//            else
+//            {
+//                GlStateManager.setFogStart(f * 0.75F);
+//                GlStateManager.setFogEnd(f);
+//            }
+//
+//            if (GLContext.getCapabilities().GL_NV_fog_distance)
+//            {
+//                GlStateManager.glFogi(34138, 34139);
+//            }
+//
+//            if (this.mc.world.provider.doesXZShowFog((int)entity.posX, (int)entity.posZ) || this.mc.ingameGUI.getBossOverlay().shouldCreateFog())
+//            {
+//                GlStateManager.setFogStart(f * 0.05F);
+//                GlStateManager.setFogEnd(Math.min(f, 192.0F) * 0.5F);
+//            }
+//            net.minecraftforge.client.ForgeHooksClient.onFogRender(this, entity, iblockstate, partialTicks, startCoords, f);
+//        }
+//
+//        GlStateManager.enableColorMaterial();
+//        GlStateManager.enableFog();
+//        GlStateManager.colorMaterial(1028, 4608);
+//    }
 	
 	
 	

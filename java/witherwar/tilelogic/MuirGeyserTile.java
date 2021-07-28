@@ -10,11 +10,13 @@ import witherwar.MCForge;
 import witherwar.ObjectCatalog;
 import witherwar.TEinTE;
 import witherwar.hermetics.Muir;
+import witherwar.hermetics.MuirElement;
 import witherwar.hermetics.MuirGasContainer;
 import witherwar.utility.Tile;
 
 public class MuirGeyserTile extends MuirGasContainerTile{
 	
+	private static final int PRESSURE = 10000;
 	
 	static {
 		TileLogicManager.registerClass( new MuirGeyserTile());
@@ -25,7 +27,8 @@ public class MuirGeyserTile extends MuirGasContainerTile{
 
 	public MuirGeyserTile(BlockPos pos) {
 		super(pos ,ObjectCatalog.GEYSER ,true ,20);
-		this.contents = Muir.random();
+		this.contents = Muir.empty();//Muir.random();
+		this.contents.add( MuirElement.G ,2000);
 		System.out.println( contents());
 	}
 	
@@ -46,9 +49,8 @@ public class MuirGeyserTile extends MuirGasContainerTile{
 			TileLogic neighbor = neighbors.get( neighborPos).logic();
 			if( neighbor instanceof MuirGasContainer) {
 				( (MuirGasContainer) neighbor).add( contents());
-				System.out.println( "Adding contents...");
 			}else {
-				if( TEinTE.instance.acceptingMuir( pos())) {
+				if( TEinTE.instance.acceptingMuir( pos() ,PRESSURE)) {
 					TEinTE.instance.addToAtmosphere( pos() ,contents());
 				}
 			}

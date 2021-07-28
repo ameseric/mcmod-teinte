@@ -12,7 +12,8 @@ public class Muir {
 	
 
 	private HashMap<MuirElement,Integer> elements = new HashMap<>();
-	private static final int DIFFUSION_THRESHOLD = 20;
+	public static final float DIFFUSION_THRESHOLD = 200; //per element
+//	public static final int STEP_SIZE = 50;
 //	private ArrayList<ElementalBond> bonds;	
 	
 	{
@@ -98,6 +99,10 @@ public class Muir {
 		return amount;
 	}
 	
+	public int pressure() {
+		return this.getTotalAmount();
+	}
+	
 	
 	public Vec3d getColor() {
 		Vec3d color = new Vec3d(0,0,0);
@@ -140,7 +145,7 @@ public class Muir {
 	
 	
 	/*
-	 * Modifies Muir value passed in.
+	 * for exchange of gases in conduits
 	 */
 	public void averageWith( Muir m) {
 		for( MuirElement e : MuirElement.values()) {
@@ -156,6 +161,73 @@ public class Muir {
 //			add( e ,ourAmount);
 //			m.add( e ,theirAmount);
 		}
+	}
+	
+	
+	/*
+	 * for exchange of gases in the atmosphere
+	 */
+	public boolean exchangeWith( Muir m) {
+		boolean valueChange = false;
+		int myPressure = this.getTotalAmount();
+		int theirPressure = m.getTotalAmount();
+		
+		for( MuirElement e : MuirElement.values()) {
+			//who has greater E amount
+			//calculate diffusion based on pressures
+			//check that amount can be honored
+			//transfer
+			
+			Muir giver = this;
+			Muir receiver = m;
+			int diff = giver.amount(e) - receiver.amount(e);
+			if( diff < 0) {
+				giver = m;
+				receiver = this;
+				diff = -diff;
+			}
+			
+			if( giver.pressure() > receiver.pressure()) {
+				int delta = diffusionValue( giver.pressure() ,receiver.pressure() ,diff);
+				if( delta > 25) {
+					giver.subtract( e ,delta);
+					receiver.add( e ,delta);
+					valueChange = true;
+				}
+			}
+//			
+//			int diff = amount(e) - m.amount(e);
+//			
+//			if( diff >= DIFFUSION_THRESHOLD && myPressure > theirPressure ) {
+//				int delta = diffusionValue( myPressure ,theirPressure);
+//				this.subtract( e ,delta);
+//				m.add( e ,delta);
+//				valueChange = true;
+//			}else if( diff <= -DIFFUSION_THRESHOLD && myPressure < theirPressure) {
+//				int delta = diffusionValue( theirPressure ,myPressure);
+//				this.add( e ,delta);
+//				m.subtract( e ,delta);
+//				valueChange = true;
+//			}
+			
+			
+//			if( Math.abs( diff) > 8000) {
+//				System.out.println( diff);
+//				System.out.println( myPressure);
+//				System.out.println( theirPressure);
+//				System.out.println( DIFFUSION_THRESHOLD);
+//				System.out.println( valueChange);
+//			}
+			
+		}
+		return valueChange;
+	}
+	
+	
+	private int diffusionValue( int pressureA ,int pressureB ,int amountDifference) {
+		float pressureDelta = (pressureA - pressureB)/(pressureA * 1f);
+		float maxTransferAmount = (amountDifference*0.25f);
+		return (int) Math.floor( maxTransferAmount * pressureDelta);
 	}
 	
 

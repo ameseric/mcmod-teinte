@@ -23,7 +23,6 @@ public class Atmosphere {
 	
 	private HashMap<EntityPlayerMP ,ChunkPos> players = new HashMap<>();
 	
-	public static final float MAX_DEFAULT = 10000;
 	public static final Vec3d DEFAULT_COLOR = new Vec3d( 0.95 ,0.95 ,0.95);
 	
 	private int bound = 35;
@@ -31,7 +30,7 @@ public class Atmosphere {
 	private int zIndex = -bound;
 	private int interval = 10;
 	
-	private int activeCellUpdateLimit = 10;
+	private int activeCellUpdateLimit = 20;
 	private int totalCellUpdateLimit = 1000;
 	
 	
@@ -49,7 +48,7 @@ public class Atmosphere {
 	
 		//change, store chunk location of players (similar to region) and send update
 		//based on that.
-		if( tickcount%10 == 0) {
+		if( tickcount%5 == 0) {
 			for( EntityPlayerMP player : MCForge.getAllPlayersOnServer()) {
 //				ChunkPos pos = new ChunkPos( player.getPosition());
 //				if( !(pos.equals( this.players.get(player)))) { //TODO rewrite for clarity
@@ -90,7 +89,7 @@ public class Atmosphere {
 
 		if( this.xIndex > this.bound) {
 			this.xIndex = -this.bound;
-			System.out.println( "Full cycle.");
+//			System.out.println( "Full cycle.");
 		}
 	}
 	
@@ -99,7 +98,7 @@ public class Atmosphere {
 	private void iterateByAddition() {
 		if( iter == null || !iter.hasNext()) {
 			iter = this.cells.keySet().iterator();
-			System.out.println( "Full cycle.");
+//			System.out.println( "Full cycle.");
 		}
 		
 		int cellsUpdated = 0;
@@ -108,7 +107,6 @@ public class Atmosphere {
 			ChunkPos pos = iter.next();
 			AtmosCell c = getCell( pos);
 			if( c.needsUpdated) {
-				System.out.println( pos);
 				averageCell( pos.x ,pos.z);
 				c.needsUpdated = false;
 				cellsUpdated++;
@@ -162,8 +160,8 @@ public class Atmosphere {
 		return getCell( new ChunkPos( pos));
 	}
 	
-	public boolean acceptingMuir( BlockPos pos) {
-		return getMuir( pos).getTotalAmount() < MAX_DEFAULT;
+	public boolean acceptingMuir( BlockPos pos ,int pressure) { 
+		return getMuir( pos).getTotalAmount() < pressure;
 	}
 	
 	
@@ -187,28 +185,27 @@ public class Atmosphere {
 //		return this.DEFAULT_COLOR.add( getMuir(pos).getColor());
 		Muir m = getMuir(pos);
 		Vec3d color = m.getColor();
-		color = color.scale( m.getTotalAmount() / MAX_DEFAULT);
+		float scale =  m.getTotalAmount() / (RuleBook.PRESSURE_THRESHOLD_A * 1f);
+		if( scale > 1.0f) { scale = 1.0f;}
+		color = color.scale( scale);
 		return color;
 	}
 	
 	
 	private float getFogDensity( BlockPos pos) {
 		float totalAmount = getMuir( pos).getTotalAmount();
-		float density = ((totalAmount / this.MAX_DEFAULT) * 0.12f) + 0.01f;
+		float density = ((totalAmount / RuleBook.PRESSURE_THRESHOLD_B));
+		if( density > 1.0f) { density = 1.0f;}
 		return density;
 	}
 	
 	
 	
 	private void averageCell( int x ,int z) {
-		System.out.println( "Averaging...");
 		BlockPos pos = new BlockPos( x<<4 ,0 ,z<<4);
-		System.out.println( pos);
 //		pos = pos.add( MCForge.getOverworld().getSpawnPoint());
-		System.out.println( pos);
 		Muir m = getMuir( pos);
 		if( m == null) {
-			System.out.println( "No muir.");
 			return;
 		}
 		
@@ -216,8 +213,10 @@ public class Atmosphere {
 			Vec3i v = face.getDirectionVec();
 			AtmosCell c = getCell( pos.add( v.getX()*16 ,0 ,v.getZ()*16));
 			if( c != null) {
-				m.averageWith( c.muir);
-				c.needsUpdated = true;
+//				m.averageWith( c.muir);
+				boolean valueChanged = m.exchangeWith( c.muir);
+				c.needsUpdated = valueChanged;
+
 			}
 		}
 		

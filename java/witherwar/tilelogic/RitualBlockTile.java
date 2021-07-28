@@ -187,6 +187,7 @@ public class RitualBlockTile extends MuirGasContainerTile {
 	}
 	
 	
+	//TODO allow multiple locus values, and only pick the last one as the "primary" to determine height & fn
 	private void calculateLocusHeight() {
 		BlockPos locusPos = pos().add( EnumFacing.UP.getDirectionVec());
 		Block b = MCForge.getBlock( locusPos);
@@ -272,9 +273,12 @@ public class RitualBlockTile extends MuirGasContainerTile {
 	}
 	
 	
+	//I think we'll have Stability, Magnitude, and Efficiency?
 	private void calculateStability() {
 		
 	}
+	
+	
 
 	
 	
@@ -289,7 +293,9 @@ public class RitualBlockTile extends MuirGasContainerTile {
 	private void explodeIfInvalidStructure() {
 		int r = TEinTE.instance.RNG.nextInt(100);
 		if( r > this.stability) {
-			MCForge.getOverworld().createExplosion( null ,posX() ,posY() ,posZ(), 4.0F, true);
+			MCForge.getOverworld().createExplosion( null ,posX() ,posY()+this.primaryFocusHeight-2 ,posZ(), 4.0F, true);
+			//should explosion location change based on stability issue?
+			//need to record stabilty issue then
 		}
 	}
 	
