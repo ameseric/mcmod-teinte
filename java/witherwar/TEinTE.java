@@ -1,5 +1,6 @@
 package witherwar;
 
+import java.awt.Color;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -68,6 +70,8 @@ import witherwar.network.MessageRegionOverlayOn;
 import witherwar.network.MessageRegionOverlayOn.HandleMessageRegionOverlayOn;
 import witherwar.network.PlayerDashMessage;
 import witherwar.network.PlayerDashMessage.HandlePlayerDashMessage;
+import witherwar.particle.MuirParticle;
+import witherwar.particle.ParticleCustom;
 import witherwar.command.CommandDarkenSky;
 import witherwar.command.CommandRunTests;
 import witherwar.command.CommandTeleportWW;
@@ -100,6 +104,7 @@ public class TEinTE
     public static final String MODID = "witherwar";
     public static final String VERSION = "0.1.00";
     public static final int TICKSASECOND = 20;
+	public static final int DEPTH_CUTOFF = 50;
 	public static final Random RNG = new Random();
 	public static final SimpleNetworkWrapper networkwrapper = NetworkRegistry.INSTANCE.newSimpleChannel("teinte");
     public static CreativeTabs teinteTab;
@@ -213,41 +218,54 @@ public class TEinTE
     //3 is used to apply fog *between* the y cloud level and the ground level. Going above this level reveals the clouds, and hides the ground.
     //2 draws over ??? (looked, unsure)
     //1, the -1 call fogs the skybox (not the horizon) (+sun? inconclusive)
+    //TODO: move fog render stuff to dedicated client render class? register from proxy?
     public void _onFogRender(EntityViewRenderEvent.RenderFogEvent event) {
     	
-        float f = event.getFarPlaneDistance();        
-//        if( event.getFogMode() != -1) {
-        	
-        	this.currentFogDensity = transitionATowardsB( this.currentFogDensity ,this.newFogDensity ,0.0002f);
-        	
-//        	if( this.currentFogDensity >= 0.005f) {
-//        		GlStateManager.setFog( GlStateManager.FogMode.EXP);
-//        		GlStateManager.setFogDensity( this.currentFogDensity*0.18f);
-//        	}
-        	
-        	
-        	float segment = f * 0.75f;
-        	float delta60 = segment * (this.currentFogDensity * 1.67f);
-        	float delta100 = (f*0.5f) * this.currentFogDensity;
-        			
-        	if( delta60 > segment) { delta60 = segment;}
-        	
-	        if(event.getFogMode() == -1) { //sky fogs quickly, completely
+    	
+    	Entity player = event.getEntity();
+    	BlockPos pos = player.getPosition();
+//    	if( pos.getY() > TEinTE.DEPTH_CUTOFF) {
+    	
+	        float f = event.getFarPlaneDistance();        
+	        	
+	    	this.currentFogDensity = transitionATowardsB( this.currentFogDensity ,this.newFogDensity ,0.00005f);
+	    	
+	  	
+	    	
+	    	float segment = f * 0.75f;
+	    	float delta34 = segment * clampTo1f(this.currentFogDensity * 2.86f);
+	    	float delta60 = segment * clampTo1f(this.currentFogDensity * 1.67f);
+	    	float delta100 = (f*0.5f) * this.currentFogDensity;
+	    			
+	    	
+	        if(event.getFogMode() == -1) { //sky fogs quickly, completely //TODO try experimenting with this normal again
 	        	this.fogRenderCount = 1;
 		        GlStateManager.setFogStart( 0f);
-	        	GlStateManager.setFogEnd( f - (delta60*1.3f));
+	        	GlStateManager.setFogEnd( f - (delta34*1.3f));
 	        }else if( this.fogRenderCount == 3){ //clouds fog completely
-		        GlStateManager.setFogStart( (f * 0.75f) - delta60);
+		        GlStateManager.setFogStart( (f * 0.75f) - delta34);
 	        	GlStateManager.setFogEnd( f - (delta60*1.3f));
+	
 	        }else {
-		        GlStateManager.setFogStart( (f * 0.75f) - delta60);
+		        GlStateManager.setFogStart( (f * 0.75f) - (delta34*1.2f));
 	        	GlStateManager.setFogEnd( (f-10) - delta100); //cap out at 1.0, @50% //move far plane in to help hide pop-in?
-	        }
-//        }
+	        }        
         
+    
 	        this.fogRenderCount++;
+//    	}else {
+//    		GlStateManager.setFog( GlStateManager.FogMode.EXP);
+//    		float density = ( 1 - (pos.getY() / (float) TEinTE.DEPTH_CUTOFF)) * 0.2f;
+//    		GlStateManager.setFogDensity( 0.15f);
+//    		Atmosphere.displayAtmosphericParticles( player ,0.4f);
+//    	}
+//		Atmosphere.displayAtmosphericParticles( player ,1f);
+
 
     }
+	private static float clampTo1f( float value) {
+	    return Math.min( value ,1f);
+	}
     
     
     @SubscribeEvent
@@ -257,7 +275,7 @@ public class TEinTE
 //        GlStateManager.setFog(GlStateManager.FogMode.EXP);
 //    	
 //    	
-//	    event.setDensity( 0.005f);
+//	    event.setDensity( 0.8f);
 //	    event.setCanceled(true); //must be cancelled
     	
 
@@ -267,15 +285,26 @@ public class TEinTE
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void _onFogColor( EntityViewRenderEvent.FogColors event) {
+    	BlockPos pos = event.getEntity().getPosition();
+    	float blue ,green ,red;
     	
-    	float blue = transitionATowardsB( (float) this.currentFogColor.z ,(float) this.newFogColor.z ,0.001f);
-    	float green = transitionATowardsB( (float) this.currentFogColor.y ,(float) this.newFogColor.y ,0.001f);
-    	float red = transitionATowardsB( (float) this.currentFogColor.x ,(float) this.newFogColor.x ,0.001f);
-    	this.currentFogColor = new Vec3d( red ,green ,blue);
-    	
-	    event.setBlue( event.getBlue() + blue);
+//    	if( pos.getY() > TEinTE.DEPTH_CUTOFF) {    	
+	    	blue = transitionATowardsB( (float) this.currentFogColor.z ,(float) this.newFogColor.z ,0.0005f);
+	    	green = transitionATowardsB( (float) this.currentFogColor.y ,(float) this.newFogColor.y ,0.0005f);
+	    	red = transitionATowardsB( (float) this.currentFogColor.x ,(float) this.newFogColor.x ,0.0005f);
+	    	this.currentFogColor = new Vec3d( red ,green ,blue);
+	    	
+
+//    	}else {
+//    		float depth = ( (pos.getY() / (float) TEinTE.DEPTH_CUTOFF)) * -0.3f;
+//    		blue = red = green = 0.1f; 
+//    	}
+	    event.setBlue( 	event.getBlue() + blue );
 	    event.setGreen( event.getGreen() + green);
 	    event.setRed( event.getRed() + red);
+//	    System.out.println( event.getRed());
+//	    System.out.println( event.getGreen());
+//	    System.out.println( event.getBlue());
     }
     
     
@@ -333,21 +362,25 @@ public class TEinTE
     public void _playerLoggedOn( PlayerLoggedInEvent event) {
     	this.regions.addPlayer( event.player);
     	this.atmosphere.addPlayer( (EntityPlayerMP) event.player);
+
     }
     
 
 
-
+    
 	@SubscribeEvent
     @SideOnly(Side.CLIENT)
 	public void _onClientTick(TickEvent.ClientTickEvent event) throws Exception {
-
-		if(event.phase.equals(Phase.END)){			
+		
+		if(event.phase.equals(Phase.END)){
 			if( config.allowPlayerDash && proxy.playerIsDashing()) {
 				TEinTE.networkwrapper.sendToServer( new PlayerDashMessage( ));
 			}
-
+			
+			TEinTE.proxy.renderMuirParticles( this.currentFogDensity ,this.currentFogColor);
+			
 		}
+
 	}
 	
 //	@SubscribeEvent
@@ -370,8 +403,9 @@ public class TEinTE
 
     	BlockPos pos = event.getPos();
     	WorldServer world = (WorldServer) event.getWorld();
+    	
+//    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY()+2 ,pos.getZ() ,5 ,0 ,0 ,0 ,0.5 ,null);
 
-    	world.spawnParticle( EnumParticleTypes.EXPLOSION_NORMAL ,pos.getX() ,pos.getY() ,pos.getZ() ,10 ,0 ,0 ,0 ,0 ,null);
     	
    		
     		
@@ -435,14 +469,14 @@ public class TEinTE
     	
 		
 		this.regions = new RegionManager( world);
-		this.tiles = new TileLogicManager( world ,"default");
+		this.tiles = new TileLogicManager( world ,"tilelogicmanager");
 		this.atmosphere = new Atmosphere();
 		this.atmosphere.setupInitialCellMap(); //TODO will be executed based on savedata at a later date
 //		this.playerlives = new PlayerLifeSystem();
 
 		
 		
-		NBTSaveObject[] objectsOnDisk = { this.tiles ,this.regions}; //TODO: add playerlives
+		NBTSaveObject[] objectsOnDisk = { this.tiles ,this.regions ,this.atmosphere}; //TODO: add playerlives
 		this.savedata = TeinteWorldSavedData.getInstance( world ,objectsOnDisk);
 		
 		
@@ -460,7 +494,6 @@ public class TEinTE
     //ticks are phased, start/end
     public void _onServerTick( TickEvent.ServerTickEvent event) {
     	
-    	
     	WorldServer world = DimensionManager.getWorld(0);
 		if( world.isRemote) {
 			System.out.println( "Server tick on client?");
@@ -472,7 +505,8 @@ public class TEinTE
 		
 		
 		if( event.phase == Phase.END) {
-			
+
+
 	    	
 	    	this.logPlayerPosition();
 	    	

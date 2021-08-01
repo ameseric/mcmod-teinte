@@ -197,7 +197,7 @@ public class RegionManager extends NBTSaveObject{
 				if( r.wasRemoved()) {
 					iter.remove(); //deletes from collection
 					this.localnbt.removeTag( r.id);
-					System.out.println("REmoving empty...=====================");
+					System.out.println("Removing empty...=====================");
 				}
 				//NBTTagCompound newRNBT = r.writeToNBT( this.localnbt.getCompoundTag( r.getID())); //???
 

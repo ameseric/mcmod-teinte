@@ -56,7 +56,7 @@ public class PlayerDashMessage implements IMessage {
 //		    	System.out.println( traj);
 		    	
 		    	if( traj.x == 0 && traj.z == 0) {
-			        Vec3d facing = player.getForward();
+			        Vec3d facing = player.getForward(); //this is going to break on a hosted server, need to fix
 			    	player.motionX = facing.x;
 			    	player.motionZ = facing.z;
 		    	}else {

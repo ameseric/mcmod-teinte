@@ -5,10 +5,12 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.EntityFlying;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityFlyHelper;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateFlying;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -17,6 +19,7 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootTableList;
+import witherwar.MCForge;
 import witherwar.faction2.Faction2;
 
 
@@ -83,7 +86,27 @@ public class DroneEntity extends FactionEntityFlying{
     
     
     
-
+   	String line1_1 = "Hello";
+   	String line1_2 = "May I help you?";
+   	String line1_3 = "Not now, please.";
+    private int dialogueMarker = 0;
+    private String getDialogue() {
+    	if( dialogueMarker == 0) {
+    		dialogueMarker++;
+    		return line1_1;
+    	}else if( dialogueMarker == 1) {
+    		dialogueMarker++;
+    		return line1_2;
+    	}
+    	return line1_3;
+    }
+    
+    
+    @Override
+    protected boolean processInteract(EntityPlayer player, EnumHand hand) {
+//    	String currentDialogue = getDialogue();
+    	return super.processInteract( player ,hand);
+    }
     
     
     public float getEyeHeight()

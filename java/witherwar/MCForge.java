@@ -12,6 +12,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import witherwar.tilelogic.TileLogic;
 import witherwar.utility.Tile;
@@ -25,6 +26,8 @@ import witherwar.utility.Tile;
  * 
  * This is an attempt to segregate Forge API calls that have a strong chance of breaking in future versions
  * and provide wrapper methods for Forge objects which do not fit our design pattern, but we cannot modify.
+ * 
+ * NOT INTENDED FOR CLIENT-SIDE USE
  *
  */
 public class MCForge {
@@ -49,7 +52,7 @@ public class MCForge {
 	
 	
 	public static Tile getTile( BlockPos pos) {
-		return getTile( getOverworld() ,pos);
+		return getTile( getOverworldServer() ,pos);
 	}
 	
 	
@@ -64,12 +67,16 @@ public class MCForge {
 	
 	
 	public static IBlockState getBlockState( BlockPos pos) {
-		return getOverworld().getBlockState( pos);
+		return getOverworldServer().getBlockState( pos);
 	}
 	
 	
 	
-	public static World getOverworld() {
+//	public static World getOverworldClient() {
+//		return null;
+//	}
+	
+	public static WorldServer getOverworldServer() {
 		return FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(0);
 	}
 	

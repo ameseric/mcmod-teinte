@@ -18,18 +18,15 @@ public class MuirGeyserTile extends MuirGasContainerTile{
 	
 	private static final int PRESSURE = 10000;
 	
-	static {
-		TileLogicManager.registerClass( new MuirGeyserTile());
+	
+	
+	public MuirGeyserTile() {
+		this( new BlockPos(0,0,0));
 	}
-	
-	
-	public MuirGeyserTile() {}
-
 	public MuirGeyserTile(BlockPos pos) {
 		super(pos ,ObjectCatalog.GEYSER ,true ,20);
 		this.contents = Muir.empty();//Muir.random();
-		this.contents.add( MuirElement.G ,2000);
-		System.out.println( contents());
+		this.contents.add( MuirElement.B ,2000);
 	}
 	
 	
@@ -69,14 +66,13 @@ public class MuirGeyserTile extends MuirGasContainerTile{
 
 	@Override
 	protected NBTTagCompound __writeToNBT(NBTTagCompound nbt) {
-		// TODO Auto-generated method stub
-		return null;
+		this.contents.writeToNBT( nbt);
+		return nbt;
 	}
 
 	@Override
 	protected void __readFromNBT(NBTTagCompound nbt) {
-		// TODO Auto-generated method stub
-		
+		this.contents.readFromNBT(nbt);		
 	}
 
 }

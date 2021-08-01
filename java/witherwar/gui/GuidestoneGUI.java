@@ -13,14 +13,14 @@ import witherwar.TEinTE;
 import witherwar.network.MessageEditGuidestone;
 
 
-public class GuiEditGuidestone extends GuiScreen{
+public class GuidestoneGUI extends GuiScreen{
 	private GuiTextField text;
 	private String plaintext;
 	private MessageEditGuidestone msg;
     private GuiButton doneBtn;
 	
 	
-	public GuiEditGuidestone( IMessage message) {
+	public GuidestoneGUI( IMessage message) {
 		this.msg = (MessageEditGuidestone) message;
 		this.plaintext = msg.regionName;
 	}

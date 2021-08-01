@@ -6,13 +6,13 @@ import net.minecraft.util.math.Vec3d;
 
 public enum MuirElement implements Comparator<MuirElement>{
 
-	A( 0 ,true ,true	,new Vec3d( 0.0 ,-0.3 ,-0.3)),
+	A( 0 ,true ,true	,new Vec3d( -0.02 ,-0.30 ,-0.3)),
 	B( 1 ,true ,true	,new Vec3d( -0.08 ,-0.22 ,-0.3)),
 	C( 2 ,false ,true	,new Vec3d( -0.15 ,-0.15 ,-0.3)),
 	D( 3 ,false ,true	,new Vec3d( -0.22 ,-0.08 ,-0.3)),
-	E( 4 ,false ,false	,new Vec3d( -0.3 ,0.0 ,-0.3)),
-	F( 5 ,false ,false	,new Vec3d( -0.3 ,-0.15 ,-0.15)),
-	G( 6 ,true ,false	,new Vec3d( -0.3 ,-0.3 ,0)),
+	E( 4 ,false ,false	,new Vec3d( -0.30 ,-0.02 ,-0.3)),
+	F( 5 ,false ,false	,new Vec3d( -0.30 ,-0.15 ,-0.15)),
+	G( 6 ,true ,false	,new Vec3d( -0.30 ,-0.30 ,-0.02)),
 	H( 7 ,true ,false	,new Vec3d( -0.15 ,-0.15 ,-0.3));
 	
 	
@@ -27,7 +27,7 @@ public enum MuirElement implements Comparator<MuirElement>{
 		this.index = index;
 		this.noble = isNoble;
 		this.ordered = isOrdered;
-		this.color = color;
+		this.color = color.scale( 1.5f);//using this to try darker colors
 	}
 	
 	
@@ -37,7 +37,7 @@ public enum MuirElement implements Comparator<MuirElement>{
 		return this.noble;
 	}
 	
-	public boolean isOrdered() {
+	public boolean isOrdered() { //TODO rename, confusing
 		return this.ordered;
 	}
 	

@@ -1,6 +1,7 @@
 package witherwar.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -41,6 +42,12 @@ public class ServerOnlyProxy implements Proxy{
 	public boolean playerIsDashing() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void renderMuirParticles(float density, Vec3d color) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

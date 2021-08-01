@@ -70,10 +70,6 @@ public class RitualBlockTile extends MuirGasContainerTile {
 	
 	
 	
-	static {
-		TileLogicManager.registerClass( new RitualBlockTile());
-	}
-	
 	
 	
 	
@@ -293,7 +289,7 @@ public class RitualBlockTile extends MuirGasContainerTile {
 	private void explodeIfInvalidStructure() {
 		int r = TEinTE.instance.RNG.nextInt(100);
 		if( r > this.stability) {
-			MCForge.getOverworld().createExplosion( null ,posX() ,posY()+this.primaryFocusHeight-2 ,posZ(), 4.0F, true);
+			MCForge.getOverworldServer().createExplosion( null ,posX() ,posY()+this.primaryFocusHeight-2 ,posZ(), 4.0F, true);
 			//should explosion location change based on stability issue?
 			//need to record stabilty issue then
 		}

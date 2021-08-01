@@ -61,14 +61,12 @@ public class TeinteWorldSavedData extends WorldSavedData implements Tickable{
 	@Override
 	//called by getOrLoadData (triggered in getInstance) (might actually be earlier, during forge init?)
 	public void readFromNBT(NBTTagCompound nbt) {
-		System.out.println( "=================" + nbt.toString() + "================");
 		this.nbtcopy = nbt.copy();
 	}
 	
 	
 	
 	private void lazyReadFromNBT(){
-		System.out.println( "Local nbt copy: " + this.nbtcopy);
 		for( NBTSaveObject systemToSave : this.objectsForReadWrite){
 			NBTTagCompound objectNBT = this.nbtcopy.getCompoundTag( systemToSave.getDataName());
 			systemToSave.readFromNBT( objectNBT);
@@ -80,10 +78,8 @@ public class TeinteWorldSavedData extends WorldSavedData implements Tickable{
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		System.out.println( "writing to compound? =================" + compound.toString() + "================");
 		
-		for( NBTSaveObject systemToSave : this.objectsForReadWrite){			
-			
+		for( NBTSaveObject systemToSave : this.objectsForReadWrite){				
 			NBTTagCompound objectNBT = this.nbtcopy.getCompoundTag( systemToSave.getDataName());
 			if( systemToSave.isDirty()) {
 				objectNBT = systemToSave.writeToNBT( objectNBT);
@@ -92,7 +88,6 @@ public class TeinteWorldSavedData extends WorldSavedData implements Tickable{
 			//compound.setTag( systemToSave.getDataName() ,objectNBT);
 		}
 		
-		System.out.println( "=================" + this.nbtcopy.toString() + "================");
 		this.setDirty( false);
 		return this.nbtcopy;
 	}

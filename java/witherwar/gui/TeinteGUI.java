@@ -53,6 +53,14 @@ public class TeinteGUI{
 	}
 	
 	
+	//add GUI object for drawing text boxes?
+	//drawRect, grey w/ alpha
+	//drawString
+	//right-click starts and progresses
+	//walking away (distance) cancels the conversation
+	//can be client-side only?
+	
+	
 	
 	public class RegionOverlay extends Gui{
 		final int MAX_ALPHA = 255;
@@ -62,7 +70,7 @@ public class TeinteGUI{
 		
 		int tick = 0;
 		int delayCounter = 0;
-		boolean asc = true;
+		boolean ascending = true;
 		
 		
 		public void draw( Minecraft mc){
@@ -82,11 +90,11 @@ public class TeinteGUI{
 			
 			int alpha = Math.min( (int) Math.floor( (1.0F/18.0F) * Math.pow(tick ,2)) + 4 ,MAX_ALPHA);
 			
-			if (asc) {
+			if (ascending) {
 				if( alpha == MAX_ALPHA) {
 					++delayCounter;
 					if( delayCounter == DELAY) {
-						asc = false;
+						ascending = false;
 						delayCounter = 0;
 					}
 				}
@@ -94,7 +102,7 @@ public class TeinteGUI{
 			}else {
 				if( alpha == 4) {
 					running = false;
-					asc = true;
+					ascending = true;
 				}else {
 					--tick;
 				}

@@ -5,21 +5,28 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.WorldServer;
 import witherwar.MCForge;
 import witherwar.TEinTE;
+import witherwar.disk.NBTSaveObject;
 import witherwar.network.ClientFogUpdate;
 import witherwar.tilelogic.TileLogic;
 
-public class Atmosphere {
+public class Atmosphere extends NBTSaveObject{
 	
 	private HashMap<ChunkPos,AtmosCell> cells = new HashMap<>();
 	private Iterator< ChunkPos> iter = null;
+//	private NBTTagCompound localnbt = new NBTTagCompound();
 	
 	private HashMap<EntityPlayerMP ,ChunkPos> players = new HashMap<>();
 	
@@ -44,24 +51,25 @@ public class Atmosphere {
 	
 	
 	
-	public void _tick( int tickcount) {
-	
-		//change, store chunk location of players (similar to region) and send update
-		//based on that.
-		if( tickcount%5 == 0) {
-			for( EntityPlayerMP player : MCForge.getAllPlayersOnServer()) {
-//				ChunkPos pos = new ChunkPos( player.getPosition());
-//				if( !(pos.equals( this.players.get(player)))) { //TODO rewrite for clarity
-//					this.players.put( player ,pos);
-					Vec3d colors = getFogColor( player.getPosition());
-					float density = getFogDensity( player.getPosition());
-					TEinTE.networkwrapper.sendTo( new ClientFogUpdate( colors ,density) ,player );
-					System.out.println( getMuir( player.getPosition()));
-//					System.out.println( colors);
-//					System.out.println( density);
-//				}
+	public void _tick( int tickcount) {	
+		
+		for( EntityPlayerMP player : MCForge.getAllPlayersOnServer()) {
+			BlockPos pos = player.getPosition();
+//			if( pos.getY() > TEinTE.DEPTH_CUTOFF  && tickcount%5 == 0) {
+			if( tickcount%5 == 0) {
+				AtmosCell cell = getCell( pos);
+				float density = 0f;
+				Vec3d colors = new Vec3d(0,0,0);
+				if( cell != null) {
+					density = getFogDensity( pos);
+					colors = getFogColor( pos);
+					System.out.println( getMuir( pos));
+				}
+				System.out.println( colors);
+				TEinTE.networkwrapper.sendTo( new ClientFogUpdate( colors ,density) ,player );
 			}
 		}
+
 
 		
 //		iterateByInterval();
@@ -168,7 +176,7 @@ public class Atmosphere {
 
 	
 	public void setupInitialCellMap() {
-		BlockPos pos = MCForge.getOverworld().getSpawnPoint();
+		BlockPos pos = MCForge.getOverworldServer().getSpawnPoint();
 		int bound = this.bound<<4;
 		System.out.println( pos);
 		for( int x=-bound; x<bound; x=x+16) {
@@ -182,14 +190,14 @@ public class Atmosphere {
 	
 	
 	private Vec3d getFogColor( BlockPos pos) {
-//		return this.DEFAULT_COLOR.add( getMuir(pos).getColor());
 		Muir m = getMuir(pos);
 		Vec3d color = m.getColor();
-		float scale =  m.getTotalAmount() / (RuleBook.PRESSURE_THRESHOLD_A * 1f);
+		float scale =  m.getTotalAmount() / (RuleBook.PRESSURE_THRESHOLD_A * 0.85f);
 		if( scale > 1.0f) { scale = 1.0f;}
 		color = color.scale( scale);
 		return color;
 	}
+	
 	
 	
 	private float getFogDensity( BlockPos pos) {
@@ -197,6 +205,24 @@ public class Atmosphere {
 		float density = ((totalAmount / RuleBook.PRESSURE_THRESHOLD_B));
 		if( density > 1.0f) { density = 1.0f;}
 		return density;
+	}
+	
+	
+	
+	public static void displayAtmosphericParticles( Entity player ,float fogDensity) {
+			BlockPos pos = player.getPosition();
+			WorldServer world = MCForge.getOverworldServer();
+			float start = 0;
+			
+			for( int i=0; i<30; i++) {
+//				start += 0.2;
+//				if( start <= fogDensity) {
+					world.spawnParticle( EnumParticleTypes.SUSPENDED_DEPTH 
+							,pos.getX()+(TEinTE.RNG.nextGaussian()*16) ,pos.getY()+(TEinTE.RNG.nextGaussian()*3) ,pos.getZ()+(TEinTE.RNG.nextGaussian()*16) 
+							,1 ,0 ,0 ,0 ,0 ,null);
+//				}
+			}
+
 	}
 	
 	
@@ -216,10 +242,59 @@ public class Atmosphere {
 //				m.averageWith( c.muir);
 				boolean valueChanged = m.exchangeWith( c.muir);
 				c.needsUpdated = valueChanged;
+//				c.needsSaved = valueChanged;
 
 			}
 		}
+		this.markDirty();
+//		getCell( pos).needsSaved = true;
+	}
+
+
+
+	@Override
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+//		nbt = this.localnbt;
 		
+		nbt.setInteger( "numOfCells" ,this.cells.size());
+		int i = 0;
+		for( ChunkPos pos : this.cells.keySet()) {
+			AtmosCell cell = getCell( pos);
+//			if( cell.needsSaved) {
+				NBTTagCompound cellnbt = new NBTTagCompound();
+				cellnbt.setBoolean( "update" ,cell.needsUpdated);
+				cellnbt.setIntArray( "chunk" ,new int[] { pos.x ,pos.z});
+				cellnbt = cell.muir.writeToNBT( cellnbt);
+				nbt.setTag( "Cell"+i ,cellnbt);
+//				cell.needsSaved = false;
+//			}
+			i++;
+		}
+		return nbt;
+	}
+
+
+
+	@Override
+	public void readFromNBT(NBTTagCompound nbt) {
+//		this.localnbt = nbt;
+		int size = nbt.getInteger( "numOfCells");
+		for( int i=0; i<size; i++) {
+			NBTTagCompound cellnbt = nbt.getCompoundTag( "Cell"+i);
+			int[] chunk = cellnbt.getIntArray( "chunk");
+			ChunkPos pos = new ChunkPos( chunk[0] ,chunk[1]);
+			AtmosCell cell = getCell( pos);
+			cell.muir.readFromNBT( cellnbt);
+			cell.needsUpdated = cellnbt.getBoolean( "update");
+		}
+		
+	}
+
+
+
+	@Override
+	public String getDataName() {
+		return "atmosphere";
 	}
 	
 
@@ -231,10 +306,13 @@ public class Atmosphere {
 
 
 
-class AtmosCell{
-	
+class AtmosCell{	
 	public boolean needsUpdated = false;
 	public Muir muir = Muir.empty();
+//	public boolean needsSaved = false;
+	
+	
+
 	
 }
 

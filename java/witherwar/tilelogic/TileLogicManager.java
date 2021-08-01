@@ -22,7 +22,15 @@ import witherwar.disk.TeinteWorldSavedData;
 
 public class TileLogicManager extends NBTSaveObject{
 
-	private static final ArrayList<TileLogic> logicClasses = new ArrayList<>();; 
+	private static final ArrayList<TileLogic> logicClasses = new ArrayList<>();
+	
+	
+	
+	static {
+		TileLogicManager.registerClass( new MuirGeyserTile());
+		TileLogicManager.registerClass( new RitualBlockTile());
+	}
+	
 
 	
 	private HashMap<BlockPos ,TileLogic> tiles;
@@ -121,6 +129,7 @@ public class TileLogicManager extends NBTSaveObject{
 				}
 			}
 		}
+		System.out.println( "COULDN'T FIND TILE CLASS");
 		return null;
 	}
 	

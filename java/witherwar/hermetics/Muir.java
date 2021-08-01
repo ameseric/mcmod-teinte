@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
 
 
@@ -30,7 +31,7 @@ public class Muir {
 		for( MuirElement e : elements.keySet()) {
 			add( e ,elements.get(e));
 		}
-	}	
+	}
 	public Muir() {}
 
 	
@@ -47,6 +48,7 @@ public class Muir {
 		int newAmount = amount(e) + amount;
 		this.elements.put( e ,newAmount);
 	}
+
 	
 	
 	public void subtract( MuirElement e ,int amount) {
@@ -169,14 +171,8 @@ public class Muir {
 	 */
 	public boolean exchangeWith( Muir m) {
 		boolean valueChange = false;
-		int myPressure = this.getTotalAmount();
-		int theirPressure = m.getTotalAmount();
 		
 		for( MuirElement e : MuirElement.values()) {
-			//who has greater E amount
-			//calculate diffusion based on pressures
-			//check that amount can be honored
-			//transfer
 			
 			Muir giver = this;
 			Muir receiver = m;
@@ -187,28 +183,14 @@ public class Muir {
 				diff = -diff;
 			}
 			
-			if( giver.pressure() > receiver.pressure()) {
+			if( giver.pressure() >= receiver.pressure()) {
 				int delta = diffusionValue( giver.pressure() ,receiver.pressure() ,diff);
-				if( delta > 25) {
+				if( delta > 5) {
 					giver.subtract( e ,delta);
 					receiver.add( e ,delta);
 					valueChange = true;
 				}
 			}
-//			
-//			int diff = amount(e) - m.amount(e);
-//			
-//			if( diff >= DIFFUSION_THRESHOLD && myPressure > theirPressure ) {
-//				int delta = diffusionValue( myPressure ,theirPressure);
-//				this.subtract( e ,delta);
-//				m.add( e ,delta);
-//				valueChange = true;
-//			}else if( diff <= -DIFFUSION_THRESHOLD && myPressure < theirPressure) {
-//				int delta = diffusionValue( theirPressure ,myPressure);
-//				this.add( e ,delta);
-//				m.subtract( e ,delta);
-//				valueChange = true;
-//			}
 			
 			
 //			if( Math.abs( diff) > 8000) {
@@ -268,6 +250,29 @@ public class Muir {
 	
 	public static Muir empty() {
 		return new Muir();
+	}
+	
+	
+	public void readFromNBT( NBTTagCompound nbt) {
+		int[] a = nbt.getIntArray( "muir");
+		int i = 0;
+		for( MuirElement e : MuirElement.values()) {
+			this.elements.put( e, a[i]);
+			i++;
+		}
+	}
+	
+	
+	
+	public NBTTagCompound writeToNBT( NBTTagCompound nbt) {
+		int[] a = new int[8];
+		int i = 0;
+		for( MuirElement e : MuirElement.values()) {
+			a[i] = amount( e);
+			i++;
+		}
+		nbt.setIntArray( "muir" ,a);
+		return nbt;
 	}
 	
 	

@@ -4,6 +4,7 @@ package witherwar.proxy;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderGhast;
 import net.minecraft.client.renderer.entity.RenderWitherSkeleton;
@@ -11,6 +12,8 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent.Load;
@@ -22,13 +25,18 @@ import witherwar.ObjectCatalog.NewBlock;
 import witherwar.entity.DroneEntity;
 import witherwar.entity.GhastTestEntity;
 import witherwar.entity.WitherSkeletonTestEntity;
-import witherwar.gui.GuiEditGuidestone;
+import witherwar.gui.GuidestoneGUI;
 import witherwar.gui.TeinteGUI;
 import witherwar.models.DroneRender;
+import witherwar.particle.MuirParticle;
+import witherwar.particle.ParticleCustom;
 
 public class ClientOnlyProxy implements Proxy{
+	
 	public static TeinteGUI teinteGUI;
-	public static KeyBinding dashKeybind = new KeyBinding("key.dash.desc", Keyboard.KEY_P, "key.magicbeans.teinte");
+	public static final KeyBinding dashKeybind = new KeyBinding("key.dash.desc", Keyboard.KEY_P, "key.magicbeans.teinte");
+	private static final ParticleCustom.TextureDefinition td = new ParticleCustom.TextureDefinition( "no_asset_default");
+
 
 	
 //	private HashMap< Class<? extends Entity> ,Class<? extends Render>> entityRenderTable = new HashMap<>();
@@ -85,7 +93,7 @@ public class ClientOnlyProxy implements Proxy{
 	@Override
 	public void openGui(int ID ,IMessage msg) {
 		if( ID == 0) {
-			Minecraft.getMinecraft().displayGuiScreen( new GuiEditGuidestone( msg));
+			Minecraft.getMinecraft().displayGuiScreen( new GuidestoneGUI( msg));
 		}
 		
 	}
@@ -117,6 +125,43 @@ public class ClientOnlyProxy implements Proxy{
 		
 	}
 
+
+
+
+	@Override
+	public void renderMuirParticles(float density, Vec3d color) {
+		float count = 10;
+		float step = 1.0f/count;
+				
+		Minecraft mc = Minecraft.getMinecraft();
+		
+		if(mc.world != null && density > 0) {
+			BlockPos pos = mc.player.getPosition();
+			
+			for( float i=step; i<=1.0; i=i+step) {
+				if( density >= i) {
+					mc.effectRenderer.addEffect( 
+							new MuirParticle( td ,mc.world 
+									,pos.getX() + mc.world.rand.nextGaussian()*16 
+									,pos.getY() + mc.world.rand.nextGaussian()*3
+									,pos.getZ() + mc.world.rand.nextGaussian()*16
+									,color));
+				}
+			}
+			
+			
+							
+		}
+	}
+
 	
 
 }
+
+
+
+
+
+
+
+
