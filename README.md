@@ -1,3 +1,3 @@
 # mcmod-teinte
 
-Minecraft modification focused on simple RTS AI factions and auto-mapping world regions for naming purposes.
+Collection of minecraft modifications dealing with resource-focused AI, basic chemical system, procedural structures, and other assorted tweaks.
