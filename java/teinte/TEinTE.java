@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -203,44 +205,44 @@ public class TEinTE
     public void _onFogRender(EntityViewRenderEvent.RenderFogEvent event) {
     	
     	
-//    	Entity player = event.getEntity();
-//    	BlockPos pos = player.getPosition();
-////    	if( pos.getY() > TEinTE.DEPTH_CUTOFF) {
-//    	
-//	        float f = event.getFarPlaneDistance();        
+    	Entity player = event.getEntity();
+    	BlockPos pos = player.getPosition();
+    	if( pos.getY() > TEinTE.DEPTH_CUTOFF) {
+    	
+	        float f = event.getFarPlaneDistance();        
 //	        	
 	    	this.currentFogDensity = transitionATowardsB( this.currentFogDensity ,this.newFogDensity ,0.00005f);
-//	    	
-//	  	
-//	    	
-//	    	float segment = f * 0.75f;
-//	    	float delta34 = segment * clampTo1f(this.currentFogDensity * 2.86f);
-//	    	float delta60 = segment * clampTo1f(this.currentFogDensity * 1.67f);
-//	    	float delta100 = (f*0.5f) * this.currentFogDensity;
-//	    			
-//	    	
-//	        if(event.getFogMode() == -1) { //sky fogs quickly, completely //TODO try experimenting with this normal again
-//	        	this.fogRenderCount = 1;
-//		        GlStateManager.setFogStart( 0f);
-//	        	GlStateManager.setFogEnd( f - (delta34*1.3f));
-//	        }else if( this.fogRenderCount == 3){ //clouds fog completely
-//		        GlStateManager.setFogStart( (f * 0.75f) - delta34);
-//	        	GlStateManager.setFogEnd( f - (delta60*1.3f));
-//	
-//	        }else {
-//		        GlStateManager.setFogStart( (f * 0.75f) - (delta34*1.2f));
-//	        	GlStateManager.setFogEnd( (f-10) - delta100); //cap out at 1.0, @50% //move far plane in to help hide pop-in?
-//	        }        
-//        
-//    
-//	        this.fogRenderCount++;
-//    	}else {
-//    		GlStateManager.setFog( GlStateManager.FogMode.EXP);
-//    		float density = ( 1 - (pos.getY() / (float) TEinTE.DEPTH_CUTOFF)) * 0.2f;
-//    		GlStateManager.setFogDensity( 0.15f);
-//    		Atmosphere.displayAtmosphericParticles( player ,0.4f);
-//    	}
-//		Atmosphere.displayAtmosphericParticles( player ,1f);
+	    	
+	  	
+	    	
+	    	float segment = f * 0.75f;
+	    	float delta34 = segment * clampTo1f(this.currentFogDensity * 2.86f);
+	    	float delta60 = segment * clampTo1f(this.currentFogDensity * 1.67f);
+	    	float delta100 = (f*0.5f) * this.currentFogDensity;
+	    			
+	    	
+	        if(event.getFogMode() == -1) { //sky fogs quickly, completely //TODO try experimenting with this normal again
+	        	this.fogRenderCount = 1;
+		        GlStateManager.setFogStart( 0f);
+	        	GlStateManager.setFogEnd( f - (delta34*1.3f));
+	        }else if( this.fogRenderCount == 3){ //clouds fog completely
+		        GlStateManager.setFogStart( (f * 0.75f) - delta34);
+	        	GlStateManager.setFogEnd( f - (delta60*1.3f));
+	
+	        }else {
+		        GlStateManager.setFogStart( (f * 0.75f) - (delta34*1.2f));
+	        	GlStateManager.setFogEnd( (f-10) - delta100); //cap out at 1.0, @50% //move far plane in to help hide pop-in?
+	        }        
+        
+    
+	        this.fogRenderCount++;
+    	}else {
+    		GlStateManager.setFog( GlStateManager.FogMode.EXP);
+    		float density = ( 1 - (pos.getY() / (float) TEinTE.DEPTH_CUTOFF)) * 0.2f;
+    		GlStateManager.setFogDensity( density);
+    		Atmosphere.displayAtmosphericParticles( player ,0.4f);
+    	}
+		Atmosphere.displayAtmosphericParticles( player ,1f);
 
 
     }
@@ -265,26 +267,24 @@ public class TEinTE
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void _onFogColor( EntityViewRenderEvent.FogColors event) {
-//    	BlockPos pos = event.getEntity().getPosition();
-//    	float blue ,green ,red;
-//    	
-////    	if( pos.getY() > TEinTE.DEPTH_CUTOFF) {    	
-//	    	blue = transitionATowardsB( (float) this.currentFogColor.z ,(float) this.newFogColor.z ,0.0005f);
-//	    	green = transitionATowardsB( (float) this.currentFogColor.y ,(float) this.newFogColor.y ,0.0005f);
-//	    	red = transitionATowardsB( (float) this.currentFogColor.x ,(float) this.newFogColor.x ,0.0005f);
-//	    	this.currentFogColor = new Vec3d( red ,green ,blue);
-//	    	
-//
-////    	}else {
-////    		float depth = ( (pos.getY() / (float) TEinTE.DEPTH_CUTOFF)) * -0.3f;
-////    		blue = red = green = 0.1f; 
-////    	}
-//	    event.setBlue( 	event.getBlue() + blue );
-//	    event.setGreen( event.getGreen() + green);
-//	    event.setRed( event.getRed() + red);
-//	    System.out.println( event.getRed());
-//	    System.out.println( event.getGreen());
-//	    System.out.println( event.getBlue());
+    	BlockPos pos = event.getEntity().getPosition();
+    	float blue ,green ,red;
+    	
+//    	if( pos.getY() > TEinTE.DEPTH_CUTOFF) {    	
+	    	blue = transitionATowardsB( (float) this.currentFogColor.z ,(float) this.newFogColor.z ,0.0005f);
+	    	green = transitionATowardsB( (float) this.currentFogColor.y ,(float) this.newFogColor.y ,0.0005f);
+	    	red = transitionATowardsB( (float) this.currentFogColor.x ,(float) this.newFogColor.x ,0.0005f);
+	    	this.currentFogColor = new Vec3d( red ,green ,blue);
+	    	
+
+//    	}else {
+//    		float depth = ( (pos.getY() / (float) TEinTE.DEPTH_CUTOFF)) * -0.3f;
+//    		blue = red = green = 0.1f; 
+//    	}
+	    event.setBlue( 	event.getBlue() + blue );
+	    event.setGreen( event.getGreen() + green);
+	    event.setRed( event.getRed() + red);
+
     }
     
     //TODO: move?

@@ -1,18 +1,11 @@
 package teinte.disk;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 import teinte.TEinTE;
-import teinte.region.RegionManager;
-import teinte.system.SystemBlockDegrade;
-import teinte.system.SystemPower;
 import teinte.utility.Tickable;
 
 /**
@@ -23,7 +16,6 @@ import teinte.utility.Tickable;
  *
  *	All TEinTE mod data that needs to be "manually" saved is done here, through an instance of this object.
  *  
- *  Includes RegionMap, BlockDegradation, Power, ...
  */
 
 
@@ -34,12 +26,10 @@ public class TeinteWorldSavedData extends WorldSavedData implements Tickable{
 	private static final String DATA_NAME = TEinTE.MODID + "_SaveData";
 	
 	
-	//private ArrayList<NBTSaveFormat> objectsForReadWrite = new ArrayList<>();
 	private NBTSaveObject[] objectsForReadWrite;
 	
 	private NBTTagCompound nbtcopy;
 	
-	//private HashMap<String,NBTTagCompound> systemDataToSave;
 	
 
 	//DO NOT USE; Not actually for public use, but forge API needs to call it. 
